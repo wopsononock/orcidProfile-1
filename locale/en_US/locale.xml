@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * plugins/generic/orcidPlugin/locale/en_US/locale.xml
+  *
+  * Copyright (c) 2015 University of Pittsburgh
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * ORCID Profile plugin localization strings
+  -->
+ 
+<locale name="en_US" full_name="U.S. English">
+
+	<message key="plugins.generic.orcidPlugin.displayName">ORCID Profile Plugin</message>
+	<message key="plugins.generic.orcidPlugin.description"><![CDATA[Allows OJS to import profile information from ORCID.]]></message>
+
+</locale>
