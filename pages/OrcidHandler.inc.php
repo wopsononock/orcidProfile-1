@@ -49,14 +49,13 @@ class OrcidHandler extends Handler {
 				}
 			} else {
 				// orcid query
-/* TODO: FIXME
 				import('lib.pkp.classes.validation.ValidatorORCID');
 				$validator = new ValidatorORCID();
 				if ($validator->isValid($params['q'])) {
+					$orcid = substr($params['q'], -19);
+				} else {
 					$orcid = $params['q'];
 				}
-*/
-				$orcid = $params['q'];
 			}
 			if ($orcid) {
 				$curl = curl_init();
@@ -77,6 +76,9 @@ class OrcidHandler extends Handler {
 		// TODO: switch back to JSON content-type
 		header('Content-type: application/json');
 		$return = array();
+		if ($orcid) {
+			$return['orcid'] = 'http://orcid.org/'.$orcid;
+		}
 		if (isset($json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value'])) {
 			$return['lastName'] = $json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value'];
 		}
@@ -100,11 +102,12 @@ class OrcidHandler extends Handler {
 			$return['email'] = $json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value'];
 		}
 		if (isset($json['orcid-profile']['orcid-bio']['researcher-urls']['researcher-url'][0]['url']['value'])) {
-			$return['url'] = $json['orcid-profile']['orcid-bio']['researcher-urls']['researcher-url'][0]['url']['value'];
+			$return['userUrl'] = $json['orcid-profile']['orcid-bio']['researcher-urls']['researcher-url'][0]['url']['value'];
 		}
 		if (isset($json['orcid-profile']['orcid-activities']['affiliations']['affiliation']['organization']['address']['country'])) {
 			$return['country'] = $json['orcid-profile']['orcid-activities']['affiliations']['affiliation']['organization']['address']['country'];
 		}
+		// TODO: this should be localized, and may need special treatment because of TinyMCE
 		if (isset($json['orcid-profile']['orcid-bio']['biography']['value'])) {
 			$return['biography'] = $json['orcid-profile']['orcid-bio']['biography']['value'];
 		}
