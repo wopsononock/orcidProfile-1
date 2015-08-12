@@ -26,13 +26,41 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled()) {
 			// Insert ORCID Profile for the Registration page
-			HookRegistry::register('Templates::User::Register', array($this, 'insertOrcidHtml'));
+			HookRegistry::register('Templates::User::Register::NewUser', array($this, 'insertOrcidHtml'));
 
 			// Insert ORCID Profile for the Registration page
 			HookRegistry::register('Templates::User::Profile', array($this, 'insertOrcidHtml'));
+
+			// Insert ORCID callback
+			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
 		}
 		return $success;
 	}
+
+	/**
+	 * Get page handler path for this plugin.
+	 * @return string Path to plugin's page handler
+	 */
+	function getHandlerPath() {
+		return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'pages';
+	}
+	
+	/**
+	 * Hook callback: register pages for each sushi-lite method
+	 * This URL is of the form: orcidapi/{$orcidrequest}
+	 * @see PKPPageRouter::route()
+	 */
+	function setupCallbackHandler($hookName, $params) {
+		$page = $params[0];
+		if ($this->getEnabled() && $page == 'orcidapi') {
+			define('HANDLER_CLASS', 'OrcidHandler');
+			AppLocale::requireComponents(LOCALE_COMPONENT_APPLICATION_COMMON);
+			$newop =& $params[1];
+			$newop = 'index';
+			$handlerFile =& $params[2];
+			$handlerFile = $this->getHandlerPath() . DIRECTORY_SEPARATOR . HANDLER_CLASS . '.inc.php';
+		}
+	}	 
 
 	function getDisplayName() {
 		return __('plugins.generic.orcidProfile.displayName');
@@ -44,6 +72,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 	/**
 	 * Extend the {url ...} smarty to support this plugin.
+	 */
 	function smartyPluginUrl($params, &$smarty) {
 		$path = array($this->getCategory(), $this->getName());
 		if (is_array($params['path'])) {
@@ -60,7 +89,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		return $smarty->smartyUrl($params, $smarty);
 	}
-	 */
 
 	/**
 	 * Set the page's breadcrumbs, given the plugin's tree of items
@@ -79,10 +107,16 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'user.role.manager'
 			)
 		);
-		if ($isSubclass) $pageCrumbs[] = array(
-			Request::url(null, 'manager', 'plugins'),
-			'manager.plugins'
-		);
+		if ($isSubclass) {
+			$pageCrumbs[] = array(
+				Request::url(null, 'manager', 'plugins'),
+				'manager.plugins'
+			);
+			$pageCrumbs[] = array(
+				Request::url(null, 'manager', 'plugins', 'generic'),
+				'plugins.categories.generic'
+			);
+		}
 
 		$templateMgr->assign('pageHierarchy', $pageCrumbs);
 	}
@@ -93,7 +127,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function getManagementVerbs() {
 		$verbs = array();
 		if ($this->getEnabled()) {
-			$verbs[] = array('settings', __('plugins.generic.orcidProfile.manager.settings'));
+			$verbs[] = array('settings', __('manager.plugins.settings'));
 		}
 		return parent::getManagementVerbs($verbs);
 	}
@@ -119,13 +153,20 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return boolean
 	 */
 	function manage($verb, $args, &$message, &$messageParams) {
-		if (!parent::manage($verb, $args, $message, $messageParams)) return false;
+		$journal =& Request::getJournal();
+		if (!parent::manage($verb, $args, $message, $messageParams)) {
+			if ($verb == 'enable' && !$this->getSetting($journal->getId(), 'orcidProfileAPIPath')) {
+				// default the 1.2 public API if no setting is present
+				$this->updateSetting($journal->getId(), 'orcidProfileAPIPath', 'http://pub.orcid.org/v1.2/', 'string');	
+			} else {
+				return false;
+			}
+		}
 
 		switch ($verb) {
 			case 'settings':
 				$templateMgr =& TemplateManager::getManager();
 				$templateMgr->register_function('plugin_url', array(&$this, 'smartyPluginUrl'));
-				$journal =& Request::getJournal();
 
 				$this->import('OrcidProfileSettingsForm');
 				$form = new OrcidProfileSettingsForm($this, $journal->getId());

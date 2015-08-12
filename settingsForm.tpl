@@ -21,10 +21,10 @@
 
 <table width="100%" class="data">
 	<tr valign="top">
-		<td width="20%" class="label">{fieldLabel name="orcidProfileAPIVersion" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIVersion"}</td>
-		<td width="80%" class="value"><input type="text" name="orcidProfileAPIVersion" id="orcidProfileAPIVersion" value="{$orcidProfileAPIVersion|escape}" size="15" maxlength="25" class="textField" />
+		<td width="20%" class="label">{fieldLabel name="orcidProfileAPIPath" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"}</td>
+		<td width="80%" class="value"><input type="text" name="orcidProfileAPIPath" id="orcidProfileAPIPath" value="{$orcidProfileAPIPath|escape}" size="40" class="textField" />
 			<br />
-			<span class="instruct">{translate key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIVersionInstructions"}</span>
+			<span class="instruct">{translate key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPathInstructions"}</span>
 		</td>
 	</tr>
 </table>

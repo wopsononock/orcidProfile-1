@@ -34,7 +34,7 @@ class OrcidProfileSettingsForm extends Form {
 
 		parent::Form($plugin->getTemplatePath() . 'settingsForm.tpl');
 
-		$this->addCheck(new FormValidator($this, 'orcidProfileAPIVersion', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIVersionRequired'));
+		$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
 	}
 
 	/**
@@ -45,7 +45,7 @@ class OrcidProfileSettingsForm extends Form {
 		$plugin =& $this->plugin;
 
 		$this->_data = array(
-			'orcidProfileAPIVersion' => $plugin->getSetting($journalId, 'orcidProfileAPIVersion'),
+			'orcidProfileAPIPath' => $plugin->getSetting($journalId, 'orcidProfileAPIPath'),
 		);
 	}
 
@@ -53,7 +53,7 @@ class OrcidProfileSettingsForm extends Form {
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('orcidProfileAPIVersion'));
+		$this->readUserVars(array('orcidProfileAPIPath'));
 	}
 
 	/**
@@ -63,7 +63,7 @@ class OrcidProfileSettingsForm extends Form {
 		$plugin =& $this->plugin;
 		$journalId = $this->journalId;
 
-		$plugin->updateSetting($journalId, 'orcidProfileAPIVersion', trim($this->getData('orcidProfileAPIVersion'), "\"\';"), 'string');
+		$plugin->updateSetting($journalId, 'orcidProfileAPIPath', trim($this->getData('orcidProfileAPIPath'), "\"\';"), 'string');
 	}
 }
 
