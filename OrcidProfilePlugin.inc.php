@@ -31,6 +31,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 			// Insert ORCID Profile for the Registration page
 			HookRegistry::register('Templates::User::Profile', array($this, 'insertOrcidHtml'));
 
+			// Insert ORCID Profile for the Manager
+			HookRegistry::register('Templates::Manager::User::Profile', array($this, 'insertOrcidHtml'));
+
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
 		}
