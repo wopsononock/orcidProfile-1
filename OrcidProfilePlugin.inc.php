@@ -142,6 +142,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$smarty =& $params[1];
 		$output =& $params[2];
 		$templateMgr =& TemplateManager::getManager();
+		$journal = Request::getJournal();
+
+		$templateMgr->assign(array(
+			'orcidProfileAPIPath' => $this->getSetting($journal->getId(), 'orcidProfileAPIPath'),
+			'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+		));
 
 		$output .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
 		return false;
