@@ -21,7 +21,33 @@ class OrcidHandler extends Handler {
 	 * @param $request Request
 	 */
 	function authorize($args, &$request) {
-		die("RECEIVED AUTHORIZATION CODE: " . Request::getUserVar('code'));
+		//die("RECEIVED AUTHORIZATION CODE: " . Request::getUserVar('code'));
+		define('OAUTH_TOKEN_URL', 'https://pub.orcid.org/oauth/token'); // public
+
+		//$router = Request::getRouter();
+                $journal = Request::getJournal(); //& $router->getContext($request);
+                $op = Request::getRequestedOp();
+                $plugin =& PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
+
+		// fetch the access token
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => OAUTH_TOKEN_URL,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_HTTPHEADER => array('Accept: application/json'),
+		  CURLOPT_POST => true,
+		  CURLOPT_POSTFIELDS => http_build_query(array(
+		    'code' => Request::getUserVar('code'),
+		    'grant_type' => 'authorization_code',
+		    'client_id' => $plugin->getSetting($journal->getId(), 'orcidClientId'),
+		    'client_secret' => $plugin->getSetting($journal->getId(), 'orcidClientSecret')
+		  ))
+		));
+		$result = curl_exec($curl);
+		//$info = curl_getinfo($curl);
+		$response = json_decode($result, true);
+		// ORCID = $response['orcid']
+		print_r($response);	
 	}
 
 	/**
