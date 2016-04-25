@@ -24,7 +24,7 @@ class OrcidHandler extends Handler {
 	function index($args, &$request) {
 		$router =& $request->getRouter();
 		$journal =& $router->getContext($request);
-		$op = Request::getRequestedOp(&$request);
+		$op = Request::getRequestedOp($request);
 		$plugin =& PluginRegistry::getPlugin('generic', 'OrcidProfilePlugin');
 		$params = $request->getQueryArray();
 		$json = array();
