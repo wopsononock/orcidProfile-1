@@ -46,6 +46,8 @@ class OrcidProfileSettingsForm extends Form {
 
 		$this->_data = array(
 			'orcidProfileAPIPath' => $plugin->getSetting($journalId, 'orcidProfileAPIPath'),
+			'orcidClientId' => $plugin->getSetting($journalId, 'orcidClientId'),
+			'orcidClientSecret' => $plugin->getSetting($journalId, 'orcidClientSecret'),
 		);
 	}
 
@@ -54,6 +56,8 @@ class OrcidProfileSettingsForm extends Form {
 	 */
 	function readInputData() {
 		$this->readUserVars(array('orcidProfileAPIPath'));
+		$this->readUserVars(array('orcidClientId'));
+		$this->readUserVars(array('orcidClientSecret'));
 	}
 
 	/**
@@ -64,6 +68,8 @@ class OrcidProfileSettingsForm extends Form {
 		$journalId = $this->journalId;
 
 		$plugin->updateSetting($journalId, 'orcidProfileAPIPath', trim($this->getData('orcidProfileAPIPath'), "\"\';"), 'string');
+		$plugin->updateSetting($journalId, 'orcidClientId', $this->getData('orcidClientId'), 'string');
+		$plugin->updateSetting($journalId, 'orcidClientSecret', $this->getData('orcidClientSecret'), 'string');
 	}
 }
 
