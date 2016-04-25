@@ -27,6 +27,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if ($success && $this->getEnabled()) {
 			// Insert ORCID Profile for the Registration page
 			HookRegistry::register('Templates::User::Register::NewUser', array($this, 'insertOrcidHtml'));
+			HookRegistry::register('Templates::User::Register::Form', array($this, 'insertOrcidBounce'));
 
 			// Insert ORCID Profile for the Registration page
 			HookRegistry::register('Templates::User::Profile', array($this, 'insertOrcidHtml'));
@@ -56,13 +57,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function setupCallbackHandler($hookName, $params) {
 		$page = $params[0];
 		if ($this->getEnabled() && $page == 'orcidapi') {
+			$this->import('pages/OrcidHandler');
 			define('HANDLER_CLASS', 'OrcidHandler');
-			AppLocale::requireComponents(LOCALE_COMPONENT_APPLICATION_COMMON);
-			$newop =& $params[1];
-			$newop = 'index';
-			$handlerFile =& $params[2];
-			$handlerFile = $this->getHandlerPath() . DIRECTORY_SEPARATOR . HANDLER_CLASS . '.inc.php';
+			return true;
 		}
+		return false;
 	}	 
 
 	function getDisplayName() {
@@ -139,6 +138,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Insert ORCID Profile HTML
 	 */
 	function insertOrcidHtml($hookName, $params) {
+		// Avoid re-presenting the form
+		if (Request::getUserVar('hideOrcid')) return false;
+
 		$smarty =& $params[1];
 		$output =& $params[2];
 		$templateMgr =& TemplateManager::getManager();
@@ -150,6 +152,21 @@ class OrcidProfilePlugin extends GenericPlugin {
 		));
 
 		$output .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
+		return false;
+	}
+
+	/**
+	 * Insert ORCID bounce HTML
+	 */
+	function insertOrcidBounce($hookName, $params) {
+		$smarty =& $params[1];
+		$output =& $params[2];
+		$output .= '<input type="hidden" name="orcidAuth" value="' . htmlspecialchars(Request::getUserVar('orcidAuth')) . '" />';
+		$output .= '<script type="text/javascript">
+		        $(document).ready(function(){ 
+				$(\'#orcid\').attr(\'readonly\', "true");
+			});
+		</script>';
 		return false;
 	}
 
