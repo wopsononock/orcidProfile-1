@@ -15,6 +15,14 @@
 import('classes.handler.Handler');
 
 class OrcidHandler extends Handler {
+	/**
+	 * Authorize handler
+	 * @param $args array
+	 * @param $request Request
+	 */
+	function authorize($args, &$request) {
+		die("RECEIVED AUTHORIZATION CODE: " . Request::getUserVar('code'));
+	}
 
 	/**
 	 * Index handler

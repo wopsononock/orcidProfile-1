@@ -15,7 +15,7 @@
 	<input type="hidden" name="client_id" value="{$orcidClientId|escape}" />
 	<input type="hidden" name="response_type" value="code" />
 	<input type="hidden" name="scope" value="/authenticate" />
-	<input type="hidden" name="redirect_uri" value="{url page="orcidapi"}" />
+	<input type="hidden" name="redirect_uri" value="{url page="orcidapi" op="authorize"}" />
 	<input type="submit" value="{translate key='plugins.generic.orcidProfile.submitAction'}" />
 </form>
 <hr />
