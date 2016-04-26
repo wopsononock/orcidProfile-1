@@ -14,6 +14,5 @@
 	<input type="hidden" name="scope" value="/authenticate" />
 	<input type="hidden" name="redirect_uri" value="{url page="orcidapi" op="orcidAuthorize" targetOp=$targetOp}" />
 	<button type='submit' form='orcidProfileForm' id="connect-orcid-button" onclick="openORCID()"><img id="orcid-id-logo" src="http://orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="{translate key='plugins.generic.orcidProfile.submitAction'}"/>Create or Connect your ORCID iD</button>
-	<!-- <input type="submit" value="{translate key='plugins.generic.orcidProfile.submitAction'}" /> -->
 </form>
 <hr />
