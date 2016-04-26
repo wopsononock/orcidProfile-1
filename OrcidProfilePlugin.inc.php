@@ -91,6 +91,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$journal = Request::getJournal();
+			$templateMgr->assign('targetOp', 'register');
 
 			if (!Request::getUserVar('hideOrcid')) {
 				// Entering the registration without ORCiD; present the button.
@@ -116,7 +117,40 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$output = $newOutput;
 			}
 		}
-		$templateMgr->unregister_outputfilter('registrationOutputFilter');
+		$templateMgr->unregister_outputfilter('registrationFilter');
+		return $output;
+	}
+
+	/**
+	 * Output filter adds ORCiD interaction to user profile form.
+	 * @param $output string
+	 * @param $templateMgr TemplateManager
+	 * @return $string
+	 */
+	function profileFilter($output, &$templateMgr) {
+		if (preg_match('/<form id="profile"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+			$match = $matches[0][0];
+			$offset = $matches[0][1];
+			$journal = Request::getJournal();
+			$templateMgr->assign('targetOp', 'profile');
+
+			// Entering the registration without ORCiD; present the button.
+			$templateMgr->assign(array(
+				'orcidProfileAPIPath' => $this->getSetting($journal->getId(), 'orcidProfileAPIPath'),
+				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+			));
+
+			$newOutput = substr($output, 0, $offset);
+			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
+			$newOutput .= '<script type="text/javascript">
+			        $(document).ready(function() {
+					$(\'#orcid\').attr(\'readonly\', "true");
+				});
+			</script>';
+			$newOutput .= substr($output, $offset);
+			$output = $newOutput;
+		}
+		$templateMgr->unregister_outputfilter('profileFilter');
 		return $output;
 	}
 

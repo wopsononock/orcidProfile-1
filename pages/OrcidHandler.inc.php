@@ -56,14 +56,26 @@ class OrcidHandler extends Handler {
 			$json = json_decode($result, true);
 		}
 
-		Request::redirect(null, 'user', 'register', null, array(
-			'firstName' => $json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value'],
-			'lastName' => $json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value'],
-			'email' => $json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value'],
-			'orcid' => $response['orcid'],
-			'hideOrcid' => true
-		));
-		
+		switch (Request::getUserVar('targetOp')) {
+			case 'register':
+				// Registration process: Pre-fill the reg form from the ORCiD data
+				Request::redirect(null, 'user', 'register', null, array(
+					'firstName' => $json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value'],
+					'lastName' => $json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value'],
+					'email' => $json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value'],
+					'orcid' => $response['orcid'],
+					'hideOrcid' => true
+				));
+				break;
+			case 'profile':
+				// Set the ORCiD in the user profile from the response
+				$user = $request->getUser();
+				$user->setData('orcid', $response['orcid']);
+				$userDao = DAORegistry::getDAO('UserDAO');
+				$userDao->updateUser($user);
+				Request::redirect(null, 'user', 'profile');
+				break;
+		}
 	}
 }
 
