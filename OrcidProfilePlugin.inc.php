@@ -37,6 +37,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
+			
+			// Send emails to authors without ORCID id upon submission
+			HookRegistry::register('Author::Form::Submit::AuthorSubmitStep3Form::Execute', array($this, 'collectAuthorOrcidId'));			
+			
 		}
 		return $success;
 	}
@@ -212,6 +216,49 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$templateMgr->unregister_outputfilter('submitFilter');
 		return $output;
 	}
+	
+	/**
+	 * Output filter adds ORCiD interaction to the 3rd step submission form.
+	 * @param $output string
+	 * @param $templateMgr TemplateManager
+	 * @return $string
+	 */	
+	function collectAuthorOrcidId($hookName, $params) {
+		
+		$author =& $params[0];
+		$formAuthor =& $params[1];
+		
+		// if author has no orcid id
+		if ($author->getData('orcid')){
+			
+			$mail =& $this->getMailTemplate('ORCID_COLLECT_AUTHOR_ID');
+
+			$orcidToken = md5(time());
+			$author->setData('orcidToken', $orcidToken);
+					
+			$request =& PKPApplication::getRequest();
+			$context = $request->getContext();
+					
+			$authorOrcidUrl = $this->getOauthPath()."?".http_build_query(array(
+				'client_id' => $plugin->getSetting($journalId, 'orcidClientId'),
+				'response_type' => 'code',
+				'scope' => '/authenticate',
+				'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken'=>$orcidToken, 'articleId'=>$author->getArticleId()));
+			));
+			
+			$mail->assignParams(
+				array('authorOrcidUrl' => $authorOrcidUrl, 'authorName' => $author->getFullName(), 'editorialContactSignature' => $context->getSetting('contactName'))
+			);
+			
+			// Send to author
+			$mail->addRecipient($site->getLocalizedContactEmail(), $site->getLocalizedContactName());
+
+			// Send the mail.
+			$mail->send($request);
+		
+		}
+		
+	}		
 
 	/**
 	 * @copydoc Plugin::getDisplayName()
