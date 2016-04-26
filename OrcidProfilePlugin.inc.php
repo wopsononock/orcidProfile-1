@@ -37,6 +37,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
+			// Add ORCID styles
+			HookRegistry::register('TemplateManager::display',array($this, 'callbackTemplateDisplay'));
 		}
 		return $success;
 	}
@@ -218,5 +220,28 @@ class OrcidProfilePlugin extends GenericPlugin {
 				return false;
 		}
 	}
+
+	/**
+         * @copydoc TemplateManager::display()
+         */
+        function callbackTemplateDisplay($hookName, $params) {
+                // Get request and context.
+                $request =& PKPApplication::getRequest();
+                $journal =& $request->getContext();
+
+                // Assign our private stylesheet.
+                $templateMgr =& $params[0];
+                $templateMgr->addStylesheet($request->getBaseUrl() . '/' . $this->getStyleSheet());
+
+                return false;
+        }
+
+	/**
+         * Return the location of the plugin's CSS file
+         * @return string
+         */
+        function getStyleSheet() {
+                return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'orcidProfile.css';
+        }
 }
 ?>
