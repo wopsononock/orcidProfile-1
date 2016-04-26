@@ -20,8 +20,11 @@
 	<message key="plugins.generic.orcidProfile.submitAction">Submit</message>
 	<message key="plugins.generic.orcidProfile.manager.orcidProfileSettings">ORCID Profile Settings</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.description">Configure the ORCID API for use in pulling ORCID profile information into the user profile.</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath">ORCID API Base URL</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPathInstructions">Include the base URL, version, and trailing slash, e.g.: http://pub.orcid.org/v1.2/</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath">ORCID API</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public">Public</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox">Public Sandbox</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member">Member</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox">Member Sandbox</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientId">Client ID</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
 </locale>

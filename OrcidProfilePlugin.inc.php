@@ -14,6 +14,13 @@
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 
+define('ORCID_OAUTH_URL', 'https://orcid.org/oauth/');
+define('ORCID_OAUTH_URL_SANDBOX', 'https://sandbox.orcid.org/oauth/');
+define('ORCID_API_URL_PUBLIC', 'https://pub.orcid.org/');
+define('ORCID_API_URL_PUBLIC_SANDBOX', 'https://pub.sandbox.orcid.org/');
+define('ORCID_API_URL_MEMBER', 'https://api.orcid.org/');
+define('ORCID_API_URL_MEMBER_SANDBOX', 'https://api.sandbox.orcid.org/');
+
 class OrcidProfilePlugin extends GenericPlugin {
 	/**
 	 * Called as a plugin is registered to the registry
@@ -85,6 +92,20 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
+	 * Return the OAUTH path (prod or sandbox) based on the current API configuration
+	 * @return $string
+	 */
+	function getOauthPath() {
+		$journal = Request::getJournal();
+		$apiPath =  $this->getSetting($journal->getId(), 'orcidProfileAPIPath');
+		if ($apiPath == ORCID_API_URL_PUBLIC || $apiPath == ORCID_API_URL_MEMBER) {
+			return ORCID_OAUTH_URL;
+		} else {
+			return ORCID_OAUTH_URL_SANDBOX;
+		}
+	}
+		
+	/**
 	 * Output filter adds ORCiD interaction to registration form.
 	 * @param $output string
 	 * @param $templateMgr TemplateManager
@@ -100,7 +121,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			if (!Request::getUserVar('hideOrcid')) {
 				// Entering the registration without ORCiD; present the button.
 				$templateMgr->assign(array(
-					'orcidProfileAPIPath' => $this->getSetting($journal->getId(), 'orcidProfileAPIPath'),
+					'orcidProfileOauthPath' => $this->getOauthPath(),
 					'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
 				));
 
@@ -140,7 +161,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
-				'orcidProfileAPIPath' => $this->getSetting($journal->getId(), 'orcidProfileAPIPath'),
+				'orcidProfileAPIPath' => $this->getOauthPath(),
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
 			));
 
@@ -173,7 +194,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
-				'orcidProfileAPIPath' => $this->getSetting($journal->getId(), 'orcidProfileAPIPath'),
+				'orcidProfileAPIPath' => $this->getOauthPath(),
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
 			));
 
@@ -280,7 +301,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (!parent::manage($verb, $args, $message, $messageParams)) {
 			if ($verb == 'enable' && !$this->getSetting($journal->getId(), 'orcidProfileAPIPath')) {
 				// default the 1.2 public API if no setting is present
-				$this->updateSetting($journal->getId(), 'orcidProfileAPIPath', 'http://pub.orcid.org/v1.2/', 'string');
+				$this->updateSetting($journal->getId(), 'orcidProfileAPIPath', ORCID_API_URL_PUBLIC, 'string');	
 			} else {
 				return false;
 			}
@@ -290,6 +311,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'settings':
 				$templateMgr =& TemplateManager::getManager();
 				$templateMgr->register_function('plugin_url', array(&$this, 'smartyPluginUrl'));
+				$apiOptions = array(
+					ORCID_API_URL_PUBLIC => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public',
+					ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox',
+					ORCID_API_URL_MEMBER => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member',
+					ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox'
+				);
+
+				$templateMgr->assign_by_ref('orcidApiUrls', $apiOptions);
 
 				$this->import('OrcidProfileSettingsForm');
 				$form = new OrcidProfileSettingsForm($this, $journal->getId());

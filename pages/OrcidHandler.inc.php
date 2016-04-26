@@ -21,7 +21,9 @@ class OrcidHandler extends Handler {
 	 * @param $request Request
 	 */
 	function orcidAuthorize($args, &$request) {
-		define('OAUTH_TOKEN_URL', 'https://pub.orcid.org/oauth/token'); // public
+		define('OAUTH_TOKEN_URL', 'oauth/token');
+		define('ORCID_API_VERSION_URL', 'v1.2/');
+		define('ORCID_API_VERSION_URL', 'orcid-profile');
 
 		$journal = Request::getJournal();
 		$op = Request::getRequestedOp();
@@ -30,7 +32,7 @@ class OrcidHandler extends Handler {
 		// fetch the access token
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => OAUTH_TOKEN_URL,
+			CURLOPT_URL => $plugin->getSetting($journal->getId(), 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 			CURLOPT_POST => true,
@@ -46,7 +48,7 @@ class OrcidHandler extends Handler {
 
 		curl_setopt_array($curl, array(
 			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_URL => 'http://pub.orcid.org/v1.2/' . htmlspecialchars($response['orcid']) . '/orcid-profile',
+			CURLOPT_URL =>  $plugin->getSetting($journal->getId(), 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($response['orcid']) . ORCID_PROFILE_URL,
 			CURLOPT_POST => false,
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 		));
