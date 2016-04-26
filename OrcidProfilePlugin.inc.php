@@ -230,7 +230,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$formAuthor =& $params[1];
 
 		// if author has no orcid id
-		if ($author->getData('orcid')){
+		if (!$author->getData('orcid')){
 			$mail =& $this->getMailTemplate('ORCID_COLLECT_AUTHOR_ID');
 
 			$orcidToken = md5(time());
@@ -240,7 +240,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$context = $request->getContext();
 
 			$authorOrcidUrl = $this->getOauthPath()."?".http_build_query(array(
-				'client_id' => $plugin->getSetting($journalId, 'orcidClientId'),
+				'client_id' => $this->getSetting($journalId, 'orcidClientId'),
 				'response_type' => 'code',
 				'scope' => '/authenticate',
 				'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken'=>$orcidToken, 'articleId'=>$author->getArticleId()))
@@ -257,6 +257,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$mail->send($request);
 
 		}
+		return false;
 	}
 
 	/**
@@ -410,5 +411,21 @@ class OrcidProfilePlugin extends GenericPlugin {
         function getStyleSheet() {
                 return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'orcidProfile.css';
         }
+
+        /**
+         * Instantiate a MailTemplate
+         *
+         * @param $emailKey string
+         * @param $journal Journal
+         */
+	function &getMailTemplate($emailKey, $journal = null) {
+		if (!isset($this->_mailTemplates[$emailKey])) {
+			import('classes.mail.MailTemplate');
+			$mailTemplate = new MailTemplate($emailKey, null, null, $journal, true, true);
+			$this->_mailTemplates[$emailKey] =& $mailTemplate;
+		}
+		return $this->_mailTemplates[$emailKey];
+	}
+
 }
 ?>
