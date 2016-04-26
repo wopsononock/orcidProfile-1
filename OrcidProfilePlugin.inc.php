@@ -25,14 +25,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$success = parent::register($category, $path);
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled()) {
-			// Register callback for Smarty filters
+			// Register callback for Smarty filters; add CSS
 			HookRegistry::register('TemplateManager::display', array(&$this, 'handleTemplateDisplay'));
 
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
-
-			// Add ORCID styles
-			HookRegistry::register('TemplateManager::display',array($this, 'callbackTemplateDisplay'));
 		}
 		return $success;
 	}
@@ -68,6 +65,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleTemplateDisplay($hookName, $args) {
 		$templateMgr =& $args[0];
 		$template =& $args[1];
+                $request =& PKPApplication::getRequest();
+
+                // Assign our private stylesheet.
+                $templateMgr->addStylesheet($request->getBaseUrl() . '/' . $this->getStyleSheet());
 
 		switch ($template) {
 			case 'user/register.tpl':
@@ -278,21 +279,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 				return false;
 		}
 	}
-
-	/**
-         * @copydoc TemplateManager::display()
-         */
-        function callbackTemplateDisplay($hookName, $params) {
-                // Get request and context.
-                $request =& PKPApplication::getRequest();
-                $journal =& $request->getContext();
-
-                // Assign our private stylesheet.
-                $templateMgr =& $params[0];
-                $templateMgr->addStylesheet($request->getBaseUrl() . '/' . $this->getStyleSheet());
-
-                return false;
-        }
 
 	/**
          * Return the location of the plugin's CSS file
