@@ -77,6 +77,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'user/profile.tpl':
 				$templateMgr->register_outputfilter(array(&$this, 'profileFilter'));
 				break;
+			case 'author/submit/step3.tpl':
+				$templateMgr->register_outputfilter(array(&$this, 'submitFilter'));
+				break;
 		}
 		return false;
 	}
@@ -152,6 +155,39 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$output = $newOutput;
 		}
 		$templateMgr->unregister_outputfilter('profileFilter');
+		return $output;
+	}
+
+	/**
+	 * Output filter adds ORCiD interaction to the 3rd step submission form.
+	 * @param $output string
+	 * @param $templateMgr TemplateManager
+	 * @return $string
+	 */
+	function submitFilter($output, &$templateMgr) {
+		if (preg_match('/<form id="submit"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+			$match = $matches[0][0];
+			$offset = $matches[0][1];
+			$journal = Request::getJournal();
+			$templateMgr->assign('targetOp', 'submit');
+
+			// Entering the registration without ORCiD; present the button.
+			$templateMgr->assign(array(
+				'orcidProfileAPIPath' => $this->getSetting($journal->getId(), 'orcidProfileAPIPath'),
+				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+			));
+
+			$newOutput = substr($output, 0, $offset);
+			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
+			$newOutput .= '<script type="text/javascript">
+			        $(document).ready(function() {
+					$(\'#orcid\').attr(\'readonly\', "true");
+				});
+			</script>';
+			$newOutput .= substr($output, $offset);
+			$output = $newOutput;
+		}
+		$templateMgr->unregister_outputfilter('submitFilter');
 		return $output;
 	}
 
