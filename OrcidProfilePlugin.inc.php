@@ -25,15 +25,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$success = parent::register($category, $path);
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled()) {
-			// Insert ORCID Profile for the Registration page
-			HookRegistry::register('Templates::User::Register::NewUser', array($this, 'insertOrcidHtml'));
-			HookRegistry::register('Templates::User::Register::Form', array($this, 'insertOrcidBounce'));
-
-			// Insert ORCID Profile for the Registration page
-			HookRegistry::register('Templates::User::Profile', array($this, 'insertOrcidHtml'));
-
-			// Insert ORCID Profile for the Manager
-			HookRegistry::register('Templates::Manager::User::Profile', array($this, 'insertOrcidHtml'));
+			// Register callback for Smarty filters
+			HookRegistry::register('TemplateManager::display', array(&$this, 'handleTemplateDisplay'));
 
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
@@ -50,7 +43,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function getHandlerPath() {
 		return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'pages';
 	}
-	
+
 	/**
 	 * Hook callback: register pages for each sushi-lite method
 	 * This URL is of the form: orcidapi/{$orcidrequest}
@@ -64,7 +57,65 @@ class OrcidProfilePlugin extends GenericPlugin {
 			return true;
 		}
 		return false;
-	}	 
+	}
+
+	/**
+	 * Hook callback: register output filter to add data citation to submission
+	 * summaries; add data citation to reading tools' suppfiles and metadata views.
+	 * @see TemplateManager::display()
+	 */
+	function handleTemplateDisplay($hookName, $args) {
+		$templateMgr =& $args[0];
+		$template =& $args[1];
+
+		switch ($template) {
+			case 'user/register.tpl':
+				$templateMgr->register_outputfilter(array(&$this, 'registrationFilter'));
+				break;
+		}
+		return false;
+	}
+
+	/**
+	 * Output filter adds data citation to submission summary.
+	 * @param $output string
+	 * @param $templateMgr TemplateManager
+	 * @return $string
+	 */
+	function registrationFilter($output, &$templateMgr) {
+		if (preg_match('/<form id="registerForm"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+			$match = $matches[0][0];
+			$offset = $matches[0][1];
+			$templateMgr = TemplateManager::getManager();
+			$journal = Request::getJournal();
+
+			if (!Request::getUserVar('hideOrcid')) {
+				// Entering the registration without ORCiD; present the button.
+				$templateMgr->assign(array(
+					'orcidProfileAPIPath' => $this->getSetting($journal->getId(), 'orcidProfileAPIPath'),
+					'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+				));
+
+				$newOutput = substr($output, 0, $offset);
+				$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
+				$newOutput .= substr($output, $offset);
+				$output = $newOutput;
+			} else {
+				// If we're returning from an ORCiD auth process, alter the form.
+				$newOutput = substr($output, 0, $offset) . $match;
+				$newOutput .= '<input type="hidden" name="orcidAuth" value="' . htmlspecialchars(Request::getUserVar('orcidAuth')) . '" />';
+				$newOutput .= '<script type="text/javascript">
+				        $(document).ready(function() {
+						$(\'#orcid\').attr(\'readonly\', "true");
+					});
+				</script>';
+				$newOutput .= substr($output, $offset + strlen($match));
+				$output = $newOutput;
+			}
+		}
+		$templateMgr->unregister_outputfilter('registrationOutputFilter');
+		return $output;
+	}
 
 	function getDisplayName() {
 		return __('plugins.generic.orcidProfile.displayName');
@@ -137,42 +188,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	 * Insert ORCID Profile HTML
-	 */
-	function insertOrcidHtml($hookName, $params) {
-		// Avoid re-presenting the form
-		if (Request::getUserVar('hideOrcid')) return false;
-
-		$smarty =& $params[1];
-		$output =& $params[2];
-		$templateMgr =& TemplateManager::getManager();
-		$journal = Request::getJournal();
-
-		$templateMgr->assign(array(
-			'orcidProfileAPIPath' => $this->getSetting($journal->getId(), 'orcidProfileAPIPath'),
-			'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
-		));
-
-		$output .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
-		return false;
-	}
-
-	/**
-	 * Insert ORCID bounce HTML
-	 */
-	function insertOrcidBounce($hookName, $params) {
-		$smarty =& $params[1];
-		$output =& $params[2];
-		$output .= '<input type="hidden" name="orcidAuth" value="' . htmlspecialchars(Request::getUserVar('orcidAuth')) . '" />';
-		$output .= '<script type="text/javascript">
-		        $(document).ready(function(){ 
-				$(\'#orcid\').attr(\'readonly\', "true");
-			});
-		</script>';
-		return false;
-	}
-
-	/**
 	 * Execute a management verb on this plugin
 	 * @param $verb string
 	 * @param $args array
@@ -185,7 +200,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (!parent::manage($verb, $args, $message, $messageParams)) {
 			if ($verb == 'enable' && !$this->getSetting($journal->getId(), 'orcidProfileAPIPath')) {
 				// default the 1.2 public API if no setting is present
-				$this->updateSetting($journal->getId(), 'orcidProfileAPIPath', 'http://pub.orcid.org/v1.2/', 'string');	
+				$this->updateSetting($journal->getId(), 'orcidProfileAPIPath', 'http://pub.orcid.org/v1.2/', 'string');
 			} else {
 				return false;
 			}
