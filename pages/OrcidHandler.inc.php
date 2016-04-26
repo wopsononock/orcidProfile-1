@@ -70,7 +70,7 @@ class OrcidHandler extends Handler {
 			case 'profile':
 				// Set the ORCiD in the user profile from the response
 				$user = $request->getUser();
-				$user->setData('orcid', $response['orcid']);
+				$user->setData('orcid', 'http://orcid.org/' . $response['orcid']);
 				$userDao = DAORegistry::getDAO('UserDAO');
 				$userDao->updateUser($user);
 				Request::redirect(null, 'user', 'profile');
