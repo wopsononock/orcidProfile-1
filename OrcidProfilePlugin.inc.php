@@ -427,5 +427,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return $this->_mailTemplates[$emailKey];
 	}
 
+	/**
+	 * Handle an author ORCiD claim
+	 * @param $args array
+	 * @param $request PKPRequest
+	 */
+	function orcidVerify($args, $request) {
+		die('Unimplemented. Got a hash: ' . Request::getUserVar('orcidToken'));
+	}
 }
 ?>
