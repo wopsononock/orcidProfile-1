@@ -410,5 +410,14 @@ class OrcidProfilePlugin extends GenericPlugin {
         function getStyleSheet() {
                 return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'orcidProfile.css';
         }
+
+	/**
+	 * Handle an author ORCiD claim
+	 * @param $args array
+	 * @param $request PKPRequest
+	 */
+	function orcidVerify($args, $request) {
+		die('Unimplemented. Got a hash: ' . Request::getUserVar('orcidToken'));
+	}
 }
 ?>
