@@ -30,6 +30,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
+
 			// Add ORCID styles
 			HookRegistry::register('TemplateManager::display',array($this, 'callbackTemplateDisplay'));
 		}
@@ -72,12 +73,15 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'user/register.tpl':
 				$templateMgr->register_outputfilter(array(&$this, 'registrationFilter'));
 				break;
+			case 'user/profile.tpl':
+				$templateMgr->register_outputfilter(array(&$this, 'profileFilter'));
+				break;
 		}
 		return false;
 	}
 
 	/**
-	 * Output filter adds data citation to submission summary.
+	 * Output filter adds ORCiD interaction to registration form.
 	 * @param $output string
 	 * @param $templateMgr TemplateManager
 	 * @return $string
@@ -86,7 +90,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (preg_match('/<form id="registerForm"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
-			$templateMgr = TemplateManager::getManager();
 			$journal = Request::getJournal();
 
 			if (!Request::getUserVar('hideOrcid')) {
@@ -117,10 +120,16 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return $output;
 	}
 
+	/**
+	 * @copydoc Plugin::getDisplayName()
+	 */
 	function getDisplayName() {
 		return __('plugins.generic.orcidProfile.displayName');
 	}
 
+	/**
+	 * @copydoc Plugin::getDescription()
+	 */
 	function getDescription() {
 		return __('plugins.generic.orcidProfile.description');
 	}
