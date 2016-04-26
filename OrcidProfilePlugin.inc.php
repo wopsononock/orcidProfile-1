@@ -405,19 +405,19 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-         * Return the location of the plugin's CSS file
-         * @return string
-         */
-        function getStyleSheet() {
-                return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'orcidProfile.css';
-        }
+	* Return the location of the plugin's CSS file
+	* @return string
+	*/
+	 function getStyleSheet() {
+		return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'orcidProfile.css';
+	 }
 
-        /**
-         * Instantiate a MailTemplate
-         *
-         * @param $emailKey string
-         * @param $journal Journal
-         */
+	/**
+	 * Instantiate a MailTemplate
+	 *
+	 * @param $emailKey string
+	 * @param $journal Journal
+	 */
 	function &getMailTemplate($emailKey, $journal = null) {
 		if (!isset($this->_mailTemplates[$emailKey])) {
 			import('classes.mail.MailTemplate');
@@ -427,13 +427,5 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return $this->_mailTemplates[$emailKey];
 	}
 
-	/**
-	 * Handle an author ORCiD claim
-	 * @param $args array
-	 * @param $request PKPRequest
-	 */
-	function orcidVerify($args, $request) {
-		die('Unimplemented. Got a hash: ' . Request::getUserVar('orcidToken'));
-	}
 }
 ?>
