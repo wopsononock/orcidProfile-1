@@ -37,10 +37,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
-			
+
 			// Send emails to authors without ORCID id upon submission
-			HookRegistry::register('Author::Form::Submit::AuthorSubmitStep3Form::Execute', array($this, 'collectAuthorOrcidId'));			
-			
+			HookRegistry::register('Author::Form::Submit::AuthorSubmitStep3Form::Execute', array($this, 'collectAuthorOrcidId'));
+
+			// Add ORCiD hash to author DAO
+			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'authorSubmitGetFieldNames'));
 		}
 		return $success;
 	}
@@ -108,7 +110,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			return ORCID_OAUTH_URL_SANDBOX;
 		}
 	}
-		
+
 	/**
 	 * Output filter adds ORCiD interaction to registration form.
 	 * @param $output string
@@ -207,7 +209,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
 			$newOutput .= '<button id="remove-orcid-button">Remove ORCID ID</button>
 <script>$("#remove-orcid-button").click(function(event) {
-	event.preventDefault(); 
+	event.preventDefault();
 	$("#authors-0-orcid").val("");
  });</script>';
 			$newOutput .= substr($output, $offset + strlen($match));
@@ -216,49 +218,57 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$templateMgr->unregister_outputfilter('submitFilter');
 		return $output;
 	}
-	
+
 	/**
 	 * Output filter adds ORCiD interaction to the 3rd step submission form.
 	 * @param $output string
 	 * @param $templateMgr TemplateManager
 	 * @return $string
-	 */	
+	 */
 	function collectAuthorOrcidId($hookName, $params) {
-		
 		$author =& $params[0];
 		$formAuthor =& $params[1];
-		
+
 		// if author has no orcid id
 		if ($author->getData('orcid')){
-			
 			$mail =& $this->getMailTemplate('ORCID_COLLECT_AUTHOR_ID');
 
 			$orcidToken = md5(time());
 			$author->setData('orcidToken', $orcidToken);
-					
+
 			$request =& PKPApplication::getRequest();
 			$context = $request->getContext();
-					
+
 			$authorOrcidUrl = $this->getOauthPath()."?".http_build_query(array(
 				'client_id' => $plugin->getSetting($journalId, 'orcidClientId'),
 				'response_type' => 'code',
 				'scope' => '/authenticate',
 				'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken'=>$orcidToken, 'articleId'=>$author->getArticleId()));
 			));
-			
+
 			$mail->assignParams(
 				array('authorOrcidUrl' => $authorOrcidUrl, 'authorName' => $author->getFullName(), 'editorialContactSignature' => $context->getSetting('contactName'))
 			);
-			
+
 			// Send to author
 			$mail->addRecipient($site->getLocalizedContactEmail(), $site->getLocalizedContactName());
 
 			// Send the mail.
 			$mail->send($request);
-		
+
 		}
-		
-	}		
+	}
+
+	/**
+	 * Add the author hash storage to the author record
+	 * @param $hookName string
+	 * @param $params array
+	 */
+	function authorSubmitGetFieldNames($hookName, $params) {
+		$fields =& $params[1];
+		$fields[] = 'orcidToken';
+		return false;
+	}
 
 	/**
 	 * @copydoc Plugin::getDisplayName()
@@ -349,7 +359,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (!parent::manage($verb, $args, $message, $messageParams)) {
 			if ($verb == 'enable' && !$this->getSetting($journal->getId(), 'orcidProfileAPIPath')) {
 				// default the 1.2 public API if no setting is present
-				$this->updateSetting($journal->getId(), 'orcidProfileAPIPath', ORCID_API_URL_PUBLIC, 'string');	
+				$this->updateSetting($journal->getId(), 'orcidProfileAPIPath', ORCID_API_URL_PUBLIC, 'string');
 			} else {
 				return false;
 			}
