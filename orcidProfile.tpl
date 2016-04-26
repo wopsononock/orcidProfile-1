@@ -4,11 +4,10 @@
  * Copyright (c) 2015 University of Pittsburgh
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * ORCID Profile plugin settings
+ * ORCID Profile authorization form
  *
  *}
-<!-- FIXME: Use the API URL from the settings form. -->
-<form id="orcidProfileForm" action="https://orcid.org/oauth/authorize">
+<form id="orcidProfileForm" action="{$orcidProfileOauthPath|escape}authorize">
 	<input type="hidden" name="client_id" value="{$orcidClientId|escape}" />
 	<input type="hidden" name="response_type" value="code" />
 	<input type="hidden" name="scope" value="/authenticate" />

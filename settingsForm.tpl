@@ -22,10 +22,7 @@
 <table width="100%" class="data">
 	<tr valign="top">
 		<td width="20%" class="label">{fieldLabel name="orcidProfileAPIPath" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"}</td>
-		<td width="80%" class="value"><input type="text" name="orcidProfileAPIPath" id="orcidProfileAPIPath" value="{$orcidProfileAPIPath|escape}" size="40" class="textField" />
-			<br />
-			<span class="instruct">{translate key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPathInstructions"}</span>
-		</td>
+		<td width="80%" class="value">{html_options_translate name="orcidProfileAPIPath" options=$orcidApiUrls selected=$orcidProfileAPIPath}</td>
 	</tr>
 	<tr valign="top">
 		<td class="label">{fieldLabel name="orcidClientId" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidClientId"}</td>
