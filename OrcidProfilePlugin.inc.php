@@ -251,7 +251,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			);
 
 			// Send to author
-			$mail->addRecipient($site->getLocalizedContactEmail(), $site->getLocalizedContactName());
+			$mail->addRecipient($author->getEmail(), $author->getFullName());
 
 			// Send the mail.
 			$mail->send($request);
