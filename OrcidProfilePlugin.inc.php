@@ -243,7 +243,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'client_id' => $plugin->getSetting($journalId, 'orcidClientId'),
 				'response_type' => 'code',
 				'scope' => '/authenticate',
-				'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken'=>$orcidToken, 'articleId'=>$author->getArticleId()));
+				'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken'=>$orcidToken, 'articleId'=>$author->getArticleId()))
 			));
 
 			$mail->assignParams(
