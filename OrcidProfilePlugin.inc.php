@@ -165,7 +165,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function submitFilter($output, &$templateMgr) {
-		if (preg_match('/<form id="submit"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+		if (preg_match('/<input type="text" class="textField" name="authors\[0\]\[orcid\][^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$journal = Request::getJournal();
@@ -177,14 +177,15 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
 			));
 
-			$newOutput = substr($output, 0, $offset);
+			$newOutput = substr($output, 0, $offset + strlen($match) - 1);
+			$newOutput .= ' readonly=\'readonly\'><br />';
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
-			$newOutput .= '<script type="text/javascript">
-			        $(document).ready(function() {
-					$(\'#orcid\').attr(\'readonly\', "true");
-				});
-			</script>';
-			$newOutput .= substr($output, $offset);
+			$newOutput .= '<button id="remove-orcid-button">Remove ORCID ID</button>
+<script>$("#remove-orcid-button").click(function(event) {
+	event.preventDefault(); 
+	$("#authors-0-orcid").val("");
+ });</script>';
+			$newOutput .= substr($output, $offset + strlen($match));
 			$output = $newOutput;
 		}
 		$templateMgr->unregister_outputfilter('submitFilter');
