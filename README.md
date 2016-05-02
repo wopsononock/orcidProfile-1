@@ -1,5 +1,7 @@
 # ORCID Profile Puller
 
+# NOTE: This plugin is a work in progress and not yet ready for production use.
+
 Plugin for PKP user profiles (tested with OJS 2.x)
 
 Copyright 2015 (c) University of Pittsburgh
