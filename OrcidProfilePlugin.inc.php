@@ -167,7 +167,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
-				'orcidProfileAPIPath' => $this->getOauthPath(),
+				'orcidProfileOauthPath' => $this->getOauthPath(),
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
 			));
 
