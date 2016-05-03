@@ -19,6 +19,7 @@ Licensed under GPL 2 or better.
  * Run `tools/upgrade.php upgrade` to allow the system to recognize the new plugin.
  * Enable this plugin within the administration interface.
  * Consider the settings within the administation interface.
+ * Apply https://github.com/pkp/ojs/commit/ee9de84713b2ce880a92a78ca751c104a9765d35 to your OJS installation
 
 ## Bugs/TODOs:
 
