@@ -65,7 +65,7 @@ class OrcidHandler extends Handler {
 					'firstName' => $json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value'],
 					'lastName' => $json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value'],
 					'email' => $json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value'],
-					'orcid' => $response['orcid'],
+					'orcid' => 'http://orcid.org/' . $response['orcid'],
 					'hideOrcid' => true
 				));
 				break;
