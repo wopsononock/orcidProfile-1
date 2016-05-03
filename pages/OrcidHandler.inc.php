@@ -23,9 +23,6 @@ class OrcidHandler extends Handler {
 	 * @param $request Request
 	 */
 	function orcidAuthorize($args, &$request) {
-		define('OAUTH_TOKEN_URL', 'oauth/token');
-		define('ORCID_API_VERSION_URL', 'v1.2/');
-		define('ORCID_API_VERSION_URL', 'orcid-profile');
 
 		$journal = Request::getJournal();
 		$op = Request::getRequestedOp();
@@ -79,6 +76,17 @@ class OrcidHandler extends Handler {
 				$userDao->updateUser($user);
 				Request::redirect(null, 'user', 'profile');
 				break;
+			case 'submit':
+				// Registration process: Pre-fill the reg form from the ORCiD data
+				Request::redirect(null, 'author', 'submit', array('3'), array(
+					'articleId' => Request::getUserVar('articleId'),
+					'firstName' => $json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value'],
+					'lastName' => $json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value'],
+					'email' => $json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value'],
+					'orcid' => 'http://orcid.org/' . $response['orcid'],
+					'hideOrcid' => true
+				));
+			default: assert(false);
 		}
 	}
 }

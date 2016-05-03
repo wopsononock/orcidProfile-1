@@ -23,6 +23,10 @@ define('ORCID_API_URL_PUBLIC_SANDBOX', 'https://pub.sandbox.orcid.org/');
 define('ORCID_API_URL_MEMBER', 'https://api.orcid.org/');
 define('ORCID_API_URL_MEMBER_SANDBOX', 'https://api.sandbox.orcid.org/');
 
+define('OAUTH_TOKEN_URL', 'oauth/token');
+define('ORCID_API_VERSION_URL', 'v1.2/');
+define('ORCID_PROFILE_URL', 'orcid-profile');
+
 class OrcidProfilePlugin extends GenericPlugin {
 	/**
 	 * Called as a plugin is registered to the registry
@@ -161,7 +165,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function profileFilter($output, &$templateMgr) {
-		if (preg_match('/<form id="profile"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+		if (preg_match('/<input[^>]+id="orcid"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$journal = Request::getJournal();
@@ -173,14 +177,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
 			));
 
-			$newOutput = substr($output, 0, $offset);
+			$newOutput = substr($output, 0, $offset+strlen($match));
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
 			$newOutput .= '<script type="text/javascript">
 			        $(document).ready(function() {
 					$(\'#orcid\').attr(\'readonly\', "true");
 				});
 			</script>';
-			$newOutput .= substr($output, $offset);
+			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
 		}
 		$templateMgr->unregister_outputfilter('profileFilter');
@@ -202,18 +206,19 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
-				'orcidProfileAPIPath' => $this->getOauthPath(),
+				'orcidProfileOauthPath' => $this->getOauthPath(),
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+				'params' => array('articleId' => Request::getUserVar('articleId')),
 			));
 
 			$newOutput = substr($output, 0, $offset + strlen($match) - 1);
 			$newOutput .= ' readonly=\'readonly\'><br />';
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
 			$newOutput .= '<button id="remove-orcid-button">Remove ORCID ID</button>
-<script>$("#remove-orcid-button").click(function(event) {
-	event.preventDefault();
-	$("#authors-0-orcid").val("");
- });</script>';
+				<script>$("#remove-orcid-button").click(function(event) {
+					event.preventDefault();
+					$("#authors-0-orcid").val("");
+				});</script>';
 			$newOutput .= substr($output, $offset + strlen($match));
 			$output = $newOutput;
 		}
