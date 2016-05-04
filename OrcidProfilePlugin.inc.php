@@ -128,31 +128,17 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$journal = Request::getJournal();
-			$templateMgr->assign('targetOp', 'register');
 
-			if (!Request::getUserVar('hideOrcid')) {
-				// Entering the registration without ORCiD; present the button.
-				$templateMgr->assign(array(
-					'orcidProfileOauthPath' => $this->getOauthPath(),
-					'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
-				));
+			$templateMgr->assign(array(
+				'targetOp' => 'register',
+				'orcidProfileOauthPath' => $this->getOauthPath(),
+				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+			));
 
-				$newOutput = substr($output, 0, $offset);
-				$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
-				$newOutput .= substr($output, $offset);
-				$output = $newOutput;
-			} else {
-				// If we're returning from an ORCiD auth process, alter the form.
-				$newOutput = substr($output, 0, $offset) . $match;
-				$newOutput .= '<input type="hidden" name="orcidAuth" value="' . htmlspecialchars(Request::getUserVar('orcidAuth')) . '" />';
-				$newOutput .= '<script type="text/javascript">
-				        $(document).ready(function() {
-						$(\'#orcid\').attr(\'readonly\', "true");
-					});
-				</script>';
-				$newOutput .= substr($output, $offset + strlen($match));
-				$output = $newOutput;
-			}
+			$newOutput = substr($output, 0, $offset);
+			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
+			$newOutput .= substr($output, $offset);
+			$output = $newOutput;
 		}
 		$templateMgr->unregister_outputfilter('registrationFilter');
 		return $output;
@@ -169,10 +155,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$journal = Request::getJournal();
-			$templateMgr->assign('targetOp', 'profile');
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
+				'targetOp' => 'profile',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
 			));
@@ -202,10 +188,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$journal = Request::getJournal();
-			$templateMgr->assign('targetOp', 'submit');
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
+				'targetOp' => 'submit',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
 				'params' => array('articleId' => Request::getUserVar('articleId')),
@@ -218,6 +204,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				<script>$("#remove-orcid-button").click(function(event) {
 					event.preventDefault();
 					$("#authors-0-orcid").val("");
+					$("#connect-orcid-button").show();
 				});</script>';
 			$newOutput .= substr($output, $offset + strlen($match));
 			$output = $newOutput;

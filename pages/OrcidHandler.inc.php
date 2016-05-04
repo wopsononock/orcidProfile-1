@@ -59,33 +59,31 @@ class OrcidHandler extends Handler {
 
 		switch (Request::getUserVar('targetOp')) {
 			case 'register':
-				// Registration process: Pre-fill the reg form from the ORCiD data
-				Request::redirect(null, 'user', 'register', null, array(
-					'firstName' => $json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value'],
-					'lastName' => $json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value'],
-					'email' => $json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value'],
-					'orcid' => 'http://orcid.org/' . $response['orcid'],
-					'hideOrcid' => true
-				));
+				echo '<html><body><script type="text/javascript">
+					opener.document.getElementById("firstName").value = ' . json_encode($json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value']) . ';
+					opener.document.getElementById("lastName").value = ' . json_encode($json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value']) . ';
+					opener.document.getElementById("email").value = ' . json_encode($json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value']) . ';
+					opener.document.getElementById("orcid").value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
+					opener.document.getElementById("connect-orcid-button").style.display = "none";
+					window.close();
+				</script></body></html>';
 				break;
 			case 'profile':
 				// Set the ORCiD in the user profile from the response
-				$user = $request->getUser();
-				$user->setData('orcid', 'http://orcid.org/' . $response['orcid']);
-				$userDao = DAORegistry::getDAO('UserDAO');
-				$userDao->updateUser($user);
-				Request::redirect(null, 'user', 'profile');
+				echo '<html><body><script type="text/javascript">
+					opener.document.getElementById("orcid").value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
+					opener.document.getElementById("connect-orcid-button").style.display = "none";
+					window.close();
+				</script></body></html>';
 				break;
 			case 'submit':
-				// Registration process: Pre-fill the reg form from the ORCiD data
-				Request::redirect(null, 'author', 'submit', array('3'), array(
-					'articleId' => Request::getUserVar('articleId'),
-					'firstName' => $json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value'],
-					'lastName' => $json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value'],
-					'email' => $json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value'],
-					'orcid' => 'http://orcid.org/' . $response['orcid'],
-					'hideOrcid' => true
-				));
+				// Submission process: Pre-fill the first author's ORCiD from the ORCiD data
+				echo '<html><body><script type="text/javascript">
+					opener.document.getElementById("authors-0-orcid").value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
+					opener.document.getElementById("connect-orcid-button").style.display = "none";
+					window.close();
+				</script></body></html>';
+				break;
 			default: assert(false);
 		}
 	}
