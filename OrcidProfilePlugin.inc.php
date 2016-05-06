@@ -233,23 +233,26 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$request =& PKPApplication::getRequest();
 			$context = $request->getContext();
 
-			$authorOrcidUrl = $this->getOauthPath()."?".http_build_query(array(
-				'client_id' => $this->getSetting($journalId, 'orcidClientId'),
-				'response_type' => 'code',
-				'scope' => '/authenticate',
-				'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken'=>$orcidToken, 'articleId'=>$author->getArticleId()))
-			));
+			$articleDao =& DAORegistry::getDAO('ArticleDAO');
+			$article =& $articleDao->getArticle($author->getSubmissionId());
 
-			$mail->assignParams(
-				array('authorOrcidUrl' => $authorOrcidUrl, 'authorName' => $author->getFullName(), 'editorialContactSignature' => $context->getSetting('contactName'))
-			);
+			$mail->assignParams(array(
+				'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
+					'client_id' => $this->getSetting($context->getId(), 'orcidClientId'),
+					'response_type' => 'code',
+					'scope' => '/authenticate',
+					'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()))
+				)),
+				'authorName' => $author->getFullName(),
+				'editorialContactSignature' => $context->getSetting('contactName'),
+				'articleTitle' => $article->getLocalizedTitle(),
+			));
 
 			// Send to author
 			$mail->addRecipient($author->getEmail(), $author->getFullName());
 
 			// Send the mail.
 			$mail->send($request);
-
 		}
 		return false;
 	}

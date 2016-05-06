@@ -23,7 +23,6 @@ class OrcidHandler extends Handler {
 	 * @param $request Request
 	 */
 	function orcidAuthorize($args, &$request) {
-
 		$journal = Request::getJournal();
 		$op = Request::getRequestedOp();
 		$plugin =& PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
@@ -86,6 +85,70 @@ class OrcidHandler extends Handler {
 				break;
 			default: assert(false);
 		}
+	}
+
+	/**
+	 * Verify an incoming author claim for an ORCiD association.
+	 * @param $args array
+	 * @param $request PKPRequest
+	 */
+	function orcidVerify($args, $request) {
+		$journal = Request::getJournal();
+		$op = Request::getRequestedOp();
+		$plugin =& PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
+		$templateMgr =& TemplateManager::getManager($request);
+
+		// fetch the access token
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+			CURLOPT_URL => $plugin->getSetting($journal->getId(), 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_HTTPHEADER => array('Accept: application/json'),
+			CURLOPT_POST => true,
+			CURLOPT_POSTFIELDS => http_build_query(array(
+				'code' => Request::getUserVar('code'),
+				'grant_type' => 'authorization_code',
+				'client_id' => $plugin->getSetting($journal->getId(), 'orcidClientId'),
+				'client_secret' => $plugin->getSetting($journal->getId(), 'orcidClientSecret')
+			))
+		));
+		$result = curl_exec($curl);
+		$response = json_decode($result, true);
+
+		if (!isset($response['orcid'])) {
+			$templateMgr->assign(array(
+				'currentUrl' => $request->url(null, 'index'),
+				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
+				'message' => 'plugins.generic.orcidProfile.authFailure',
+			));
+			$templateMgr->display('common/message.tpl');
+			exit();
+		}
+
+		$authorDao =& DAORegistry::getDAO('AuthorDAO');
+		$authors =& $authorDao->getAuthorsBySubmissionId($request->getUserVar('articleId'));
+		foreach ($authors as $author) {
+			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
+				$author->setData('orcid', 'http://orcid.org/' . $response['orcid']);
+				$author->setData('orcidToken', null);
+				$authorDao->updateAuthor($author);
+
+				$templateMgr->assign(array(
+					'currentUrl' => $request->url(null, 'index'),
+					'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
+					'message' => 'plugins.generic.orcidProfile.author.submission.success',
+				));
+				$templateMgr->display('common/message.tpl');
+				exit();
+			}
+		}
+
+		$templateMgr->assign(array(
+			'currentUrl' => $request->url(null, 'index'),
+			'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
+			'message' => 'plugins.generic.orcidProfile.author.submission.failure',
+		));
+		$templateMgr->display('common/message.tpl');
 	}
 }
 

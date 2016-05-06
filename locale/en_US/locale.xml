@@ -29,4 +29,8 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox">Member Sandbox</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientId">Client ID</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
+	<message key="plugins.generic.orcidProfile.author.submission">Submission ORCID</message>
+	<message key="plugins.generic.orcidProfile.author.submission.success">Your submission has successfully been associated with your ORCID.</message>
+	<message key="plugins.generic.orcidProfile.author.submission.failure">Your submission could not be successfully associated with your ORCID. Please contact the journal manager with your name, ORCID, and details of your submission.</message>
+	<message key="plugins.generic.orcidProfile.authFailure">OJS was not able to communicate with the ORCID service. Please contact the journal manager with your name, ORCID, and details of your submission.</message>
 </locale>
