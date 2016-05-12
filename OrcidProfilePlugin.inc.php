@@ -93,7 +93,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'user/register.tpl':
 				$templateMgr->register_outputfilter(array(&$this, 'registrationFilter'));
 				break;
-			case 'user/profile.tpl':
+			case 'user/publicProfileForm.tpl':
 				$templateMgr->register_outputfilter(array(&$this, 'profileFilter'));
 				break;
 			case 'author/submit/step3.tpl':
@@ -151,7 +151,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function profileFilter($output, &$templateMgr) {
-		if (preg_match('/<input[^>]+id="orcid"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$journal = Request::getJournal();
