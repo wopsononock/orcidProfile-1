@@ -2,6 +2,8 @@
 
 **NOTE: This plugin is a work in progress and not yet ready for production use.**
 
+**NOTE: Please ensure you're using the correct branch. Use the [master branch](https://github.com/asmecher/orcidProfile/tree/master) for OJS 3.0, and the [ojs-dev-2_4 branch](https://github.com/asmecher/orcidProfile/tree/ojs-dev-2_4) for OJS 2.4.x.**
+
 Plugin for PKP user profiles (tested with OJS 2.x)
 
 Copyright © 2015-2016 University of Pittsburgh
