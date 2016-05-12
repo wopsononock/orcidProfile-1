@@ -9,18 +9,22 @@
  * ORCID Profile plugin settings
  *
  *}
-{strip}
-{assign var="pageTitle" value="plugins.generic.orcidProfile.manager.orcidProfileSettings"}
-{include file="common/header.tpl"}
-{/strip}
 <div id="orcidProfileSettings">
 <div id="description">{translate key="plugins.generic.orcidProfile.manager.settings.description"}</div>
 
-<div class="separator"></div>
+<h3>{translate key="plugins.generic.webfeed.settings"}</h3>
 
-<form method="post" action="{plugin_url path="settings"}">
-{include file="common/formErrors.tpl"}
+<script>
+	$(function() {ldelim}
+		// Attach the form handler.
+		$('#orcidProfileSettingsForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
+	{rdelim});
+</script>
 
+<form class="pkp_form" id="orcidProfileSettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
+	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="orcidProfileSettingsFormNotification"}
+
+	{fbvFormArea id="orcidProfileSettingsFormArea"}
 <table width="100%" class="data">
 	<tr valign="top">
 		<td width="20%" class="label">{fieldLabel name="orcidProfileAPIPath" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"}</td>
@@ -36,9 +40,10 @@
 	</tr>
 </table>
 
-<input type="submit" name="save" class="button defaultButton" value="{translate key="common.save"}"/><input type="button" class="button" value="{translate key="common.cancel"}" onclick="history.go(-1)"/>
+	{/fbvFormArea}
+
+	{fbvFormButtons}
 </form>
 
 <p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 </div>
-{include file="common/footer.tpl"}
