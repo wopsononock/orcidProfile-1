@@ -19,3 +19,4 @@ function openORCID() {ldelim}
 </script>
 
 <button id="connect-orcid-button" onclick="return openORCID();"><img id="orcid-id-logo" src="http://orcid.org/sites/default/files/images/orcid_24x24.png" width="24" height="24" alt="{translate key='plugins.generic.orcidProfile.submitAction'}"/>Create or Connect your ORCID iD</button>
+<br />
