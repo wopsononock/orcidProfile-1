@@ -84,10 +84,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleTemplateDisplay($hookName, $args) {
 		$templateMgr =& $args[0];
 		$template =& $args[1];
-                $request =& PKPApplication::getRequest();
+		$request =& PKPApplication::getRequest();
 
-                // Assign our private stylesheet.
-                $templateMgr->addStylesheet($request->getBaseUrl() . '/' . $this->getStyleSheet());
+		// Assign our private stylesheet.
+		$templateMgr->addStylesheet($request->getBaseUrl() . '/' . $this->getStyleSheet());
 
 		switch ($template) {
 			case 'user/register.tpl':
@@ -370,38 +370,15 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	 * Display verbs for the management interface (OJS 2.x).
+	 * @see Plugin::manage()
 	 */
-	function getManagementVerbs() {
-		$verbs = array();
-		if ($this->getEnabled()) {
-			$verbs[] = array('settings', __('manager.plugins.settings'));
-		}
-		return parent::getManagementVerbs($verbs);
-	}
+	function manage($args, $request) {
 
-	/**
-	 * Execute a management verb on this plugin
-	 * @param $verb string
-	 * @param $args array
-	 * @param $message string Result status message
-	 * @param $messageParams array Parameters for the message key
-	 * @return boolean
-	 */
-	function manage($verb, $args, &$message, &$messageParams) {
-		$journal =& Request::getJournal();
-		if (!parent::manage($verb, $args, $message, $messageParams)) {
-			if ($verb == 'enable' && !$this->getSetting($journal->getId(), 'orcidProfileAPIPath')) {
-				// default the 1.2 public API if no setting is present
-				$this->updateSetting($journal->getId(), 'orcidProfileAPIPath', ORCID_API_URL_PUBLIC, 'string');
-			} else {
-				return false;
-			}
-		}
-
-		switch ($verb) {
+		switch ($request->getUserVar('verb')) {
 			case 'settings':
-				$templateMgr =& TemplateManager::getManager();
+				$context = $request->getContext();
+
+				$templateMgr = TemplateManager::getManager();
 				$templateMgr->register_function('plugin_url', array(&$this, 'smartyPluginUrl'));
 				$apiOptions = array(
 					ORCID_API_URL_PUBLIC => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public',
@@ -414,27 +391,18 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 				$this->import('OrcidProfileSettingsForm');
 				$form = new OrcidProfileSettingsForm($this, $journal->getId());
-				if (Request::getUserVar('save')) {
+				if ($request->getUserVar('save')) {
 					$form->readInputData();
 					if ($form->validate()) {
 						$form->execute();
-						Request::redirect(null, 'manager', 'plugin');
-						return false;
-					} else {
-						$this->setBreadcrumbs(true);
-						$form->display();
+						return new JSONMessage(true);
 					}
 				} else {
-					$this->setBreadcrumbs(true);
 					$form->initData();
-					$form->display();
 				}
-				return true;
-			default:
-				// Unknown management verb
-				assert(false);
-				return false;
+				return new JSONMessage(true, $form->fetch($request));
 		}
+		return parent::manage($args, $request);
 	}
 
 	/**
