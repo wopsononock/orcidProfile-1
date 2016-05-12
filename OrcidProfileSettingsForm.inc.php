@@ -63,6 +63,16 @@ class OrcidProfileSettingsForm extends Form {
 	}
 
 	/**
+	 * Fetch the form.
+	 * @copydoc Form::fetch()
+	 */
+	function fetch($request) {
+		$templateMgr = TemplateManager::getManager($request);
+		$templateMgr->assign('pluginName', $this->_plugin->getName());
+		return parent::fetch($request);
+	}
+
+	/**
 	 * Save settings.
 	 */
 	function execute() {
