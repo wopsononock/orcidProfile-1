@@ -373,7 +373,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @see Plugin::manage()
 	 */
 	function manage($args, $request) {
-
 		switch ($request->getUserVar('verb')) {
 			case 'settings':
 				$context = $request->getContext();
@@ -390,7 +389,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$templateMgr->assign_by_ref('orcidApiUrls', $apiOptions);
 
 				$this->import('OrcidProfileSettingsForm');
-				$form = new OrcidProfileSettingsForm($this, $journal->getId());
+				$form = new OrcidProfileSettingsForm($this, $context->getId());
 				if ($request->getUserVar('save')) {
 					$form->readInputData();
 					if ($form->validate()) {
