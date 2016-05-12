@@ -283,6 +283,20 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
+	 * @see PKPPlugin::getInstallEmailTemplatesFile()
+	 */
+	function getInstallEmailTemplatesFile() {
+		return ($this->getPluginPath() . '/emailTemplates.xml');
+	}
+
+	/**
+	 * @see PKPPlugin::getInstallEmailTemplateDataFile()
+	 */
+	function getInstallEmailTemplateDataFile() {
+		return ($this->getPluginPath() . '/locale/{$installedLocale}/emailTemplates.xml');
+	}
+
+	/**
 	 * Extend the {url ...} smarty to support this plugin.
 	 */
 	function smartyPluginUrl($params, &$smarty) {
