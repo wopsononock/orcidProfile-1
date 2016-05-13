@@ -317,37 +317,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	 * Set the page's breadcrumbs, given the plugin's tree of items
-	 * to append.
-	 * @param $subclass boolean
-	 */
-	function setBreadcrumbs($isSubclass = false) {
-		$templateMgr =& TemplateManager::getManager();
-		$pageCrumbs = array(
-			array(
-				Request::url(null, 'user'),
-				'navigation.user'
-			),
-			array(
-				Request::url(null, 'manager'),
-				'user.role.manager'
-			)
-		);
-		if ($isSubclass) {
-			$pageCrumbs[] = array(
-				Request::url(null, 'manager', 'plugins'),
-				'manager.plugins'
-			);
-			$pageCrumbs[] = array(
-				Request::url(null, 'manager', 'plugins', 'generic'),
-				'plugins.categories.generic'
-			);
-		}
-
-		$templateMgr->assign('pageHierarchy', $pageCrumbs);
-	}
-
-	/**
 	 * @see Plugin::getActions()
 	 */
 	function getActions($request, $actionArgs) {
