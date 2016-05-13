@@ -39,10 +39,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled()) {
 			// Register callback for Smarty filters; add CSS
-			HookRegistry::register('TemplateManager::display', array(&$this, 'handleTemplateDisplay'));
+			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
 
 			// Insert ORCID callback
-			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
+			HookRegistry::register('LoadHandler', array($this, 'setupCallbackHandler'));
 
 			// Send emails to authors without ORCID id upon submission
 			HookRegistry::register('Author::Form::Submit::AuthorSubmitStep3Form::Execute', array($this, 'collectAuthorOrcidId'));
@@ -91,13 +91,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		switch ($template) {
 			case 'user/register.tpl':
-				$templateMgr->register_outputfilter(array(&$this, 'registrationFilter'));
+				$templateMgr->register_outputfilter(array($this, 'registrationFilter'));
 				break;
 			case 'user/publicProfileForm.tpl':
-				$templateMgr->register_outputfilter(array(&$this, 'profileFilter'));
+				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
 				break;
 			case 'author/submit/step3.tpl':
-				$templateMgr->register_outputfilter(array(&$this, 'submitFilter'));
+				$templateMgr->register_outputfilter(array($this, 'submitFilter'));
 				break;
 		}
 		return false;
@@ -378,7 +378,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$context = $request->getContext();
 
 				$templateMgr = TemplateManager::getManager();
-				$templateMgr->register_function('plugin_url', array(&$this, 'smartyPluginUrl'));
+				$templateMgr->register_function('plugin_url', array($this, 'smartyPluginUrl'));
 				$apiOptions = array(
 					ORCID_API_URL_PUBLIC => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public',
 					ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox',
