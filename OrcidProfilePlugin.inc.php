@@ -166,7 +166,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$newOutput = substr($output, 0, $offset+strlen($match));
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
 			$newOutput .= '<script type="text/javascript">
-			        $(document).ready(function() {
+					$(document).ready(function() {
 					$(\'#orcid\').attr(\'readonly\', "true");
 				});
 			</script>';
