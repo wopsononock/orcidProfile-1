@@ -374,12 +374,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	* Return the location of the plugin's CSS file
-	* @return string
-	*/
-	 function getStyleSheet() {
+	 * Return the location of the plugin's CSS file
+	 * @return string
+	 */
+	function getStyleSheet() {
 		return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'orcidProfile.css';
-	 }
+	}
 
 	/**
 	 * Instantiate a MailTemplate
