@@ -151,7 +151,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function profileFilter($output, &$templateMgr) {
-		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE) &&
+			!(preg_match('/\$(\'#orcid\')/', $output))) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$journal = Request::getJournal();
