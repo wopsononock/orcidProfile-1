@@ -162,6 +162,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'targetOp' => 'profile',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+                'params' => array('router' => ROUTE_PAGE),
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
