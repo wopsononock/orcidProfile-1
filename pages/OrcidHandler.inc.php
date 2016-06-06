@@ -70,7 +70,7 @@ class OrcidHandler extends Handler {
 			case 'profile':
 				// Set the ORCiD in the user profile from the response
 				echo '<html><body><script type="text/javascript">
-					opener.document.getElementByNames("orcid")[0].value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
+					opener.document.getElementsByName("orcid")[0].value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
 					window.close();
 				</script></body></html>';
