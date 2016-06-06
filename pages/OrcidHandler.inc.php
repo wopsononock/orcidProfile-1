@@ -59,10 +59,10 @@ class OrcidHandler extends Handler {
 		switch (Request::getUserVar('targetOp')) {
 			case 'register':
 				echo '<html><body><script type="text/javascript">
-					// opener.document.getElementById("firstName").value = ' . json_encode($json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value']) . ';
-					// opener.document.getElementById("lastName").value = ' . json_encode($json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value']) . ';
-					// opener.document.getElementById("email").value = ' . json_encode($json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value']) . ';
-					opener.document.getElementsByName("orcid")[0].value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
+					opener.document.getElementById("firstName").value = ' . json_encode($json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value']) . ';
+					opener.document.getElementById("lastName").value = ' . json_encode($json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value']) . ';
+					opener.document.getElementById("email").value = ' . json_encode($json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value']) . ';
+					opener.document.getElementById("orcid").value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
 					window.close();
 				</script></body></html>';
@@ -70,7 +70,7 @@ class OrcidHandler extends Handler {
 			case 'profile':
 				// Set the ORCiD in the user profile from the response
 				echo '<html><body><script type="text/javascript">
-					opener.document.getElementById("orcid").value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
+					opener.document.getElementByNames("orcid")[0].value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
 					window.close();
 				</script></body></html>';
