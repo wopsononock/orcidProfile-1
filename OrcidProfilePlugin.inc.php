@@ -284,6 +284,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
+	 * Override the builtin to get the correct template path.
+	 * @return string
+	 */
+	function getTemplatePath() {
+		return parent::getTemplatePath() . 'templates/';
+	}
+
+	/**
 	 * @see PKPPlugin::getInstallEmailTemplatesFile()
 	 */
 	function getInstallEmailTemplatesFile() {
