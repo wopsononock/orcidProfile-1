@@ -94,7 +94,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		);
 
 		switch ($template) {
-			case 'user/register.tpl':
+			case 'frontend/pages/userRegister.tpl':
 				$templateMgr->register_outputfilter(array($this, 'registrationFilter'));
 				break;
 			case 'user/publicProfileForm.tpl':
