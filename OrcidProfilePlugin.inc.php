@@ -86,7 +86,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$template =& $args[1];
 		$request =& PKPApplication::getRequest();
 
-		// Assign our private stylesheet.
+		// Assign our private stylesheet, for front and back ends.
+		$templateMgr->addStyleSheet($request->getBaseUrl() . '/' . $this->getStyleSheet());
 		$templateMgr->addStyleSheet(
 			$request->getBaseUrl() . '/' . $this->getStyleSheet(),
 			STYLE_SEQUENCE_NORMAL,
