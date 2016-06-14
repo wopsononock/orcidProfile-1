@@ -140,9 +140,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
 			));
 
-			$newOutput = substr($output, 0, $offset);
+			$newOutput = substr($output, 0, $offset+strlen($match));
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
-			$newOutput .= substr($output, $offset);
+			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
 		}
 		$templateMgr->unregister_outputfilter('registrationFilter');
