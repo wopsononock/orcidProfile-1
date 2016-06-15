@@ -44,6 +44,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array($this, 'setupCallbackHandler'));
 
+			// Handle ORCID on user registration
+			HookRegistry::register('registrationform::execute', array($this, 'collectUserOrcidId'));
+
 			// Send emails to authors without ORCID id upon submission
 			HookRegistry::register('Author::Form::Submit::AuthorSubmitStep3Form::Execute', array($this, 'collectAuthorOrcidId'));
 
@@ -217,6 +220,20 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		$templateMgr->unregister_outputfilter('submitFilter');
 		return $output;
+	}
+
+	/**
+	 * Collect the ORCID when registering a user.
+	 * @param $hookName string
+	 * @param $params array
+	 */
+	function collectUserOrcidId($hookName, $params) {
+		$form = $params[0]
+		$user =& $params[1];
+
+		$user->setOrcid($form->getData('orcid'));
+
+		return false;
 	}
 
 	/**
