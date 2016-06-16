@@ -117,7 +117,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function getOauthPath() {
 		$context = Request::getContext();
-		$apiPath =  $this->getSetting($context->getId(), 'orcidProfileAPIPath');
+		$contextId = ($context == null) ? 0 : $context->getId();
+
+		$apiPath =	$this->getSetting($contextId, 'orcidProfileAPIPath');
 		if ($apiPath == ORCID_API_URL_PUBLIC || $apiPath == ORCID_API_URL_MEMBER) {
 			return ORCID_OAUTH_URL;
 		} else {
@@ -136,11 +138,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$context = Request::getContext();
+			$contextId = ($context == null) ? 0 : $context->getId();
 
 			$templateMgr->assign(array(
 				'targetOp' => 'register',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($context->getId(), 'orcidClientId'),
+				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
@@ -164,12 +167,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$context = Request::getContext();
+			$contextId = ($context == null) ? 0 : $context->getId();
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
 				'targetOp' => 'profile',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($context->getId(), 'orcidClientId'),
+				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
@@ -197,12 +201,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$context = Request::getContext();
+			$contextId = ($context == null) ? 0 : $context->getId();
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
 				'targetOp' => 'submit',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($context->getId(), 'orcidClientId'),
+				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
 				'params' => array('articleId' => Request::getUserVar('articleId')),
 			));
 
@@ -226,7 +231,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Collect the ORCID when registering a user.
 	 * @param $hookName string
 	 * @param $params array
-     * @return bool
+	 * @return bool
 	 */
 	function collectUserOrcidId($hookName, $params) {
 		$form = $params[0];
@@ -256,13 +261,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			$request =& PKPApplication::getRequest();
 			$context = $request->getContext();
+			$contextId = ($context == null) ? 0 : $context->getId();
 
 			$articleDao =& DAORegistry::getDAO('ArticleDAO');
 			$article =& $articleDao->getArticle($author->getSubmissionId());
 
 			$mail->assignParams(array(
 				'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
-					'client_id' => $this->getSetting($context->getId(), 'orcidClientId'),
+					'client_id' => $this->getSetting($contextId, 'orcidClientId'),
 					'response_type' => 'code',
 					'scope' => '/authenticate',
 					'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()))
@@ -377,6 +383,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		switch ($request->getUserVar('verb')) {
 			case 'settings':
 				$context = $request->getContext();
+				$contextId = ($context == null) ? 0 : $context->getId();
 
 				$templateMgr = TemplateManager::getManager();
 				$templateMgr->register_function('plugin_url', array($this, 'smartyPluginUrl'));
@@ -390,7 +397,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$templateMgr->assign_by_ref('orcidApiUrls', $apiOptions);
 
 				$this->import('OrcidProfileSettingsForm');
-				$form = new OrcidProfileSettingsForm($this, $context->getId());
+				$form = new OrcidProfileSettingsForm($this, $contextId);
 				if ($request->getUserVar('save')) {
 					$form->readInputData();
 					if ($form->validate()) {

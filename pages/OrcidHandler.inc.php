@@ -26,19 +26,20 @@ class OrcidHandler extends Handler {
 		$context = Request::getContext();
 		$op = Request::getRequestedOp();
 		$plugin =& PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
+		$contextId = ($context == null) ? 0 : $context->getId();
 
 		// fetch the access token
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => $plugin->getSetting($context->getId(), 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
+			CURLOPT_URL => $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => http_build_query(array(
 				'code' => Request::getUserVar('code'),
 				'grant_type' => 'authorization_code',
-				'client_id' => $plugin->getSetting($context->getId(), 'orcidClientId'),
-				'client_secret' => $plugin->getSetting($context->getId(), 'orcidClientSecret')
+				'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
+				'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
 			))
 		));
 		$result = curl_exec($curl);
@@ -46,7 +47,7 @@ class OrcidHandler extends Handler {
 
 		curl_setopt_array($curl, array(
 			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_URL =>  $url = $plugin->getSetting($context->getId(), 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($response['orcid']) . '/' . ORCID_PROFILE_URL,
+			CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($response['orcid']) . '/' . ORCID_PROFILE_URL,
 			CURLOPT_POST => false,
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 		));
@@ -97,19 +98,20 @@ class OrcidHandler extends Handler {
 		$op = Request::getRequestedOp();
 		$plugin =& PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$templateMgr =& TemplateManager::getManager($request);
+		$contextId = ($context == null) ? 0 : $context->getId();
 
 		// fetch the access token
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => $plugin->getSetting($context->getId(), 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
+			CURLOPT_URL => $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => http_build_query(array(
 				'code' => Request::getUserVar('code'),
 				'grant_type' => 'authorization_code',
-				'client_id' => $plugin->getSetting($context->getId(), 'orcidClientId'),
-				'client_secret' => $plugin->getSetting($context->getId(), 'orcidClientSecret')
+				'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
+				'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
 			))
 		));
 		$result = curl_exec($curl);
