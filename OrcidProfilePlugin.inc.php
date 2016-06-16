@@ -116,8 +116,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function getOauthPath() {
-		$journal = Request::getJournal();
-		$apiPath =  $this->getSetting($journal->getId(), 'orcidProfileAPIPath');
+		$context = Request::getContext();
+		$apiPath =  $this->getSetting($context->getId(), 'orcidProfileAPIPath');
 		if ($apiPath == ORCID_API_URL_PUBLIC || $apiPath == ORCID_API_URL_MEMBER) {
 			return ORCID_OAUTH_URL;
 		} else {
@@ -135,12 +135,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (preg_match('/<form[^>]+id="register"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
-			$journal = Request::getJournal();
+			$context = Request::getContext();
 
 			$templateMgr->assign(array(
 				'targetOp' => 'register',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+				'orcidClientId' => $this->getSetting($context->getId(), 'orcidClientId'),
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
@@ -163,13 +163,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 			!(preg_match('/\$\(\'input\[name=orcid\]\'\)/', $output))) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
-			$journal = Request::getJournal();
+			$context = Request::getContext();
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
 				'targetOp' => 'profile',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+				'orcidClientId' => $this->getSetting($context->getId(), 'orcidClientId'),
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
@@ -196,13 +196,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (preg_match('/<input type="text" class="textField" name="authors\[0\]\[orcid\][^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
-			$journal = Request::getJournal();
+			$context = Request::getContext();
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
 				'targetOp' => 'submit',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+				'orcidClientId' => $this->getSetting($context->getId(), 'orcidClientId'),
 				'params' => array('articleId' => Request::getUserVar('articleId')),
 			));
 
@@ -226,9 +226,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Collect the ORCID when registering a user.
 	 * @param $hookName string
 	 * @param $params array
+     * @return bool
 	 */
 	function collectUserOrcidId($hookName, $params) {
-		$form = $params[0]
+		$form = $params[0];
 		$user =& $params[1];
 
 		$user->setOrcid($form->getData('orcid'));
@@ -240,7 +241,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Output filter adds ORCiD interaction to the 3rd step submission form.
 	 * @param $output string
 	 * @param $templateMgr TemplateManager
-	 * @return $string
+	 * @return bool
 	 */
 	function collectAuthorOrcidId($hookName, $params) {
 		$author =& $params[0];
@@ -416,12 +417,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Instantiate a MailTemplate
 	 *
 	 * @param $emailKey string
-	 * @param $journal Journal
+	 * @param $context Context
 	 */
-	function &getMailTemplate($emailKey, $journal = null) {
+	function &getMailTemplate($emailKey, $context = null) {
 		if (!isset($this->_mailTemplates[$emailKey])) {
 			import('classes.mail.MailTemplate');
-			$mailTemplate = new MailTemplate($emailKey, null, null, $journal, true, true);
+			$mailTemplate = new MailTemplate($emailKey, null, null, $context, true, true);
 			$this->_mailTemplates[$emailKey] =& $mailTemplate;
 		}
 		return $this->_mailTemplates[$emailKey];

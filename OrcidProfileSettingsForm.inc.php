@@ -19,8 +19,8 @@ import('lib.pkp.classes.form.Form');
 
 class OrcidProfileSettingsForm extends Form {
 
-	/** @var $journalId int */
-	var $journalId;
+	/** @var $contextId int */
+	var $contextId;
 
 	/** @var $plugin object */
 	var $plugin;
@@ -28,10 +28,10 @@ class OrcidProfileSettingsForm extends Form {
 	/**
 	 * Constructor
 	 * @param $plugin object
-	 * @param $journalId int
+	 * @param $contextId int
 	 */
-	function OrcidProfileSettingsForm(&$plugin, $journalId) {
-		$this->journalId = $journalId;
+	function OrcidProfileSettingsForm(&$plugin, $contextId) {
+		$this->contextId = $contextId;
 		$this->plugin =& $plugin;
 
 		parent::Form($plugin->getTemplatePath() . 'settingsForm.tpl');
@@ -43,13 +43,13 @@ class OrcidProfileSettingsForm extends Form {
 	 * Initialize form data.
 	 */
 	function initData() {
-		$journalId = $this->journalId;
+		$contextId = $this->contextId;
 		$plugin =& $this->plugin;
 
 		$this->_data = array(
-			'orcidProfileAPIPath' => $plugin->getSetting($journalId, 'orcidProfileAPIPath'),
-			'orcidClientId' => $plugin->getSetting($journalId, 'orcidClientId'),
-			'orcidClientSecret' => $plugin->getSetting($journalId, 'orcidClientSecret'),
+			'orcidProfileAPIPath' => $plugin->getSetting($contextId, 'orcidProfileAPIPath'),
+			'orcidClientId' => $plugin->getSetting($contextId, 'orcidClientId'),
+			'orcidClientSecret' => $plugin->getSetting($contextId, 'orcidClientSecret'),
 		);
 	}
 
@@ -77,11 +77,11 @@ class OrcidProfileSettingsForm extends Form {
 	 */
 	function execute() {
 		$plugin =& $this->plugin;
-		$journalId = $this->journalId;
+		$contextId = $this->contextId;
 
-		$plugin->updateSetting($journalId, 'orcidProfileAPIPath', trim($this->getData('orcidProfileAPIPath'), "\"\';"), 'string');
-		$plugin->updateSetting($journalId, 'orcidClientId', $this->getData('orcidClientId'), 'string');
-		$plugin->updateSetting($journalId, 'orcidClientSecret', $this->getData('orcidClientSecret'), 'string');
+		$plugin->updateSetting($contextId, 'orcidProfileAPIPath', trim($this->getData('orcidProfileAPIPath'), "\"\';"), 'string');
+		$plugin->updateSetting($contextId, 'orcidClientId', $this->getData('orcidClientId'), 'string');
+		$plugin->updateSetting($contextId, 'orcidClientSecret', $this->getData('orcidClientSecret'), 'string');
 	}
 }
 
