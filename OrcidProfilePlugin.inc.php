@@ -262,7 +262,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			$request =& PKPApplication::getRequest();
 			$context = $request->getContext();
-			$contextId = ($context == null) ? 0 : $context->getId();
+
+			// This should only ever happen within a context, never site-wide.
+			assert($context != null);
+			$contextId = $context->getId();
 
 			$articleDao =& DAORegistry::getDAO('ArticleDAO');
 			$article =& $articleDao->getArticle($author->getSubmissionId());
@@ -366,7 +369,18 @@ class OrcidProfilePlugin extends GenericPlugin {
 				new LinkAction(
 					'settings',
 					new AjaxModal(
-						$router->url($request, null, null, 'manage', null, array('verb' => 'settings', 'plugin' => $this->getName(), 'category' => 'generic')),
+						$router->url(
+							$request,
+							null,
+							null,
+							'manage',
+							null,
+							array(
+								'verb' => 'settings',
+								'plugin' => $this->getName(),
+								'category' => 'generic'
+							)
+						),
 						$this->getDisplayName()
 					),
 					__('manager.plugins.settings'),
