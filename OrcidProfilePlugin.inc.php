@@ -237,6 +237,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$form = $params[0];
 		$user =& $params[1];
 
+		$form->readUserVars(array('orcid'));
 		$user->setOrcid($form->getData('orcid'));
 
 		return false;
