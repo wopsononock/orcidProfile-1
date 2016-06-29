@@ -104,8 +104,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'user/publicProfileForm.tpl':
 				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
 				break;
-			case 'author/submit/step3.tpl':
-				$templateMgr->register_outputfilter(array($this, 'submitFilter'));
+			case 'controllers/grid/users/author/form/authorForm.tpl':
+				$templateMgr->register_outputfilter(array($this, 'authorFilter'));
 				break;
 		}
 		return false;
@@ -196,7 +196,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param $templateMgr TemplateManager
 	 * @return $string
 	 */
-	function submitFilter($output, &$templateMgr) {
+	function authorFilter($output, &$templateMgr) {
 		if (preg_match('/<input type="text" class="textField" name="authors\[0\]\[orcid\][^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
@@ -223,7 +223,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$newOutput .= substr($output, $offset + strlen($match));
 			$output = $newOutput;
 		}
-		$templateMgr->unregister_outputfilter('submitFilter');
+		$templateMgr->unregister_outputfilter('authorFilter');
 		return $output;
 	}
 
