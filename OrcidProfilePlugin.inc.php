@@ -197,7 +197,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function authorFilter($output, &$templateMgr) {
-		if (preg_match('/<input type="text" class="textField" name="authors\[0\]\[orcid\][^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$context = Request::getContext();
@@ -212,14 +212,19 @@ class OrcidProfilePlugin extends GenericPlugin {
 			));
 
 			$newOutput = substr($output, 0, $offset + strlen($match) - 1);
-			$newOutput .= ' readonly=\'readonly\'><br />';
+			// $newOutput .= ' readonly=\'readonly\'><br />';
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
-			$newOutput .= '<button id="remove-orcid-button">Remove ORCID ID</button>
-				<script>$("#remove-orcid-button").click(function(event) {
-					event.preventDefault();
-					$("#authors-0-orcid").val("");
-					$("#connect-orcid-button").show();
-				});</script>';
+			$newOutput .= '<script type="text/javascript">
+					$(document).ready(function() {
+					$(\'input[name=orcid]\').attr(\'readonly\', "true");
+				});
+			</script>';
+			// $newOutput .= '<button id="remove-orcid-button">Remove ORCID ID</button>
+			// 	<script>$("#remove-orcid-button").click(function(event) {
+			// 		event.preventDefault();
+			// 		$("#authors-0-orcid").val("");
+			// 		$("#connect-orcid-button").show();
+			// 	});</script>';
 			$newOutput .= substr($output, $offset + strlen($match));
 			$output = $newOutput;
 		}
