@@ -104,9 +104,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'user/publicProfileForm.tpl':
 				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
 				break;
-			case 'controllers/grid/users/author/form/authorForm.tpl':
-				$templateMgr->register_outputfilter(array($this, 'authorFilter'));
-				break;
 		}
 		return false;
 	}
@@ -187,49 +184,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$output = $newOutput;
 		}
 		$templateMgr->unregister_outputfilter('profileFilter');
-		return $output;
-	}
-
-	/**
-	 * Output filter adds ORCiD interaction to the 3rd step submission form.
-	 * @param $output string
-	 * @param $templateMgr TemplateManager
-	 * @return $string
-	 */
-	function authorFilter($output, &$templateMgr) {
-		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE) &&
-			!(preg_match('/\$\(\'input\[name=orcid\]\'\)/', $output))) {
-			$match = $matches[0][0];
-			$offset = $matches[0][1];
-			$context = Request::getContext();
-			$contextId = ($context == null) ? 0 : $context->getId();
-
-			// Entering the registration without ORCiD; present the button.
-			$templateMgr->assign(array(
-				'targetOp' => 'submit',
-				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
-				'params' => array('articleId' => Request::getUserVar('articleId')),
-			));
-
-			$newOutput = substr($output, 0, $offset + strlen($match));
-			// $newOutput .= ' readonly=\'readonly\'><br />';
-			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
-			$newOutput .= '<script type="text/javascript">
-					$(document).ready(function() {
-					$(\'input[name=orcid]\').attr(\'readonly\', "true");
-				});
-			</script>';
-			// $newOutput .= '<button id="remove-orcid-button">Remove ORCID ID</button>
-			// 	<script>$("#remove-orcid-button").click(function(event) {
-			// 		event.preventDefault();
-			// 		$("#authors-0-orcid").val("");
-			// 		$("#connect-orcid-button").show();
-			// 	});</script>';
-			$newOutput .= substr($output, $offset+strlen($match));
-			$output = $newOutput;
-		}
-		$templateMgr->unregister_outputfilter('authorFilter');
 		return $output;
 	}
 
