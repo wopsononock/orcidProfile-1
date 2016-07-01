@@ -197,7 +197,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function authorFilter($output, &$templateMgr) {
-		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE) &&
+			!(preg_match('/\$\(\'input\[name=orcid\]\'\)/', $output))) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$context = Request::getContext();
@@ -211,7 +212,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'params' => array('articleId' => Request::getUserVar('articleId')),
 			));
 
-			$newOutput = substr($output, 0, $offset + strlen($match) - 1);
+			$newOutput = substr($output, 0, $offset + strlen($match));
 			// $newOutput .= ' readonly=\'readonly\'><br />';
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
 			$newOutput .= '<script type="text/javascript">
@@ -225,7 +226,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			// 		$("#authors-0-orcid").val("");
 			// 		$("#connect-orcid-button").show();
 			// 	});</script>';
-			$newOutput .= substr($output, $offset + strlen($match));
+			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
 		}
 		$templateMgr->unregister_outputfilter('authorFilter');
