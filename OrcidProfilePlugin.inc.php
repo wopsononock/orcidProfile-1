@@ -39,10 +39,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled()) {
 			// Register callback for Smarty filters; add CSS
-			HookRegistry::register('TemplateManager::display', array(&$this, 'handleTemplateDisplay'));
+			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
 
 			// Insert ORCID callback
-			HookRegistry::register('LoadHandler', array(&$this, 'setupCallbackHandler'));
+			HookRegistry::register('LoadHandler', array($this, 'setupCallbackHandler'));
+
+			// Handle ORCID on user registration
+			HookRegistry::register('registrationform::execute', array($this, 'collectUserOrcidId'));
 
 			// Send emails to authors without ORCID id upon submission
 			HookRegistry::register('Author::Form::Submit::AuthorSubmitStep3Form::Execute', array($this, 'collectAuthorOrcidId'));
@@ -84,20 +87,22 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleTemplateDisplay($hookName, $args) {
 		$templateMgr =& $args[0];
 		$template =& $args[1];
-                $request =& PKPApplication::getRequest();
+		$request =& PKPApplication::getRequest();
 
-                // Assign our private stylesheet.
-                $templateMgr->addStylesheet($request->getBaseUrl() . '/' . $this->getStyleSheet());
+		// Assign our private stylesheet, for front and back ends.
+		$templateMgr->addStyleSheet($request->getBaseUrl() . '/' . $this->getStyleSheet());
+		$templateMgr->addStyleSheet(
+			$request->getBaseUrl() . '/' . $this->getStyleSheet(),
+			STYLE_SEQUENCE_NORMAL,
+			array('backend')
+		);
 
 		switch ($template) {
-			case 'user/register.tpl':
-				$templateMgr->register_outputfilter(array(&$this, 'registrationFilter'));
+			case 'frontend/pages/userRegister.tpl':
+				$templateMgr->register_outputfilter(array($this, 'registrationFilter'));
 				break;
-			case 'user/profile.tpl':
-				$templateMgr->register_outputfilter(array(&$this, 'profileFilter'));
-				break;
-			case 'author/submit/step3.tpl':
-				$templateMgr->register_outputfilter(array(&$this, 'submitFilter'));
+			case 'user/publicProfileForm.tpl':
+				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
 				break;
 		}
 		return false;
@@ -108,8 +113,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function getOauthPath() {
-		$journal = Request::getJournal();
-		$apiPath =  $this->getSetting($journal->getId(), 'orcidProfileAPIPath');
+		$context = Request::getContext();
+		$contextId = ($context == null) ? 0 : $context->getId();
+
+		$apiPath =	$this->getSetting($contextId, 'orcidProfileAPIPath');
 		if ($apiPath == ORCID_API_URL_PUBLIC || $apiPath == ORCID_API_URL_MEMBER) {
 			return ORCID_OAUTH_URL;
 		} else {
@@ -124,20 +131,21 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function registrationFilter($output, &$templateMgr) {
-		if (preg_match('/<form id="registerForm"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+		if (preg_match('/<form[^>]+id="register"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
-			$journal = Request::getJournal();
+			$context = Request::getContext();
+			$contextId = ($context == null) ? 0 : $context->getId();
 
 			$templateMgr->assign(array(
 				'targetOp' => 'register',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
 			));
 
-			$newOutput = substr($output, 0, $offset);
+			$newOutput = substr($output, 0, $offset+strlen($match));
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
-			$newOutput .= substr($output, $offset);
+			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
 		}
 		$templateMgr->unregister_outputfilter('registrationFilter');
@@ -151,23 +159,25 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return $string
 	 */
 	function profileFilter($output, &$templateMgr) {
-		if (preg_match('/<input[^>]+id="orcid"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE) &&
+			!(preg_match('/\$\(\'input\[name=orcid\]\'\)/', $output))) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
-			$journal = Request::getJournal();
+			$context = Request::getContext();
+			$contextId = ($context == null) ? 0 : $context->getId();
 
 			// Entering the registration without ORCiD; present the button.
 			$templateMgr->assign(array(
 				'targetOp' => 'profile',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
+				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
 			$newOutput .= '<script type="text/javascript">
-			        $(document).ready(function() {
-					$(\'#orcid\').attr(\'readonly\', "true");
+					$(document).ready(function() {
+					$(\'input[name=orcid]\').attr(\'readonly\', "true");
 				});
 			</script>';
 			$newOutput .= substr($output, $offset+strlen($match));
@@ -178,46 +188,26 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	 * Output filter adds ORCiD interaction to the 3rd step submission form.
-	 * @param $output string
-	 * @param $templateMgr TemplateManager
-	 * @return $string
+	 * Collect the ORCID when registering a user.
+	 * @param $hookName string
+	 * @param $params array
+	 * @return bool
 	 */
-	function submitFilter($output, &$templateMgr) {
-		if (preg_match('/<input type="text" class="textField" name="authors\[0\]\[orcid\][^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
-			$match = $matches[0][0];
-			$offset = $matches[0][1];
-			$journal = Request::getJournal();
+	function collectUserOrcidId($hookName, $params) {
+		$form = $params[0];
+		$user =& $params[1];
 
-			// Entering the registration without ORCiD; present the button.
-			$templateMgr->assign(array(
-				'targetOp' => 'submit',
-				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($journal->getId(), 'orcidClientId'),
-				'params' => array('articleId' => Request::getUserVar('articleId')),
-			));
+		$form->readUserVars(array('orcid'));
+		$user->setOrcid($form->getData('orcid'));
 
-			$newOutput = substr($output, 0, $offset + strlen($match) - 1);
-			$newOutput .= ' readonly=\'readonly\'><br />';
-			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
-			$newOutput .= '<button id="remove-orcid-button">Remove ORCID ID</button>
-				<script>$("#remove-orcid-button").click(function(event) {
-					event.preventDefault();
-					$("#authors-0-orcid").val("");
-					$("#connect-orcid-button").show();
-				});</script>';
-			$newOutput .= substr($output, $offset + strlen($match));
-			$output = $newOutput;
-		}
-		$templateMgr->unregister_outputfilter('submitFilter');
-		return $output;
+		return false;
 	}
 
 	/**
 	 * Output filter adds ORCiD interaction to the 3rd step submission form.
 	 * @param $output string
 	 * @param $templateMgr TemplateManager
-	 * @return $string
+	 * @return bool
 	 */
 	function collectAuthorOrcidId($hookName, $params) {
 		$author =& $params[0];
@@ -233,12 +223,16 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$request =& PKPApplication::getRequest();
 			$context = $request->getContext();
 
+			// This should only ever happen within a context, never site-wide.
+			assert($context != null);
+			$contextId = $context->getId();
+
 			$articleDao =& DAORegistry::getDAO('ArticleDAO');
 			$article =& $articleDao->getArticle($author->getSubmissionId());
 
 			$mail->assignParams(array(
 				'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
-					'client_id' => $this->getSetting($context->getId(), 'orcidClientId'),
+					'client_id' => $this->getSetting($contextId, 'orcidClientId'),
 					'response_type' => 'code',
 					'scope' => '/authenticate',
 					'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()))
@@ -283,6 +277,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
+	 * Override the builtin to get the correct template path.
+	 * @return string
+	 */
+	function getTemplatePath() {
+		return parent::getTemplatePath() . 'templates/';
+	}
+
+	/**
 	 * @see PKPPlugin::getInstallEmailTemplatesFile()
 	 */
 	function getInstallEmailTemplatesFile() {
@@ -317,70 +319,49 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	 * Set the page's breadcrumbs, given the plugin's tree of items
-	 * to append.
-	 * @param $subclass boolean
+	 * @see Plugin::getActions()
 	 */
-	function setBreadcrumbs($isSubclass = false) {
-		$templateMgr =& TemplateManager::getManager();
-		$pageCrumbs = array(
-			array(
-				Request::url(null, 'user'),
-				'navigation.user'
-			),
-			array(
-				Request::url(null, 'manager'),
-				'user.role.manager'
-			)
+	function getActions($request, $actionArgs) {
+		$router = $request->getRouter();
+		import('lib.pkp.classes.linkAction.request.AjaxModal');
+		return array_merge(
+			$this->getEnabled()?array(
+				new LinkAction(
+					'settings',
+					new AjaxModal(
+						$router->url(
+							$request,
+							null,
+							null,
+							'manage',
+							null,
+							array(
+								'verb' => 'settings',
+								'plugin' => $this->getName(),
+								'category' => 'generic'
+							)
+						),
+						$this->getDisplayName()
+					),
+					__('manager.plugins.settings'),
+					null
+				),
+			):array(),
+			parent::getActions($request, $actionArgs)
 		);
-		if ($isSubclass) {
-			$pageCrumbs[] = array(
-				Request::url(null, 'manager', 'plugins'),
-				'manager.plugins'
-			);
-			$pageCrumbs[] = array(
-				Request::url(null, 'manager', 'plugins', 'generic'),
-				'plugins.categories.generic'
-			);
-		}
-
-		$templateMgr->assign('pageHierarchy', $pageCrumbs);
 	}
 
 	/**
-	 * Display verbs for the management interface.
+	 * @see Plugin::manage()
 	 */
-	function getManagementVerbs() {
-		$verbs = array();
-		if ($this->getEnabled()) {
-			$verbs[] = array('settings', __('manager.plugins.settings'));
-		}
-		return parent::getManagementVerbs($verbs);
-	}
-
-	/**
-	 * Execute a management verb on this plugin
-	 * @param $verb string
-	 * @param $args array
-	 * @param $message string Result status message
-	 * @param $messageParams array Parameters for the message key
-	 * @return boolean
-	 */
-	function manage($verb, $args, &$message, &$messageParams) {
-		$journal =& Request::getJournal();
-		if (!parent::manage($verb, $args, $message, $messageParams)) {
-			if ($verb == 'enable' && !$this->getSetting($journal->getId(), 'orcidProfileAPIPath')) {
-				// default the 1.2 public API if no setting is present
-				$this->updateSetting($journal->getId(), 'orcidProfileAPIPath', ORCID_API_URL_PUBLIC, 'string');
-			} else {
-				return false;
-			}
-		}
-
-		switch ($verb) {
+	function manage($args, $request) {
+		switch ($request->getUserVar('verb')) {
 			case 'settings':
-				$templateMgr =& TemplateManager::getManager();
-				$templateMgr->register_function('plugin_url', array(&$this, 'smartyPluginUrl'));
+				$context = $request->getContext();
+				$contextId = ($context == null) ? 0 : $context->getId();
+
+				$templateMgr = TemplateManager::getManager();
+				$templateMgr->register_function('plugin_url', array($this, 'smartyPluginUrl'));
 				$apiOptions = array(
 					ORCID_API_URL_PUBLIC => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public',
 					ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox',
@@ -391,48 +372,39 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$templateMgr->assign_by_ref('orcidApiUrls', $apiOptions);
 
 				$this->import('OrcidProfileSettingsForm');
-				$form = new OrcidProfileSettingsForm($this, $journal->getId());
-				if (Request::getUserVar('save')) {
+				$form = new OrcidProfileSettingsForm($this, $contextId);
+				if ($request->getUserVar('save')) {
 					$form->readInputData();
 					if ($form->validate()) {
 						$form->execute();
-						Request::redirect(null, 'manager', 'plugin');
-						return false;
-					} else {
-						$this->setBreadcrumbs(true);
-						$form->display();
+						return new JSONMessage(true);
 					}
 				} else {
-					$this->setBreadcrumbs(true);
 					$form->initData();
-					$form->display();
 				}
-				return true;
-			default:
-				// Unknown management verb
-				assert(false);
-				return false;
+				return new JSONMessage(true, $form->fetch($request));
 		}
+		return parent::manage($args, $request);
 	}
 
 	/**
-	* Return the location of the plugin's CSS file
-	* @return string
-	*/
-	 function getStyleSheet() {
-		return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'orcidProfile.css';
-	 }
+	 * Return the location of the plugin's CSS file
+	 * @return string
+	 */
+	function getStyleSheet() {
+		return $this->getPluginPath() . '/css/orcidProfile.css';
+	}
 
 	/**
 	 * Instantiate a MailTemplate
 	 *
 	 * @param $emailKey string
-	 * @param $journal Journal
+	 * @param $context Context
 	 */
-	function &getMailTemplate($emailKey, $journal = null) {
+	function &getMailTemplate($emailKey, $context = null) {
 		if (!isset($this->_mailTemplates[$emailKey])) {
 			import('classes.mail.MailTemplate');
-			$mailTemplate = new MailTemplate($emailKey, null, null, $journal, true, true);
+			$mailTemplate = new MailTemplate($emailKey, null, null, $context, true, true);
 			$this->_mailTemplates[$emailKey] =& $mailTemplate;
 		}
 		return $this->_mailTemplates[$emailKey];
