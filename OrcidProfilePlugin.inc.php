@@ -90,11 +90,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$request =& PKPApplication::getRequest();
 
 		// Assign our private stylesheet, for front and back ends.
-		$templateMgr->addStyleSheet($request->getBaseUrl() . '/' . $this->getStyleSheet());
 		$templateMgr->addStyleSheet(
+			'orcidProfile',
 			$request->getBaseUrl() . '/' . $this->getStyleSheet(),
-			STYLE_SEQUENCE_NORMAL,
-			array('backend')
+			array(
+				'contexts' => array('frontend', 'backend')
+			)
 		);
 
 		switch ($template) {
@@ -199,7 +200,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		$form->readUserVars(array('orcid'));
 		$user->setOrcid($form->getData('orcid'));
-
 		return false;
 	}
 
