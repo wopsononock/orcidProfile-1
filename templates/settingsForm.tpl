@@ -22,6 +22,7 @@
 </script>
 
 <form class="pkp_form" id="orcidProfileSettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
+	{csrf}
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="orcidProfileSettingsFormNotification"}
 
 	{fbvFormArea id="orcidProfileSettingsFormArea"}
