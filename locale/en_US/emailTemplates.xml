@@ -18,7 +18,7 @@
 
 You have been listed as a co-author on the manuscript submission "{$articleTitle}" to {$journalName}. 
 
-To confirm you authorship please add your ORCID id to this submission by visiting the link provided below.
+To confirm your authorship, please add your ORCID id to this submission by visiting the link provided below.
 
 {$authorOrcidUrl}
 
