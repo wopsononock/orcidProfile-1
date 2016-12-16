@@ -368,7 +368,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox'
 				);
 
-				$templateMgr->assign_by_ref('orcidApiUrls', $apiOptions);
+				$templateMgr->assign('orcidApiUrls', $apiOptions);
 
 				$this->import('OrcidProfileSettingsForm');
 				$form = new OrcidProfileSettingsForm($this, $contextId);
