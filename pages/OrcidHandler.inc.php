@@ -25,7 +25,7 @@ class OrcidHandler extends Handler {
 	function orcidAuthorize($args, $request) {
 		$context = Request::getContext();
 		$op = Request::getRequestedOp();
-		$plugin =& PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
+		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$contextId = ($context == null) ? 0 : $context->getId();
 
 		// fetch the access token
@@ -96,8 +96,8 @@ class OrcidHandler extends Handler {
 	function orcidVerify($args, $request) {
 		$context = Request::getContext();
 		$op = Request::getRequestedOp();
-		$plugin =& PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
-		$templateMgr =& TemplateManager::getManager($request);
+		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
+		$templateMgr = TemplateManager::getManager($request);
 		$contextId = ($context == null) ? 0 : $context->getId();
 
 		// fetch the access token
@@ -127,8 +127,8 @@ class OrcidHandler extends Handler {
 			exit();
 		}
 
-		$authorDao =& DAORegistry::getDAO('AuthorDAO');
-		$authors =& $authorDao->getAuthorsBySubmissionId($request->getUserVar('articleId'));
+		$authorDao = DAORegistry::getDAO('AuthorDAO');
+		$authors = $authorDao->getAuthorsBySubmissionId($request->getUserVar('articleId'));
 		foreach ($authors as $author) {
 			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
 				$author->setData('orcid', 'http://orcid.org/' . $response['orcid']);

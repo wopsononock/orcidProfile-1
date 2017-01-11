@@ -87,7 +87,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleTemplateDisplay($hookName, $args) {
 		$templateMgr =& $args[0];
 		$template =& $args[1];
-		$request =& PKPApplication::getRequest();
+		$request = PKPApplication::getRequest();
 
 		// Assign our private stylesheet, for front and back ends.
 		$templateMgr->addStyleSheet(
@@ -215,20 +215,20 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		// if author has no orcid id
 		if (!$author->getData('orcid')){
-			$mail =& $this->getMailTemplate('ORCID_COLLECT_AUTHOR_ID');
+			$mail = $this->getMailTemplate('ORCID_COLLECT_AUTHOR_ID');
 
 			$orcidToken = md5(time());
 			$author->setData('orcidToken', $orcidToken);
 
-			$request =& PKPApplication::getRequest();
+			$request = PKPApplication::getRequest();
 			$context = $request->getContext();
 
 			// This should only ever happen within a context, never site-wide.
 			assert($context != null);
 			$contextId = $context->getId();
 
-			$articleDao =& DAORegistry::getDAO('ArticleDAO');
-			$article =& $articleDao->getArticle($author->getSubmissionId());
+			$articleDao = DAORegistry::getDAO('ArticleDAO');
+			$article = $articleDao->getArticle($author->getSubmissionId());
 
 			$mail->assignParams(array(
 				'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
@@ -404,7 +404,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (!isset($this->_mailTemplates[$emailKey])) {
 			import('classes.mail.MailTemplate');
 			$mailTemplate = new MailTemplate($emailKey, null, null, $context, true, true);
-			$this->_mailTemplates[$emailKey] =& $mailTemplate;
+			$this->_mailTemplates[$emailKey] = $mailTemplate;
 		}
 		return $this->_mailTemplates[$emailKey];
 	}
