@@ -24,7 +24,7 @@ define('ORCID_API_URL_MEMBER', 'https://api.orcid.org/');
 define('ORCID_API_URL_MEMBER_SANDBOX', 'https://api.sandbox.orcid.org/');
 
 define('OAUTH_TOKEN_URL', 'oauth/token');
-define('ORCID_API_VERSION_URL', 'v1.2/');
+define('ORCID_API_VERSION_URL', 'v2.0/');
 define('ORCID_PROFILE_URL', 'orcid-profile');
 
 class OrcidProfilePlugin extends GenericPlugin {
