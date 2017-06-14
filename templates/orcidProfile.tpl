@@ -10,7 +10,6 @@
  *
  *}
 <script type="text/javascript">
-
 function openORCID() {ldelim}
 	var oauthWindow = window.open("{$orcidProfileOauthPath|escape}authorize?client_id={$orcidClientId|urlencode}&response_type=code&scope=/authenticate&redirect_uri={url|urlencode router="page" page="orcidapi" op="orcidAuthorize" targetOp=$targetOp params=$params escape=false}", "_blank", "toolbar=no, scrollbars=yes, width=500, height=600, top=500, left=500");
 	oauthWindow.opener = self;
@@ -18,7 +17,10 @@ function openORCID() {ldelim}
 {rdelim}
 </script>
 
-<button id="connect-orcid-button" onclick="return openORCID();"><img id="orcid-id-logo" src="{$baseUrl}/plugins/generic/orcidProfile/templates/images/orcid_24x24.png" width="24" height="24" alt="{translate key='plugins.generic.orcidProfile.submitAction'}"/>Create or Connect your ORCID iD</button>
+<button id="connect-orcid-button" class="cmp_button" onclick="return openORCID();">
+	<img id="orcid-id-logo" src="{$baseUrl}/plugins/generic/orcidProfile/templates/images/orcid_24x24.png" width="16" height="16">
+	{translate key='plugins.generic.orcidProfile.connect'}
+</button>
 
 {if $targetOp eq 'register'}
 	{fbvElement type="hidden" name="orcid" id="orcid" value=$orcid maxlength="36"}
