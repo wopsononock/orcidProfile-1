@@ -10,3 +10,11 @@
 	margin-right: 0.5em;
 	vertical-align: middle;
 }
+
+.orcid_icon {
+	display: inline-block;
+	margin-right: 0.25em;
+	width: 24px;
+	height: 24px;
+	vertical-align: middle;
+}

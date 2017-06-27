@@ -18,7 +18,7 @@ function openORCID() {ldelim}
 </script>
 
 <button id="connect-orcid-button" class="cmp_button" onclick="return openORCID();">
-	<img id="orcid-id-logo" src="{$baseUrl}/plugins/generic/orcidProfile/templates/images/orcid_24x24.png" width="16" height="16">
+	{$orcidIcon}
 	{translate key='plugins.generic.orcidProfile.connect'}
 </button>
 

@@ -102,6 +102,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'frontend/pages/userRegister.tpl':
 				$templateMgr->register_outputfilter(array($this, 'registrationFilter'));
 				break;
+			case 'frontend/pages/article.tpl':
+				$templateMgr->assign('orcidIcon', $this->getIcon());
+				break;
 			case 'user/publicProfileForm.tpl':
 				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
 				break;
@@ -142,6 +145,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'targetOp' => 'register',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
 				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
+				'orcidIcon' => $this->getIcon(),
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
@@ -172,6 +176,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'targetOp' => 'profile',
 				'orcidProfileOauthPath' => $this->getOauthPath(),
 				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
+				'orcidIcon' => $this->getIcon(),
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
@@ -392,6 +397,15 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function getStyleSheet() {
 		return $this->getPluginPath() . '/css/orcidProfile.css';
+	}
+
+	/**
+	 * Return a string of the ORCiD SVG icon
+	 * @return string
+	 */
+	function getIcon() {
+		$path = Core::getBaseDir() . '/' . $this->getPluginPath() . '/templates/images/orcid.svg';
+		return file_exists($path) ? file_get_contents($path) : '';
 	}
 
 	/**
