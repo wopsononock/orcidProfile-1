@@ -57,13 +57,28 @@ class OrcidHandler extends Handler {
 			$json = json_decode($result, true);
 		}
 
+		curl_setopt_array($curl, array(
+			CURLOPT_RETURNTRANSFER => 1,
+			CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($response['orcid']) . '/' . ORCID_EMAIL_URL,
+			CURLOPT_POST => false,
+			CURLOPT_HTTPHEADER => array('Accept: application/json'),
+		));
+		$result = curl_exec($curl);
+		$info = curl_getinfo($curl);
+		if ($info['http_code'] == 200) {
+			$json_email = json_decode($result, true);
+			$json['email']['value'] = $json_email['email'][0]['email'];
+		}
+
+		$orcid_uri = 'http://orcid.org/' . $response['orcid'];
+
 		switch (Request::getUserVar('targetOp')) {
 			case 'register':
 				echo '<html><body><script type="text/javascript">
-					opener.document.getElementById("firstName").value = ' . json_encode($json['orcid-profile']['orcid-bio']['personal-details']['given-names']['value']) . ';
-					opener.document.getElementById("lastName").value = ' . json_encode($json['orcid-profile']['orcid-bio']['personal-details']['family-name']['value']) . ';
-					opener.document.getElementById("email").value = ' . json_encode($json['orcid-profile']['orcid-bio']['contact-details']['email'][0]['value']) . ';
-					opener.document.getElementById("orcid").value = ' . json_encode($json['orcid-profile']['orcid-identifier']['uri']). ';
+					opener.document.getElementById("firstName").value = ' . json_encode($json['name']['given-names']['value']) . ';
+					opener.document.getElementById("lastName").value = ' . json_encode($json['name']['family-name']['value']) . ';
+					opener.document.getElementById("email").value = ' . json_encode($json['email']['value']) . ';
+					opener.document.getElementById("orcid").value = ' . json_encode($orcid_uri). ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
 					window.close();
 				</script></body></html>';
@@ -71,7 +86,7 @@ class OrcidHandler extends Handler {
 			case 'profile':
 				// Set the ORCiD in the user profile from the response
 				echo '<html><body><script type="text/javascript">
-					opener.document.getElementsByName("orcid")[0].value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
+					opener.document.getElementsByName("orcid")[0].value = ' . json_encode($orcid_uri). ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
 					window.close();
 				</script></body></html>';
@@ -79,7 +94,7 @@ class OrcidHandler extends Handler {
 			case 'submit':
 				// Submission process: Pre-fill the first author's ORCiD from the ORCiD data
 				echo '<html><body><script type="text/javascript">
-					opener.document.getElementById("authors-0-orcid").value = ' . json_encode('http://orcid.org/' . $response['orcid']). ';
+					opener.document.getElementById("authors-0-orcid").value = ' . json_encode($orcid_uri). ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
 					window.close();
 				</script></body></html>';
