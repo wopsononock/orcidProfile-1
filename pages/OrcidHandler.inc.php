@@ -43,6 +43,7 @@ class OrcidHandler extends Handler {
 			))
 		));
 		$result = curl_exec($curl);
+		if (!$result) error_log('CURL error: ' . curl_error($curl));
 		$response = json_decode($result, true);
 
 		curl_setopt_array($curl, array(
@@ -52,6 +53,7 @@ class OrcidHandler extends Handler {
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 		));
 		$result = curl_exec($curl);
+		if (!$result) error_log('CURL error: ' . curl_error($curl));
 		$info = curl_getinfo($curl);
 		if ($info['http_code'] == 200) {
 			$json = json_decode($result, true);
@@ -64,6 +66,7 @@ class OrcidHandler extends Handler {
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 		));
 		$result = curl_exec($curl);
+		if (!$result) error_log('CURL error: ' . curl_error($curl));
 		$info = curl_getinfo($curl);
 		if ($info['http_code'] == 200) {
 			$json_email = json_decode($result, true);
@@ -130,6 +133,7 @@ class OrcidHandler extends Handler {
 			))
 		));
 		$result = curl_exec($curl);
+		if (!$result) error_log('CURL error: ' . curl_error($curl));
 		$response = json_decode($result, true);
 
 		if (!isset($response['orcid'])) {
