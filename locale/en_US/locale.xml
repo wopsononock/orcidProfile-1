@@ -30,8 +30,8 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
 	<message key="plugins.generic.orcidProfile.author.submission">Submission ORCID</message>
 	<message key="plugins.generic.orcidProfile.author.submission.success">Your submission has successfully been associated with your ORCID iD.</message>
-	<message key="plugins.generic.orcidProfile.author.submission.failure">Your submission could not be successfully associated with your ORCID iD. Please contact the journal manager with your name, ORCID, and details of your submission.</message>
+	<message key="plugins.generic.orcidProfile.author.submission.failure">Your submission could not be successfully associated with your ORCID iD. Please contact the journal manager with your name, ORCID iD, and details of your submission.</message>
 	<message key="plugins.generic.orcidProfile.authFailure">OJS was not able to communicate with the ORCID service. Please contact the journal manager with your name, ORCID iD, and details of your submission.</message>
 	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
-	<message key="plugins.generic.orcidProfile.connect">Create or Connect your ORCID</message>
+	<message key="plugins.generic.orcidProfile.connect">Create or Connect your ORCID iD</message>
 </locale>

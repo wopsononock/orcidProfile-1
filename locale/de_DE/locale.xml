@@ -32,4 +32,6 @@
 	<message key="plugins.generic.orcidProfile.author.submission.success">Ihre Einreichung wurde erfolgreich mit Ihrem ORCID-Profil verknüpft.</message>
 	<message key="plugins.generic.orcidProfile.author.submission.failure">Ihre Einreichung könnte nicht erfolgreich mit Ihrem ORCID-Profil verknüpft werden. Bitte kontaktieren Sie den/die Zeitschriftenverwalter/in und geben Sie Ihren Namen, ORCID-iD und Details zu Ihrer Einreichung an.</message>
 	<message key="plugins.generic.orcidProfile.authFailure">OJS konnte nicht mit ORCID kommunizieren. Bitte kontaktieren Sie den/die Zeitschriftenverwalter/in und geben Sie Ihren Namen, ORCID-iD und Details zu Ihrer Einreichung an.</message>
+	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
+	<message key="plugins.generic.orcidProfile.connect">ORCID iD anlegen und verknüpfen</message>
 </locale>
