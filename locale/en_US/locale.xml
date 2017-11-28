@@ -21,6 +21,7 @@
 	<message key="plugins.generic.orcidProfile.emailOrOrcid">Email address or ORCID iD:</message>
 	<message key="plugins.generic.orcidProfile.manager.orcidProfileSettings">ORCID Profile Settings</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.description">Configure the ORCID API for use in pulling ORCID profile information into the user profile.</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured">The ORCID API was configured globally by the host. The following credentials have been saved.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath">ORCID API</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public">Public</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox">Public Sandbox</message>
@@ -28,6 +29,7 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox">Member Sandbox</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientId">Client ID</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
+	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Send request for ORCID authorization to Author's Email</message>
 	<message key="plugins.generic.orcidProfile.author.submission">Submission ORCID</message>
 	<message key="plugins.generic.orcidProfile.author.submission.success">Your submission has successfully been associated with your ORCID iD.</message>
 	<message key="plugins.generic.orcidProfile.author.submission.failure">Your submission could not be successfully associated with your ORCID iD. Please contact the journal manager with your name, ORCID iD, and details of your submission.</message>
