@@ -10,10 +10,18 @@
  *
  *}
 <div id="orcidProfileSettings">
-<div id="description">{translate key="plugins.generic.orcidProfile.manager.settings.description"}</div>
+
+<div id="description">
+	{if $globallyConfigured}
+		{translate key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured" }
+	{else}
+        {translate key="plugins.generic.orcidProfile.manager.settings.description" }
+    {/if}
+</div>
 
 <h3>{translate key="plugins.generic.webfeed.settings"}</h3>
 
+{if !$globallyConfigured}
 <script>
 	$(function() {ldelim}
 		// Attach the form handler.
@@ -26,25 +34,54 @@
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="orcidProfileSettingsFormNotification"}
 
 	{fbvFormArea id="orcidProfileSettingsFormArea"}
-<table width="100%" class="data">
-	<tr valign="top">
-		<td width="20%" class="label">{fieldLabel name="orcidProfileAPIPath" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"}</td>
-		<td width="80%" class="value">{html_options_translate name="orcidProfileAPIPath" options=$orcidApiUrls selected=$orcidProfileAPIPath}</td>
-	</tr>
-	<tr valign="top">
-		<td class="label">{fieldLabel name="orcidClientId" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidClientId"}</td>
-		<td class="label"><input type="text" name="orcidClientId" id="orcidClientId" value="{$orcidClientId|escape}" size="40" class="textField" /></td>
-	</tr>
-	<tr valign="top">
-		<td class="label">{fieldLabel name="orcidClientSecret" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret"}</td>
-		<td class="label"><input type="text" name="orcidClientSecret" id="orcidClientSecret" value="{$orcidClientSecret|escape}" size="40" class="textField" /></td>
-	</tr>
-</table>
+	<table width="100%" class="data">
+		<tr valign="top">
+			<td width="20%" class="label">{fieldLabel name="orcidProfileAPIPath" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"}</td>
+			<td width="80%" class="value">
+				{html_options_translate name="orcidProfileAPIPath" options=$orcidApiUrls selected=$orcidProfileAPIPath}
+			</td>
+		</tr>
+		<tr valign="top">
+			<td class="label">{fieldLabel name="orcidClientId" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidClientId"}</td>
+			<td class="value">
+				<input type="text" name="orcidClientId" id="orcidClientId" value="{$orcidClientId|escape}" size="40" class="textField" />
+			</td>
+		</tr>
+		<tr valign="top">
+			<td class="label">{fieldLabel name="orcidClientSecret" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret"}</td>
+			<td class="value">
+				<input type="text" name="orcidClientSecret" id="orcidClientSecret" value="{$orcidClientSecret|escape}" size="40" class="textField" />
+			</td>
+		</tr>
+	</table>
 
 	{/fbvFormArea}
 
 	{fbvFormButtons}
 </form>
 
+
 <p><span class="formRequired">{translate key="common.requiredField"}</span></p>
+{else}
+	<table width="100%" class="data">
+		<tr valign="top">
+			<td width="20%" class="label">{translate key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"}</td>
+			<td width="80%" class="value">
+				{$orcidProfileAPIPath}
+			</td>
+		</tr>
+		<tr valign="top">
+			<td class="label">{translate key="plugins.generic.orcidProfile.manager.settings.orcidClientId"}</td>
+			<td class="value">
+				{$orcidClientId|escape}
+			</td>
+		</tr>
+		<tr valign="top">
+			<td class="label">{translate key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret"}</td>
+			<td class="value">
+				<i>hidden</i>
+			</td>
+		</tr>
+	</table>
+{/if}
 </div>

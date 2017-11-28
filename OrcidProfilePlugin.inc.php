@@ -38,6 +38,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if ($success && $this->getEnabled($mainContextId)) {
 			// Register callback for Smarty filters; add CSS
 			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
+			HookRegistry::register('authorform::display', array($this, 'handleAuthorFormDisplay'));
+			HookRegistry::register('authorform::execute', array($this, 'handleAuthorFormExecute'));
+			HookRegistry::register('authorform::readuservars', array($this, 'authorFormReadUserVars'));
 
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array($this, 'setupCallbackHandler'));
@@ -77,9 +80,41 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return false;
 	}
 
-	/**
-	 * Hook callback: register output filter to add data citation to submission
-	 * summaries; add data citation to reading tools' suppfiles and metadata views.
+    function getSetting($contextId, $name)
+    {
+		switch ($name) {
+			case 'orcidProfileAPIPath':
+				$config_value = Config::getVar('orcid','api_url');
+				break;
+			case 'orcidClientId':
+				$config_value = Config::getVar('orcid','client_id');
+				break;
+			case 'orcidClientSecret':
+				$config_value = Config::getVar('orcid','client_secret');
+				break;
+			default:
+            	return parent::getSetting($contextId, $name);
+		}
+	    return $config_value ?: parent::getSetting($contextId, $name);
+    }
+
+    function isGloballyConfigured() {
+	    $apiUrl = Config::getVar('orcid','api_url');
+	    $clientId = Config::getVar('orcid','client_id');
+	    $clientSecret = Config::getVar('orcid','client_secret');
+	    return isset($apiUrl) && trim($apiUrl) && isset($clientId) && trim($clientId) &&
+		    isset($clientSecret) && trim($clientSecret);
+    }
+
+    function handleAuthorFormDisplay($hookname, $params) {
+		$form =& $args[0];
+		$templateMgr = TemplateManager::getManager(PKPApplication::getRequest());
+	    $templateMgr->register_outputfilter(array($this, 'authorFormFilter'));
+    }
+
+    /**
+	 * Hook callback: register output filter to add ORCID extensions to forms/views.
+	 *
 	 * @see TemplateManager::display()
 	 */
 	function handleTemplateDisplay($hookName, $args) {
@@ -112,7 +147,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 	/**
 	 * Return the OAUTH path (prod or sandbox) based on the current API configuration
-	 * @return $string
+	 * @return string
 	 */
 	function getOauthPath() {
 		$context = Request::getContext();
@@ -130,7 +165,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Output filter adds ORCiD interaction to registration form.
 	 * @param $output string
 	 * @param $templateMgr TemplateManager
-	 * @return $string
+	 * @return string
 	 */
 	function registrationFilter($output, $templateMgr) {
 		if (preg_match('/<form[^>]+id="register"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
@@ -159,7 +194,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Output filter adds ORCiD interaction to user profile form.
 	 * @param $output string
 	 * @param $templateMgr TemplateManager
-	 * @return $string
+	 * @return string
 	 */
 	function profileFilter($output, &$templateMgr) {
 		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE) &&
@@ -189,6 +224,42 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		$templateMgr->unregister_outputfilter('profileFilter');
 		return $output;
+	}
+
+	/**
+	 * Output filter adds ORCiD interaction to contributors metadata add/edit form.
+	 * @param $output string
+	 * @param $templateMgr TemplateManager
+	 * @return string
+	 */
+	function authorFormFilter($output, &$templateMgr) {
+		if (preg_match('/<input[^>]+name="submissionId"[^>]*>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+			$match = $matches[0][0];
+			$offset = $matches[0][1];
+
+			$templateMgr->assign(array(
+				'targetOp' => 'profile'
+			));
+
+			$newOutput = substr($output, 0, $offset+strlen($match));
+			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'authorFormOrcid.tpl');
+			$newOutput .= substr($output, $offset+strlen($match));
+			$output = $newOutput;
+		}
+		$templateMgr->unregister_outputfilter('authorFormFilter');
+		return $output;
+	}
+
+	function authorFormReadUserVars($hookname, $args) {
+		$form =& $args[0];
+		$form->setData('requestOrcidAuthorization', Request::getUserVar('requestOrcidAuthorization'));
+		return false;
+	}
+
+	function handleAuthorFormExecute($hookname, $args) {
+		$form =& $args[0];
+		$requestAuthorization = $form->getData('requestOrcidAuthorization');
+		// TODO Send mail to author if no ORCID was stored and or no ORCID access token has been stored.
 	}
 
 	/**
@@ -258,6 +329,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Add the author hash storage to the author record
 	 * @param $hookName string
 	 * @param $params array
+	 *
+	 * @return bool
 	 */
 	function authorSubmitGetFieldNames($hookName, $params) {
 		$fields =& $params[1];
