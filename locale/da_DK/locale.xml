@@ -32,4 +32,6 @@
 	<message key="plugins.generic.orcidProfile.author.submission.success">Din indsendelse blev forbundet med din ORCID iD</message>
 	<message key="plugins.generic.orcidProfile.author.submission.failure">Din indsendelse kunne ikke forbindes med din ORCID iD. Kontakt tidsskriftschefen med oplysning om dit navn, ORCID og indsendelsesdetaljer.</message>
 	<message key="plugins.generic.orcidProfile.authFailure">OJS var ikke i stand til at kommunikere med ORCID-tjenestem. Kontakt tidsskriftschefen med oplysning om dit navn, ORCID og indsendelsesdetaljer.</message>
+	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
+	<message key="plugins.generic.orcidProfile.connect">Opret eller tilslut din ORCID iD</message>
 </locale>
