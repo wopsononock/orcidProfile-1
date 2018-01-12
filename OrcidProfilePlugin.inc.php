@@ -41,9 +41,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if ($success && $this->getEnabled()) {
 			// Register callback for Smarty filters; add CSS
 			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
-			HookRegistry::register('authorform::display', array($this, 'handleAuthorFormDisplay'));
+			HookRegistry::register('authorform::display', array($this, 'handleFormDisplay'));
 			HookRegistry::register('authorform::execute', array($this, 'handleAuthorFormExecute'));
 			HookRegistry::register('authorform::readuservars', array($this, 'authorFormReadUserVars'));
+			// Register callback for public user profile form display
+			HookRegistry::register('publicprofileform::display', array($this, 'handleFormDisplay'));
 
 			// Insert ORCID callback
 			HookRegistry::register('LoadHandler', array($this, 'setupCallbackHandler'));
@@ -109,15 +111,34 @@ class OrcidProfilePlugin extends GenericPlugin {
 		    isset($clientSecret) && trim($clientSecret);
     }
 
-    function handleAuthorFormDisplay($hookname, $params) {
-		$form =& $args[0];
-		$templateMgr = TemplateManager::getManager(PKPApplication::getRequest());
-	    $templateMgr->register_outputfilter(array($this, 'authorFormFilter'));
-    }
-
     /**
-	 * Hook callback: register output filter to add ORCID extensions to forms/views.
+	 * Hook callback to handle form display.
+	 * Registers output filter for public user profile and author form.
 	 *
+	 * @see Form::display()
+	 *
+	 * @param $hookName
+	 * @param $args
+	 *
+	 * @return bool
+	 */
+	function handleFormDisplay($hookName, $args) {
+		$request = PKPApplication::getRequest();
+		$templateMgr = TemplateManager::getManager($request);
+		switch ($hookName) {
+			case 'publicprofileform::display':
+				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
+				break;			
+			case 'authorform::display':
+				$templateMgr->register_outputfilter(array($this, 'authorFormFilter'));
+				break;
+			default:				
+		}
+		return false;
+	}
+
+	/**
+	 * Hook callback: register output filter for user registration and article display.
 	 * @see TemplateManager::display()
 	 */
 	function handleTemplateDisplay($hookName, $args) {
@@ -140,9 +161,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 				break;
 			case 'frontend/pages/article.tpl':
 				$templateMgr->assign('orcidIcon', $this->getIcon());
-				break;
-			case 'user/publicProfileForm.tpl':
-				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
 				break;
 		}
 		return false;
@@ -171,7 +189,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return string
 	 */
 	function registrationFilter($output, &$templateMgr) {
-		if (preg_match('/<form[^>]+id="register"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
+		if (preg_match('/<form[^>]+id="register"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {			
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$context = Request::getContext();
@@ -189,7 +207,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
 		}
-		$templateMgr->unregister_outputfilter('registrationFilter');
+		$templateMgr->unregister_outputfilter(array($this, 'registrationFilter'));
 		return $output;
 	}
 
@@ -225,7 +243,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
 		}
-		$templateMgr->unregister_outputfilter('profileFilter');
+		$templateMgr->unregister_outputfilter(array($this, 'profileFilter'));
 		return $output;
 	}
 
