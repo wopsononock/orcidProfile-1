@@ -43,7 +43,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
 			// Register callbacks for author metadata form handling
 			HookRegistry::register('authorform::execute', array($this, 'handleAuthorFormExecute'));
-			HookRegistry::register('authorform::readuservars', array($this, 'authorFormReadUserVars'));
 			// Register callbacks for modified form displays
 			HookRegistry::register('publicprofileform::display', array($this, 'handleFormDisplay'));
 			HookRegistry::register('authorform::display', array($this, 'handleFormDisplay'));
@@ -272,14 +271,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return $output;
 	}
 
-	function authorFormReadUserVars($hookname, $args) {
-		$form =& $args[0];
-		$form->setData('requestOrcidAuthorization', Request::getUserVar('requestOrcidAuthorization'));
-		return false;
-	}
-
+	/**
+	 * @param $hookname string
+	 * @param $args AuthorForm[]
+	 */
 	function handleAuthorFormExecute($hookname, $args) {
 		$form =& $args[0];
+		$form->readUserVars(array('requestOrcidAuthorization'));
 		$requestAuthorization = $form->getData('requestOrcidAuthorization');
 		$author = $form->getAuthor();
 		if ($author) {
@@ -518,6 +516,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()))
 				)),
 			'authorName' => $author->getFullName(),
+			'journalName' => $context->getLocalizedName(),
 			'editorialContactSignature' => $context->getSetting('contactName'),
 			'articleTitle' => $article->getLocalizedTitle(),
 		));
