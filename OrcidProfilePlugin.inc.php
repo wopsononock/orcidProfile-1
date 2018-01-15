@@ -118,8 +118,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @see Form::display()
 	 *
-	 * @param $hookName
-	 * @param $args
+	 * @param $hookName string
+	 * @param $args array
 	 *
 	 * @return bool
 	 */
@@ -140,7 +140,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 	/**
 	 * Hook callback: register output filter for user registration and article display.
+	 *
 	 * @see TemplateManager::display()
+	 * @param $hookName string
+	 * @param $args array
+	 * @return bool
 	 */
 	function handleTemplateDisplay($hookName, $args) {
 		$templateMgr =& $args[0];
@@ -277,6 +281,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleAuthorFormExecute($hookname, $args) {
 		$form =& $args[0];
 		$requestAuthorization = $form->getData('requestOrcidAuthorization');
+		$author = $form->getAuthor();
+		if ($author) {
+			$this->sendAuthorMail($author);
+		}
 		// TODO Send mail to author if no ORCID was stored and or no ORCID access token has been stored.
 	}
 
@@ -307,38 +315,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		// if author has no orcid id
 		if (!$author->getData('orcid')){
-			$mail = $this->getMailTemplate('ORCID_COLLECT_AUTHOR_ID');
-
-			$orcidToken = md5(time());
-			$author->setData('orcidToken', $orcidToken);
-
-			$request = PKPApplication::getRequest();
-			$context = $request->getContext();
-
-			// This should only ever happen within a context, never site-wide.
-			assert($context != null);
-			$contextId = $context->getId();
-
-			$articleDao = DAORegistry::getDAO('ArticleDAO');
-			$article = $articleDao->getArticle($author->getSubmissionId());
-
-			$mail->assignParams(array(
-				'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
-					'client_id' => $this->getSetting($contextId, 'orcidClientId'),
-					'response_type' => 'code',
-					'scope' => '/authenticate',
-					'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()))
-				)),
-				'authorName' => $author->getFullName(),
-				'editorialContactSignature' => $context->getSetting('contactName'),
-				'articleTitle' => $article->getLocalizedTitle(),
-			));
-
-			// Send to author
-			$mail->addRecipient($author->getEmail(), $author->getFullName());
-
-			// Send the mail.
-			$mail->send($request);
+			$this->sendAuthorMail($author);
 		}
 		return false;
 	}
@@ -353,6 +330,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function authorSubmitGetFieldNames($hookName, $params) {
 		$fields =& $params[1];
 		$fields[] = 'orcidToken';
+		$fields[] = 'orcidAccessToken';
 		return false;
 	}
 
@@ -505,11 +483,50 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function &getMailTemplate($emailKey, $context = null) {
 		if (!isset($this->_mailTemplates[$emailKey])) {
-			import('classes.mail.MailTemplate');
+			import('lib.pkp.classes.mail.MailTemplate');
 			$mailTemplate = new MailTemplate($emailKey, null, null, $context, true, true);
 			$this->_mailTemplates[$emailKey] = $mailTemplate;
 		}
 		return $this->_mailTemplates[$emailKey];
+	}
+
+	/**
+	 * @param $author Author
+	 */
+	public function sendAuthorMail($author)
+	{
+		$mail = $this->getMailTemplate('ORCID_COLLECT_AUTHOR_ID');
+
+		$orcidToken = md5(time());
+		$author->setData('orcidToken', $orcidToken);
+
+		$request = PKPApplication::getRequest();
+		$context = $request->getContext();
+
+		// This should only ever happen within a context, never site-wide.
+		assert($context != null);
+		$contextId = $context->getId();
+
+		$articleDao = DAORegistry::getDAO('ArticleDAO');
+		$article = $articleDao->getById($author->getSubmissionId());
+
+		$mail->assignParams(array(
+			'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
+					'client_id' => $this->getSetting($contextId, 'orcidClientId'),
+					'response_type' => 'code',
+					'scope' => '/authenticate',
+					'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()))
+				)),
+			'authorName' => $author->getFullName(),
+			'editorialContactSignature' => $context->getSetting('contactName'),
+			'articleTitle' => $article->getLocalizedTitle(),
+		));
+
+		// Send to author
+		$mail->addRecipient($author->getEmail(), $author->getFullName());
+
+		// Send the mail.
+		$mail->send($request);
 	}
 
 }
