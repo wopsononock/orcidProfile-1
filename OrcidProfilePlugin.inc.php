@@ -478,6 +478,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @param $emailKey string
 	 * @param $context Context
+	 *
+	 * @return MailTemplate
 	 */
 	function &getMailTemplate($emailKey, $context = null) {
 		if (!isset($this->_mailTemplates[$emailKey])) {
@@ -507,14 +509,18 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		$articleDao = DAORegistry::getDAO('ArticleDAO');
 		$article = $articleDao->getById($author->getSubmissionId());
+		$dispatcher = $request->getDispatcher();
+		// We need to construct a page url, but the request is using the component router.
+		// Use the Dispatcher to construct the url and set the router.
+		$redirectUrl = $dispatcher->url($request, ROUTE_PAGE, null, 'orcidapi',
+			'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()));
 
 		$mail->assignParams(array(
 			'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
-					'client_id' => $this->getSetting($contextId, 'orcidClientId'),
-					'response_type' => 'code',
-					'scope' => '/authenticate',
-					'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()))
-				)),
+				'client_id' => $this->getSetting($contextId, 'orcidClientId'),
+				'response_type' => 'code',
+				'scope' => '/authenticate',
+				'redirect_uri' => $redirectUrl)),
 			'authorName' => $author->getFullName(),
 			'journalName' => $context->getLocalizedName(),
 			'editorialContactSignature' => $context->getSetting('contactName'),
