@@ -17,6 +17,8 @@
 import('classes.handler.Handler');
 
 class OrcidHandler extends Handler {
+	const MESSAGE_TPL = 'frontend/pages/message.tpl';
+
 	/**
 	 * Authorize handler
 	 * @param $args array
@@ -112,8 +114,7 @@ class OrcidHandler extends Handler {
 	 * @param $request PKPRequest
 	 */
 	function orcidVerify($args, $request) {
-		$context = Request::getContext();
-		$op = Request::getRequestedOp();
+		$context = $request->getContext();
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$templateMgr = TemplateManager::getManager($request);
 		$contextId = ($context == null) ? 0 : $context->getId();
@@ -142,12 +143,12 @@ class OrcidHandler extends Handler {
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 				'message' => 'plugins.generic.orcidProfile.authFailure',
 			));
-			$templateMgr->display('common/message.tpl');
+			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
 		}
 
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
-		$authors = $authorDao->getAuthorsBySubmissionId($request->getUserVar('articleId'));
+		$authors = $authorDao->getBySubmissionId($request->getUserVar('articleId'));
 		foreach ($authors as $author) {
 			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
 				$author->setData('orcid', 'http://orcid.org/' . $response['orcid']);
@@ -159,7 +160,7 @@ class OrcidHandler extends Handler {
 					'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 					'message' => 'plugins.generic.orcidProfile.author.submission.success',
 				));
-				$templateMgr->display('common/message.tpl');
+				$templateMgr->display(self::MESSAGE_TPL);
 				exit();
 			}
 		}
@@ -169,7 +170,7 @@ class OrcidHandler extends Handler {
 			'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 			'message' => 'plugins.generic.orcidProfile.author.submission.failure',
 		));
-		$templateMgr->display('common/message.tpl');
+		$templateMgr->display(self::MESSAGE_TPL);
 	}
 }
 
