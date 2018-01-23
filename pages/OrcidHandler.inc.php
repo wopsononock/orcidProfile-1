@@ -127,7 +127,7 @@ class OrcidHandler extends Handler {
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => http_build_query(array(
-				'code' => Request::getUserVar('code'),
+				'code' => $request->getUserVar('code'),
 				'grant_type' => 'authorization_code',
 				'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
 				'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
@@ -158,7 +158,6 @@ class OrcidHandler extends Handler {
 			exit();
 		}
 
-
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$authors = $authorDao->getBySubmissionId($request->getUserVar('articleId'));
 		foreach ($authors as $author) {
@@ -168,7 +167,7 @@ class OrcidHandler extends Handler {
 				$author->setData('orcidRefreshToken', $response['refresh_token']);
 				$author->setData('orcidAccessExpiresIn', $response['expires_in']);
 				$author->setData('orcidToken', null);
-				$authorDao->updateAuthor($author);
+				$authorDao->updateObject($author);
 
 				$templateMgr->assign(array(
 					'currentUrl' => $request->url(null, 'index'),
