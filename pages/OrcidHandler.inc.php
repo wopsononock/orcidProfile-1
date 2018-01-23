@@ -143,15 +143,30 @@ class OrcidHandler extends Handler {
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 				'message' => 'plugins.generic.orcidProfile.authFailure',
 			));
+			error_log('Invalid orcid response: '. $result);
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
 		}
+
+		if (!isset($response['access_token'])) {
+			$templateMgr->assign(array(
+				'currentUrl' => $request->url(null, 'index'),
+				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
+				'message' => 'plugins.generic.orcidProfile.authFailure',
+			));
+			$templateMgr->display(self::MESSAGE_TPL);
+			exit();
+		}
+
 
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$authors = $authorDao->getBySubmissionId($request->getUserVar('articleId'));
 		foreach ($authors as $author) {
 			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
 				$author->setData('orcid', 'http://orcid.org/' . $response['orcid']);
+				$author->setData('orcidAccessToken', $response['access_token']);
+				$author->setData('orcidRefreshToken', $response['refresh_token']);
+				$author->setData('orcidAccessExpiresIn', $response['expires_in']);
 				$author->setData('orcidToken', null);
 				$authorDao->updateAuthor($author);
 

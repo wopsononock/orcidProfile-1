@@ -56,7 +56,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			// Send emails to authors without ORCID id upon submission
 			HookRegistry::register('Author::Form::Submit::AuthorSubmitStep3Form::Execute', array($this, 'collectAuthorOrcidId'));
 
-			// Add ORCiD hash to author DAO
+			// Add ORCiD fields to author DAO
 			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'authorSubmitGetFieldNames'));
 		}
 		return $success;
@@ -329,6 +329,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$fields =& $params[1];
 		$fields[] = 'orcidToken';
 		$fields[] = 'orcidAccessToken';
+		$fields[] = 'orcidRefreshToken';
+		$fields[] = 'orcidAccessExpiresIn';
 		return false;
 	}
 
@@ -519,7 +521,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
 				'client_id' => $this->getSetting($contextId, 'orcidClientId'),
 				'response_type' => 'code',
-				'scope' => '/authenticate',
+				'scope' => '/activities/update /read-limited',
 				'redirect_uri' => $redirectUrl)),
 			'authorName' => $author->getFullName(),
 			'journalName' => $context->getLocalizedName(),
