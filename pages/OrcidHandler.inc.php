@@ -169,7 +169,7 @@ class OrcidHandler extends Handler {
 				$author->setData('orcid', 'http://orcid.org/' . $response['orcid']);
 				$author->setData('orcidAccessToken', $response['access_token']);
 				$author->setData('orcidRefreshToken', $response['refresh_token']);
-				$author->setData('orcidAccessExpiresIn', $orcidAccessExpiresOn);
+				$author->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 				$author->setData('orcidToken', null);
 				$authorDao->updateObject($author);
 

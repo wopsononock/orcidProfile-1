@@ -57,7 +57,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			HookRegistry::register('Author::Form::Submit::AuthorSubmitStep3Form::Execute', array($this, 'collectAuthorOrcidId'));
 
 			// Add ORCiD fields to author DAO
-			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'authorSubmitGetFieldNames'));
+			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'authorGetAdditionalFieldNames'));
 		}
 		return $success;
 	}
@@ -325,18 +325,18 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	 * Add the author hash storage to the author record
+	 * Add additional ORCID specific fields to the author record
 	 * @param $hookName string
 	 * @param $params array
 	 *
 	 * @return bool
 	 */
-	function authorSubmitGetFieldNames($hookName, $params) {
+	function authorGetAdditionalFieldNames($hookName, $params) {
 		$fields =& $params[1];
 		$fields[] = 'orcidToken';
 		$fields[] = 'orcidAccessToken';
 		$fields[] = 'orcidRefreshToken';
-		$fields[] = 'orcidAccessExpiresIn';
+		$fields[] = 'orcidAccessExpiresOn';
 		return false;
 	}
 
