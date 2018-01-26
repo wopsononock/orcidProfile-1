@@ -118,11 +118,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @see Form::display()
 	 *
 	 * @param $hookName string
-	 * @param $args array
+	 * @param $args Form[]
 	 *
 	 * @return bool
 	 */
-	function handleFormDisplay($hookName, $args) {
+	function handleFormDisplay($hookName, $args) {		
 		$request = PKPApplication::getRequest();
 		$templateMgr = TemplateManager::getManager($request);
 
@@ -131,6 +131,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
 				break;
 			case 'authorform::display':
+				$authorForm =& $args[0];
+				$author = $authorForm->getAuthor();
+				$templateMgr->assign( array(
+					'orcidAccessToken' => $author->getData('orcidAccessToken'),
+					'orcidAccessExpiresIn' => $author->getData('orcidAccessExpiresIn')
+				));
 				$templateMgr->register_outputfilter(array($this, 'authorFormFilter'));
 				break;
 		}
