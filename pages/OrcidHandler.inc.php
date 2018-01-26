@@ -162,7 +162,7 @@ class OrcidHandler extends Handler {
 		$authors = $authorDao->getBySubmissionId($request->getUserVar('articleId'));
 		foreach ($authors as $author) {
 			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
-				$orcidAccessExpiresOn = Carbon::now();
+				$orcidAccessExpiresOn = Carbon/Carbon::now();
 				// expires_in field from the response contains the lifetime in seconds of the token
 				// See https://members.orcid.org/api/get-oauthtoken
 				$orcidAccessExpiresOn->addSeconds($response['expires_in']);
