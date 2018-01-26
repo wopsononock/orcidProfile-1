@@ -135,7 +135,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$author = $authorForm->getAuthor();
 				$templateMgr->assign( array(
 					'orcidAccessToken' => $author->getData('orcidAccessToken'),
-					'orcidAccessExpiresIn' => $author->getData('orcidAccessExpiresIn')
+					'orcidAccessExpiresOn' => $author->getData('orcidAccessExpiresOn')
 				));
 				$templateMgr->register_outputfilter(array($this, 'authorFormFilter'));
 				break;

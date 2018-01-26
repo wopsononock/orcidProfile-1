@@ -162,10 +162,14 @@ class OrcidHandler extends Handler {
 		$authors = $authorDao->getBySubmissionId($request->getUserVar('articleId'));
 		foreach ($authors as $author) {
 			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
+				$orcidAccessExpiresOn = Carbon::now();
+				// expires_in field from the response contains the lifetime in seconds of the token
+				// See https://members.orcid.org/api/get-oauthtoken
+				$orcidAccessExpiresOn->addSeconds($response['expires_in']);
 				$author->setData('orcid', 'http://orcid.org/' . $response['orcid']);
 				$author->setData('orcidAccessToken', $response['access_token']);
 				$author->setData('orcidRefreshToken', $response['refresh_token']);
-				$author->setData('orcidAccessExpiresIn', $response['expires_in']);
+				$author->setData('orcidAccessExpiresIn', $orcidAccessExpiresOn);
 				$author->setData('orcidToken', null);
 				$authorDao->updateObject($author);
 
