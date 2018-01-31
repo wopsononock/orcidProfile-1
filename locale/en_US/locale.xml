@@ -29,7 +29,7 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox">Member Sandbox</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientId">Client ID</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
-	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Send request for ORCID authorization to Author's Email</message>
+	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Send E-Mail to request ORCID authorization from Author</message>
 	<message key="plugins.generic.orcidProfile.author.submission">Submission ORCID</message>
 	<message key="plugins.generic.orcidProfile.author.submission.success">Your submission has successfully been associated with your ORCID iD.</message>
 	<message key="plugins.generic.orcidProfile.author.submission.failure">Your submission could not be successfully associated with your ORCID iD. Please contact the journal manager with your name, ORCID iD, and details of your submission.</message>
