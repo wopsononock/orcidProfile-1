@@ -542,5 +542,95 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$mail->send($request);
 	}
 
+	/**
+	 * sendSubmissionToOrcid function
+	 *
+	 * @param $authorWithOrcid Author An Author object with a valid ORCID access
+	 * token to write a work to the corresponsing ORCID profile (scope: /activities/update)
+	 * @param $articleId integer Id of the article for which the data will be sent to ORCID
+	 * @return boolean True if posting the article
+	 * 
+	 **/
+	public function sendSubmissionToOrcid($request, $authorWithOrcid, $articleId) {
+		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');		
+		$issueDao = DAORegistry::getDAO('IssueDAO');
+		$article = $publishedArticleDao->getByArticleId($articleId);
+		if ( $article === null ) {
+			return false;
+		}
+		$journal = null;
+		$authors = array();
+		$dispatcher = $request->getDispatcher();
+		$articleUrl = $dispatcher->url($request, ROUTE_PAGE, null, 'article', 'view', $article->getBestArticleId());
+		$orcidWorkJson = $this->buildOrcidWorkJson($article, $articleUrl, $journal, $authors);
+	}
+
+	public function buildOrcidWorkJson($article, $articleUrl, $issue, $journal, $authors) {
+		$articleLocale = $article->getLocale();
+		$titles = $article->getTitle();
+		$translatedTitle = null;
+		foreach ($titles as $locale => $title) {
+			if ($locale === $articleLocale) {
+				continue;
+			}
+			else {
+				$translatedTitle = $title;
+			}
+		}
+		$externalIds = array();
+		$pubIdPlugins = PluginRegistry::getPlugins('pubids');
+		// Add doi, urn for article
+		foreach ($pubIdPlugins as $plugin) {
+			if (!$doiPlugin->getEnabled()) {
+				continue;
+			}
+			$pubIdType = $plugin->getPubIdType()
+			$pubId = $article->getStoredPubId($pubIdType);
+			$externalIds[] = [
+				'external-id-type' => $pubIdType,
+				'external-id-value' => $pubId,
+				'external-id-url' => [ 'value' => $doiPlugin->getResolvingURL($pubId) ],
+				'external-id-relationship' => 'SELF'
+			];
+		}
+		// Add journal online ISSN
+		// TODO What about print ISSN?
+		$externalIds[] = [
+			'external-id-type' => 'issn',
+			'external-id-value' => $journal->getData('onlineIssn'),
+			'external-id-relationship' => 'PART_OF'
+		];
+		$publicationDate = $article->getDatePublished();		
+		$orcidWork = [
+			'title' => [
+				'title' => [
+					'value' => $article->getLocalizedTitle($articleLocale)
+				],
+				'subtitle' => [
+					'value' => $article->getSubtitle($articleLocale)
+				],
+				'translated-title' => $translatedTitle
+			],
+			'journal-title' => [
+				'value' => $journal->getName('en_US')
+			],
+			'short-description' => [
+				'value' => $article->getAbstract('en_US')
+			],
+			'type' => 'JOURNAL_ARTICLE',
+			'external-ids' => [ 'external-id' => $externalIds ],
+			'publication-date' => [
+				'year' => [ 'value' => $publicationDate->format("Y")]
+				'month' => [ 'value' => $publicationDate->format("m")],
+				'day' => [ 'value' => $publicationDate->format("d")]
+			],
+			'url' => $articleUrl
+
+		];
+		$jsonString = json_encode(['work' => $orcidWork], JSON_FORCE_OBJECT);
+		return $jsonString;
+	}
 }
+
+
 ?>
