@@ -159,7 +159,7 @@ class OrcidHandler extends Handler {
 		}
 
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
-		$submissionId = $request->getUserVar('articleId')
+		$submissionId = $request->getUserVar('articleId');
 		$authors = $authorDao->getBySubmissionId($submissionId);
 		foreach ($authors as $author) {
 			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {

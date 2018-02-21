@@ -27,8 +27,12 @@ define('OAUTH_TOKEN_URL', 'oauth/token');
 define('ORCID_API_VERSION_URL', 'v2.1/');
 define('ORCID_PROFILE_URL', 'person');
 define('ORCID_EMAIL_URL', 'email');
+define('ORCID_WORK_URL', 'work');
 
 class OrcidProfilePlugin extends GenericPlugin {
+
+	const PUBID_TO_ORCID_EXT_ID = [ "doi" => "doi", "other::urn" => "urn"];
+
 	/**
 	 * Called as a plugin is registered to the registry
 	 * @param $category String Name of category plugin was registered to
@@ -560,50 +564,77 @@ class OrcidProfilePlugin extends GenericPlugin {
 			return false;
 		}
 		$journal = $journalDao->getById($article->getJournalId());
-		$authors = $authorDao->getBySubmissionId($articleId);
+		$authors = $authorDao->getBySubmissionId($submissionId);
 		$dispatcher = $request->getDispatcher();
 		$articleUrl = $dispatcher->url($request, ROUTE_PAGE, null, 'article', 'view', $article->getBestArticleId());
 		$orcidWorkJson = $this->buildOrcidWorkJson($article, $articleUrl, $journal, $authors);
-		error_log("POST ".$jsonString."\n", 3, Config::getVar('files','files_dir')."/orcid-communication.log");
+
+		$url = $this->getSetting($journal->getId(), 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($orcid) . '/' . ORCID_WORK_URL;
+		$header = [
+			'Content-Type: application/vnd.orcid+json',
+			'Content-Length: ' . strlen($orcidWorkJson),
+			'Accept: application/json',
+			'Authorization: Bearer '.$orcidAccessToken
+		];
+		error_log("POST $url\n", 3, Config::getVar('files','files_dir')."/orcid-communication.log");
+		error_log("Header: ".var_export($header, true)."\n", 3, Config::getVar('files','files_dir')."/orcid-communication.log");
+		error_log("Content: ".$orcidWorkJson."\n", 3, Config::getVar('files','files_dir')."/orcid-communication.log");
+
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $orcidWorkJson);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
+		$result = curl_exec($ch);
+		$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if (curl_error($ch)) {
+			error_log('Unable to post to Orcid API, Curl error: '.curl_error($ch));
+		}
+		error_log("Response Status $httpstatus , Body: ".$result."\n", 3, Config::getVar('files','files_dir')."/orcid-communication.log");
 		return false;
 	}
 
-	public function buildOrcidWorkJson($article, $articleUrl, $issue, $journal, $authors) {
-		$articleLocale = $article->getLocale();
-		$titles = $article->getTitle();
-		$translatedTitle = null;
-		foreach ($titles as $locale => $title) {
-			if ($locale === $articleLocale) {
-				continue;
-			}
-			else {
-				$translatedTitle = $title;
-			}
-		}
+	private function buildOrcidExternalIds($article, $journal) {
 		$externalIds = array();
-		$pubIdPlugins = PluginRegistry::getPlugins('pubids');
-		// Add doi, urn for article
-		foreach ($pubIdPlugins as $plugin) {
-			if (!$doiPlugin->getEnabled()) {
-				continue;
-			}
-			$pubIdType = $plugin->getPubIdType()
-			$pubId = $article->getStoredPubId($pubIdType);
-			$externalIds[] = [
-				'external-id-type' => $pubIdType,
-				'external-id-value' => $pubId,
-				'external-id-url' => [ 'value' => $doiPlugin->getResolvingURL($pubId) ],
-				'external-id-relationship' => 'SELF'
-			];
+		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true, $article->getContextId());
+		// Add doi, urn, etc. for article
+		if (is_array($pubIdPlugins)) {
+			foreach ($pubIdPlugins as $plugin) {
+				if (!$plugin->getEnabled()) {
+					continue;
+				}
+				$pubIdType = $plugin->getPubIdType();
+				$pubId = $article->getStoredPubId($pubIdType);				
+				$externalIds[] = [
+					'external-id-type' => self::PUBID_TO_ORCID_EXT_ID[$pubIdType],
+					'external-id-value' => $pubId,
+					'external-id-url' => [ 'value' => $plugin->getResolvingURL($article->getContextId(), $pubId) ],
+					'external-id-relationship' => 'SELF'
+				];
+			}	
+		}
+		else {
+			error_log("No pubId plugins could be loaded\n");
 		}
 		// Add journal online ISSN
 		// TODO What about print ISSN?
-		$externalIds[] = [
-			'external-id-type' => 'issn',
-			'external-id-value' => $journal->getData('onlineIssn'),
-			'external-id-relationship' => 'PART_OF'
-		];
-		$publicationDate = $article->getDatePublished();		
+		if ($journal->getData('onlineIssn')) {
+			$externalIds[] = [
+				'external-id-type' => 'issn',
+				'external-id-value' => $journal->getData('onlineIssn'),
+				'external-id-relationship' => 'PART_OF'
+			];	
+		}
+		return $externalIds;
+	}
+
+	public function buildOrcidWorkJson($article, $articleUrl, $journal, $authors) {
+		$articleLocale = $article->getLocale();
+		$titles = $article->getTitle($articleLocale);
+		$translatedTitle = $article->getTitle('en_US');
+		$externalIds = $this->buildOrcidExternalIds($article, $journal);
+		$publicationDate = new DateTime($article->getDatePublished());
 		$orcidWork = [
 			'title' => [
 				'title' => [
@@ -623,14 +654,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 			'type' => 'JOURNAL_ARTICLE',
 			'external-ids' => [ 'external-id' => $externalIds ],
 			'publication-date' => [
-				'year' => [ 'value' => $publicationDate->format("Y")]
+				'year' => [ 'value' => $publicationDate->format("Y")],
 				'month' => [ 'value' => $publicationDate->format("m")],
 				'day' => [ 'value' => $publicationDate->format("d")]
 			],
 			'url' => $articleUrl
 
 		];		
-		$jsonString = json_encode(['work' => $orcidWork], JSON_FORCE_OBJECT);		
+		$jsonString = json_encode(['work' => $orcidWork]);		
 		return $jsonString;
 	}
 }
