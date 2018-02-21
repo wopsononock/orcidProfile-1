@@ -159,7 +159,8 @@ class OrcidHandler extends Handler {
 		}
 
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
-		$authors = $authorDao->getBySubmissionId($request->getUserVar('articleId'));
+		$submissionId = $request->getUserVar('articleId')
+		$authors = $authorDao->getBySubmissionId($submissionId);
 		foreach ($authors as $author) {
 			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
 				$orcidAccessExpiresOn = Carbon\Carbon::now();
@@ -172,7 +173,7 @@ class OrcidHandler extends Handler {
 				$author->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 				$author->setData('orcidToken', null);
 				$authorDao->updateObject($author);
-
+				$plugin->sendSubmissionToOrcid($submissionId, $response['orcid'], $response['access_token'], $request);
 				$templateMgr->assign(array(
 					'currentUrl' => $request->url(null, 'index'),
 					'pageTitle' => 'plugins.generic.orcidProfile.author.submission',

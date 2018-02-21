@@ -551,18 +551,21 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return boolean True if posting the article
 	 * 
 	 **/
-	public function sendSubmissionToOrcid($request, $authorWithOrcid, $articleId) {
+	public function sendSubmissionToOrcid($submissionId, $orcid, $orcidAccessToken, $request) {
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');		
-		$issueDao = DAORegistry::getDAO('IssueDAO');
-		$article = $publishedArticleDao->getByArticleId($articleId);
+		$journalDao = DAORegistry::getDAO('JournalDAO');
+		$authorDao = DAORegistry::getDAO('AuthorDAO');
+		$article = $publishedArticleDao->getByArticleId($submissionId);
 		if ( $article === null ) {
 			return false;
 		}
-		$journal = null;
-		$authors = array();
+		$journal = $journalDao->getById($article->getJournalId());
+		$authors = $authorDao->getBySubmissionId($articleId);
 		$dispatcher = $request->getDispatcher();
 		$articleUrl = $dispatcher->url($request, ROUTE_PAGE, null, 'article', 'view', $article->getBestArticleId());
 		$orcidWorkJson = $this->buildOrcidWorkJson($article, $articleUrl, $journal, $authors);
+		error_log("POST ".$jsonString."\n", 3, Config::getVar('files','files_dir')."/orcid-communication.log");
+		return false;
 	}
 
 	public function buildOrcidWorkJson($article, $articleUrl, $issue, $journal, $authors) {
@@ -626,8 +629,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 			],
 			'url' => $articleUrl
 
-		];
-		$jsonString = json_encode(['work' => $orcidWork], JSON_FORCE_OBJECT);
+		];		
+		$jsonString = json_encode(['work' => $orcidWork], JSON_FORCE_OBJECT);		
 		return $jsonString;
 	}
 }
