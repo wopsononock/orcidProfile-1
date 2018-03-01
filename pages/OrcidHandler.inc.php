@@ -3,7 +3,7 @@
 /**
  * @file plugins/generic/orcidProfile/OrcidHandler.inc.php
  *
- * Copyright (c) 2015-2016 University of Pittsburgh
+ * Copyright (c) 2015-2018 University of Pittsburgh
  * Copyright (c) 2014-2018 Simon Fraser University
  * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2 or later. For full terms see the file docs/COPYING.
