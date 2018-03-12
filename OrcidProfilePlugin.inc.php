@@ -63,6 +63,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Add ORCiD fields to author DAO
 			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'authorGetAdditionalFieldNames'));
+
+			HookRegistry::register('IssueGridHandler::publishIssue', array($this, 'handlePublishIssue'));
+			
 		}
 		return $success;
 	}
@@ -139,10 +142,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'authorform::display':
 				$authorForm =& $args[0];
 				$author = $authorForm->getAuthor();
-				$templateMgr->assign( array(
-					'orcidAccessToken' => $author->getData('orcidAccessToken'),
-					'orcidAccessExpiresOn' => $author->getData('orcidAccessExpiresOn')
-				));
+				if ($author) {
+					$templateMgr->assign( array(
+						'orcidAccessToken' => $author->getData('orcidAccessToken'),
+						'orcidAccessExpiresOn' => $author->getData('orcidAccessExpiresOn')
+					));
+				}				
 				$templateMgr->register_outputfilter(array($this, 'authorFormFilter'));
 				break;
 		}
@@ -294,8 +299,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$author = $form->getAuthor();
 		if ($author) {
 			$this->sendAuthorMail($author);
-		}
-		// TODO Send mail to author if no ORCID was stored and or no ORCID access token has been stored.
+		}		
 	}
 
 	/**
@@ -549,18 +553,58 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
+	 * handlePublishIssue sends all submissions for which there exists authors with valid ORCID and access token
+	 * to ORCID on publication of a new issue
+	 * @param $hookName string
+	 * @param $args Issue[] Issue object that will be published
+	 *
+	 **/
+	public function handlePublishIssue($hookName, $args) {
+		$issue =& $args[0];
+		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+		$authorDao = DAORegistry::getDAO('AuthorDAO');
+		$publishedArticles = $publishedArticleDao->getPublishedArticles($issue->getId());
+		$request = PKPApplication::getRequest();
+		$journal = $request->getContext();
+		foreach ($publishedArticles as $publishedArticle) {
+			$articleId = $publishedArticle->getId();
+			$authors = $authorDao->getBySubmissionId($articleId);
+			$orcidProfiles = [];
+			foreach ($authors as $author) {
+				if ($author->getOrcid() && $author->getData('orcidAccessToken') ) {
+					$orcidAccessExpiresOn = Carbon\Carbon::parse($author->getData('orcidAccessExpiresOn'));	
+					if ($orcidAccessExpiresOn->isFuture()) {
+						# Extract only the ORCID from the stored ORCID uri						
+						$orcid = end(explode('/', parse_url($author->getOrcid(), PHP_URL_PATH)));
+						$orcidProfiles[$orcid] = $author->getData('orcidAccessToken');
+					}
+				}
+			}
+			if( count($orcidProfiles) > 0 ) {
+				if ( !$this->sendSubmissionToOrcid($articleId, $orcidProfiles, $request)) {
+					error_log('Unable to send updates to ORCID. See orcid.log');
+				}	
+			}
+		}
+	}
+
+	/**
 	 * sendSubmissionToOrcid function
 	 *
-	 * @param $authorWithOrcid Author An Author object with a valid ORCID access
-	 * token to write a work to the corresponsing ORCID profile (scope: /activities/update)
-	 * @param $articleId integer Id of the article for which the data will be sent to ORCID
+	 * @param $submissionId integer Id of the article for which the data will be sent to ORCID
+	 * @param $orcidProfiles array Associative Array consisting of the ORCID and the ORCID access token
+	 * @param $orcid the ORCID profile to push to. Only the number without the url part, e.g. 0000-0000-1234-8514.
+	 * @param $orcidAccessToken token to write a work to the corresponsing ORCID profile (scope: /activities/update)	 
 	 * @return boolean True if posting the article
 	 * 
 	 **/
-	public function sendSubmissionToOrcid($submissionId, $orcid, $orcidAccessToken, $request) {
+	public function sendSubmissionToOrcid($submissionId, $orcidProfiles, $request) {
+		if( empty($orcidProfiles) ) {
+			return false;
+		}
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');		
 		$journalDao = DAORegistry::getDAO('JournalDAO');
-		$authorDao = DAORegistry::getDAO('AuthorDAO');		
+		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$article = $publishedArticleDao->getByArticleId($submissionId);
 		if ( $article === null ) {
 			return false;
@@ -569,32 +613,41 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$authors = $authorDao->getBySubmissionId($submissionId);
 		// Maybe check if the orcid and orcidAccessToken actually belong to one of the Author objects?
 		$orcidWorkJson = $this->buildOrcidWorkJson($article, $journal, $authors, $request);
+		self::orcidLog("Posting JSON: ".$orcidWorkJson);
+		foreach ($orcidProfiles as $orcid => $orcidAccessToken) {
+			$url = $this->getSetting($journal->getId(), 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/' . ORCID_WORK_URL;
+			$header = [
+				'Content-Type: application/vnd.orcid+json',
+				'Content-Length: ' . strlen($orcidWorkJson),
+				'Accept: application/json',
+				'Authorization: Bearer '.$orcidAccessToken
+			];
 
-		$url = $this->getSetting($journal->getId(), 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($orcid) . '/' . ORCID_WORK_URL;
-		$header = [
-			'Content-Type: application/vnd.orcid+json',
-			'Content-Length: ' . strlen($orcidWorkJson),
-			'Accept: application/json',
-			'Authorization: Bearer '.$orcidAccessToken
-		];
+			self::orcidLog("POST $url");
+			self::orcidLog("Header: ".var_export($header, true));
+			
 
-		error_log("POST $url\n", 3, self::getOrcidLogFilePath());
-		error_log("Header: ".var_export($header, true)."\n", 3, self::getOrcidLogFilePath());
-		error_log("Body: ".$orcidWorkJson."\n", 3, self::getOrcidLogFilePath());
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $orcidWorkJson);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $orcidWorkJson);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-
-		$result = curl_exec($ch);
-		$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if (curl_error($ch)) {
-			error_log('Unable to post to Orcid API, Curl error: '.curl_error($ch));
+			$result = curl_exec($ch);
+			$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			if (curl_error($ch)) {
+				error_log('Unable to post to Orcid API, Curl error: '.curl_error($ch));
+				return false;
+			}
+			self::orcidLog("Response status: $httpstatus\nBody: ".$result);
 		}
-		error_log("Response status: $httpstatus\nBody: ".$result."\n", 3, self::getOrcidLogFilePath());
-		return false;
+		
+		if ($httpstatus == 201) {
+			return true;	
+		}
+		else {
+			return false;
+		}
 	}
 
 	public function buildOrcidWorkJson($article, $journal, $authors, $request) {
@@ -631,7 +684,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'citation-value' => $bibtexCitation
 			],
 			'language-code' => substr($articleLocale, 0, 2),
-			'contributors' => [ 'contributor' => $this->buildOrcidContributors($authors) ]
+			'contributors' => [ 'contributor' => $this->buildOrcidContributors($authors, $journal->getId()) ]
 		];
 		if ($articleLocale !== 'en_US') {
 			$orcidWork['title']['translated-title'] = [
@@ -676,11 +729,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return $externalIds;
 	}
 
-	private function buildOrcidContributors($authors) {
+	private function buildOrcidContributors($authors, $contextId) {
 		$contributors = [];
 		$first = true;
-		foreach ($authors as $author) {			
-			// TODO Check if e-mail address should be added			
+		foreach ($authors as $author) {
+			// TODO Check if e-mail address should be added
 			$contributor = [
 				'credit-name' => $author->getFullName(),
 				'contributor-attributes' => [
@@ -691,23 +744,35 @@ class OrcidProfilePlugin extends GenericPlugin {
 			if ($role) {
 				$contributor['contributor-attributes']['contributor-role'] = $role;
 			}
-			if ($author->getOrcid()) {				
+			if ($author->getOrcid()) {
 				$path = parse_url($author->getOrcid(), PHP_URL_PATH);
-				$orcid = end(explode('/', $path));				 
+				$orcid = end(explode('/', $path));
+				if( $this->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ) {
+					$uri = 'http://sandbox.orcid.org/'.$orcid;
+					$host = 'sandbox.orcid.org';
+				}
+				else {
+					$uri = 'https://orcid.org/'.$orcid;
+					$host = 'orcid.org';
+				}
 				$contributor['contributor-orcid'] = [
-					'uri' => 'https://orcid.org/'.$orcid,
+					#'uri' => $uri,
 					'path' => $orcid,
-					'host' => 'orcid.org'
+					'host' => $host
 				];
 			}
 			$first = false;
 			$contributors[] = $contributor;
-		}		
+		}
 		return $contributors;
 	}
 
 	public static function getOrcidLogFilePath() {
-		return Config::getVar('files','files_dir')."/orcid.log";
+		return Config::getVar('files','files_dir').'/orcid.log';
+	}
+
+	public static function orcidLog($message) {
+		error_log(date("c")." $message\n", 3, self::getOrcidLogFilePath());
 	}
 }
 

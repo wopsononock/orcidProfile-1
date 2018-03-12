@@ -173,7 +173,7 @@ class OrcidHandler extends Handler {
 				$author->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 				$author->setData('orcidToken', null);
 				$authorDao->updateObject($author);
-				$plugin->sendSubmissionToOrcid($submissionId, $response['orcid'], $response['access_token'], $request);
+				$plugin->sendSubmissionToOrcid($submissionId, [ $response['orcid'] => $response['access_token'] ], $request);
 				$templateMgr->assign(array(
 					'currentUrl' => $request->url(null, 'index'),
 					'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
