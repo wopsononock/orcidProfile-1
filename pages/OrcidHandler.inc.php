@@ -6,6 +6,7 @@
  * Copyright (c) 2015-2016 University of Pittsburgh
  * Copyright (c) 2014-2017 Simon Fraser University
  * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2017-2018 University Library Heidelberg
  * Distributed under the GNU GPL v2 or later. For full terms see the file docs/COPYING.
  *
  * @class OrcidHandler
@@ -119,6 +120,19 @@ class OrcidHandler extends Handler {
 		$templateMgr = TemplateManager::getManager($request);
 		$contextId = ($context == null) ? 0 : $context->getId();
 
+		// User denied access
+		if ( $request->getUserVar('error') === 'access_denied' ) {
+			// TODO specify special message if user denied access
+			$templateMgr->assign(array(
+				'currentUrl' => $request->url(null, 'index'),
+				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
+				'message' => 'plugins.generic.orcidProfile.authFailure',
+			));
+			error_log('ORCID verfifcation error: '. $request->getUserVar('error_description'));
+			$templateMgr->display(self::MESSAGE_TPL);
+			exit();
+		}
+
 		// fetch the access token
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
@@ -135,6 +149,7 @@ class OrcidHandler extends Handler {
 		));
 		$result = curl_exec($curl);
 		if (!$result) error_log('CURL error: ' . curl_error($curl));
+		
 		$response = json_decode($result, true);
 
 		if (!isset($response['orcid'])) {
@@ -173,7 +188,7 @@ class OrcidHandler extends Handler {
 				$author->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 				$author->setData('orcidToken', null);
 				$authorDao->updateObject($author);
-				$plugin->sendSubmissionToOrcid($submissionId, [ $response['orcid'] => $response['access_token'] ], $request);
+				$plugin->sendSubmissionToOrcid($submissionId, $request);
 				$templateMgr->assign(array(
 					'currentUrl' => $request->url(null, 'index'),
 					'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
