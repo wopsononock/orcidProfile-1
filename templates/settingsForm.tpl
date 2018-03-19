@@ -20,7 +20,7 @@
     {/if}
 </div>
 
-<h3>{translate key="plugins.generic.webfeed.settings"}</h3>
+<h3>{translate key="plugins.generic.orcidProfile.manager.orcidProfileSettings"}</h3>
 
 {if !$globallyConfigured}
 <script>

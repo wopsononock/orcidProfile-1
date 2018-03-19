@@ -581,7 +581,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$request =& $args[1];
 		$submissionId = $request->getUserVar('submissionId');
 		$this->submissionIdToBePublished = $submissionId;
-		self::orcidLog("handleScheduleForPublication: registering callback to send $submissionId");
+		self::log("handleScheduleForPublication: registering callback to send $submissionId");
 		HookRegistry::register('ArticleSearchIndex::articleChangesFinished',
 			[$this, 'handleScheduleForPublicationFinished']);
 	}
@@ -609,7 +609,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
 		$article = $publishedArticleDao->getByArticleId($submissionId);
 		if ( $article === null ) {
-			self::orcidLog("No PublishedArticle found for id $submissionId");
+			self::log("No PublishedArticle found for id $submissionId");
 			return;
 		}
 		if ( $issue === null ) {
@@ -634,18 +634,18 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$authorsWithOrcid[$orcid] = $author;
 				}
 				else {
-					self::orcidLog("Token expired on $orcidAccessExpiresOn for author ". $author->getId() . 
+					self::log("Token expired on $orcidAccessExpiresOn for author ". $author->getId() . 
 									", deleting orcidAccessToken");
 					$this->removeOrcidAccessToken($author);
 				}
 			}
 		}
-		if ( empty($authorsWithOrcid) ) {			
+		if ( empty($authorsWithOrcid) ) {
 			return;
 		}
 		$orcidWorkJson = $this->buildOrcidWorkJson($article, $journal, $authors, $issue, $request);
-		self::orcidLog("Request body: " . $orcidWorkJson);
-		foreach ($authorsWithOrcid as $orcid => $author) {			
+		self::log("Request body: " . $orcidWorkJson);
+		foreach ($authorsWithOrcid as $orcid => $author) {
 			$url = $this->getSetting($journal->getId(), 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/'
 					. ORCID_WORK_URL;
 			$header = [
@@ -654,14 +654,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'Accept: application/json',
 				'Authorization: Bearer ' . $author->getData('orcidAccessToken')
 			];
-			self::orcidLog("POST $url");
-			self::orcidLog("Header: " . var_export($header, true));
+			self::log("POST $url");
+			self::log("Header: " . var_export($header, true));
 			$ch = curl_init($url);
 			curl_setopt_array($ch, [
 				CURLOPT_CUSTOMREQUEST => "POST",
 				CURLOPT_POSTFIELDS => $orcidWorkJson,
 				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_HTTPHEADER => $header				
+				CURLOPT_HTTPHEADER => $header
 			]);
 			$responseHeaders = [];
 			// Needed to correctly process response headers
@@ -677,7 +677,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					} 
 
 					$name = strtolower(trim($header[0]));
-					if (!array_key_exists($name, $responseHeaders)) {			    		
+					if (!array_key_exists($name, $responseHeaders)) {
 						$responseHeaders[$name] = [trim($header[1])];
 					}
 					else {
@@ -693,28 +693,28 @@ class OrcidProfilePlugin extends GenericPlugin {
 				error_log('Unable to post to ORCID API, curl error: ' . curl_error($ch));
 				return;
 			}
-			self::orcidLog("Response status: $httpstatus");
+			self::log("Response status: $httpstatus");
 			switch ($httpstatus) {
 				case 201:
 					$location = $responseHeaders['location'][0];
 					// Extract the ORCID work put code for updates/deletion.
 					$putCode = basename(parse_url($location, PHP_URL_PATH));
-					self::orcidLog("Work added, putCode: $putCode");
+					self::log("Work added, putCode: $putCode");
 					break;
 				case 401:
 					// invalid access token, token was revoked
 					$error = json_decode($result);
 					if ($error->error === 'invalid_token') {
-						self::orcidLog("Error: " . $error->error_description);
-						self::orcidLog("Deleting orcidAccessToken from author");
+						self::log("Error: " . $error->error_description);
+						self::log("Deleting orcidAccessToken from author");
 						$this->removeOrcidAccessToken($author);
 					}	
 					break;
 				case 409:
-					self::orcidLog("Work already added to profile.");
+					self::log("Work already added to profile.");
 					break;
 				default:
-					self::orcidLog("Response body: " . $result);
+					self::log("Response body: " . $result);
 			}
 			curl_close($ch);
 		}
@@ -828,9 +828,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 			if ($role) {
 				$contributor['contributor-attributes']['contributor-role'] = $role;
 			}
-			if ($author->getOrcid()) {
-				$path = parse_url($author->getOrcid(), PHP_URL_PATH);
-				$orcid = end(explode('/', $path));
+			if ($author->getOrcid()) {				
+				$orcid = basename(parse_url($author->getOrcid(), PHP_URL_PATH));
 				if( $this->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ) {
 					$uri = 'http://sandbox.orcid.org/'.$orcid;
 					$host = 'sandbox.orcid.org';
@@ -840,7 +839,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$host = 'orcid.org';
 				}
 				$contributor['contributor-orcid'] = [
-					#'uri' => $uri,
+					'uri' => $uri,
 					'path' => $orcid,
 					'host' => $host
 				];
@@ -859,12 +858,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$authorDao->updateLocaleFields($author);
 	}
 
-	public static function orcidLogFilePath() {
+	public static function logFilePath() {
 		return Config::getVar('files', 'files_dir') . '/orcid.log';
 	}
 
-	public static function orcidLog($message) {
-		error_log(date(DateTime::ISO8601) . " $message\n", 3, self::orcidLogFilePath());
+	public static function log($message) {
+		error_log(date(DateTime::ISO8601) . " $message\n", 3, self::logFilePath());
 	}
 }
 
