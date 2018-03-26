@@ -109,6 +109,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'orcidClientSecret':
 				$config_value = Config::getVar('orcid','client_secret');
 				break;
+			case 'orcidScope':
+				$config_value = Config::getVar('orcid','scope');
+				break;
 			default:
             	return parent::getSetting($contextId, $name);
 		}
@@ -136,8 +139,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function handleFormDisplay($hookName, $args) {		
 		$request = PKPApplication::getRequest();
-		$templateMgr = TemplateManager::getManager($request);
-
+		$templateMgr = TemplateManager::getManager($request);		
 		switch ($hookName) {
 			case 'publicprofileform::display':
 				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
@@ -242,8 +244,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return string
 	 */
 	function profileFilter($output, &$templateMgr) {
+		error_log("OrcidProfilePlugin::profileFilter - $output");
 		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE) &&
-			!(preg_match('/\$\(\'input\[name=orcid\]\'\)/', $output))) {
+			!(preg_match('/\$\(\'input\[name=orcid\]\'\)/', $output))) {			
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$context = Request::getContext();
@@ -258,12 +261,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
-			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
-			$newOutput .= '<script type="text/javascript">
-					$(document).ready(function() {
-					$(\'input[name=orcid]\').attr(\'readonly\', "true");
-				});
-			</script>';
+			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');			
 			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
 		}
@@ -347,9 +345,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function authorGetAdditionalFieldNames($hookName, $params) {
 		$fields =& $params[1];
 		$fields[] = 'orcidToken';
+		$fields[] = 'orcidSandbox';
 		$fields[] = 'orcidAccessToken';
 		$fields[] = 'orcidRefreshToken';
 		$fields[] = 'orcidAccessExpiresOn';
+		// holds the id of the added work entry in the corresponding ORCID profile for updates
+		$fields[] = 'orcidWorkPutCode';
 		return false;
 	}
 
@@ -529,18 +530,17 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$contextId = $context->getId();
 
 		$articleDao = DAORegistry::getDAO('ArticleDAO');
-		$article = $articleDao->getById($author->getSubmissionId());
-		$dispatcher = $request->getDispatcher();
+		$article = $articleDao->getById($author->getSubmissionId());		
 		// We need to construct a page url, but the request is using the component router.
 		// Use the Dispatcher to construct the url and set the router.
-		$redirectUrl = $dispatcher->url($request, ROUTE_PAGE, null, 'orcidapi',
+		$redirectUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi',
 			'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()));
 
 		$mail->assignParams(array(
 			'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
 				'client_id' => $this->getSetting($contextId, 'orcidClientId'),
 				'response_type' => 'code',
-				'scope' => '/activities/update /read-limited',
+				'scope' => $this->getSetting($contextId, 'orcidScope'),
 				'redirect_uri' => $redirectUrl)),
 			'authorName' => $author->getFullName(),
 			'journalName' => $context->getLocalizedName(),
@@ -643,29 +643,44 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if ( empty($authorsWithOrcid) ) {
 			return;
 		}
-		$orcidWorkJson = $this->buildOrcidWorkJson($article, $journal, $authors, $issue, $request);
-		self::log("Request body: " . $orcidWorkJson);
+		$orcidWork = $this->buildOrcidWork($article, $journal, $authors, $issue, $request);
+		self::log("Request body (without put-code): " . json_encode($orcidWork));
 		foreach ($authorsWithOrcid as $orcid => $author) {
 			$url = $this->getSetting($journal->getId(), 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/'
 					. ORCID_WORK_URL;
+			$method = "POST";
+
+			if ( $putCode = $author->getData('orcidWorkPutCode')) {
+				// Submission has already been sent to ORCID. Use PUT to update meta data
+				$url .= '/' . $putCode;
+				$method = "PUT";
+				$orcidWork['put-code'] = $putCode;
+			}
+			else {
+				// Remove put-code from body because the work has not yet been sent
+				unset($orcidWork['put-code']);
+			}
+			$orcidWorkJson = json_encode($orcidWork);
 			$header = [
 				'Content-Type: application/vnd.orcid+json',
 				'Content-Length: ' . strlen($orcidWorkJson),
 				'Accept: application/json',
 				'Authorization: Bearer ' . $author->getData('orcidAccessToken')
 			];
-			self::log("POST $url");
+			self::log("$method $url");
 			self::log("Header: " . var_export($header, true));
 			$ch = curl_init($url);
 			curl_setopt_array($ch, [
-				CURLOPT_CUSTOMREQUEST => "POST",
+				CURLOPT_CUSTOMREQUEST => $method,
 				CURLOPT_POSTFIELDS => $orcidWorkJson,
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_HTTPHEADER => $header
 			]);
 			$responseHeaders = [];
-			// Needed to correctly process response headers
-			// this function is called by curl for each header received
+			// Needed to correctly process response headers.
+			// This function is called by curl for each received line of the header.
+			// Code from StackOverflow answer here: https://stackoverflow.com/a/41135574/8938233
+			// Thanks to StackOverflow user Geoffrey.
 			curl_setopt($ch, CURLOPT_HEADERFUNCTION,
 				function($curl, $header) use (&$responseHeaders)
 				{
@@ -687,19 +702,26 @@ class OrcidProfilePlugin extends GenericPlugin {
 				}
 			);
 			$result = curl_exec($ch);			
-			
 			$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			if (curl_error($ch)) {
 				error_log('Unable to post to ORCID API, curl error: ' . curl_error($ch));
+				curl_close($ch);
 				return;
 			}
+			curl_close($ch);
 			self::log("Response status: $httpstatus");
 			switch ($httpstatus) {
+				case 200:
+					// Work updated
+					self::log("Work updated in profile, putCode: $putCode");
+					break;
 				case 201:
 					$location = $responseHeaders['location'][0];
 					// Extract the ORCID work put code for updates/deletion.
-					$putCode = basename(parse_url($location, PHP_URL_PATH));
-					self::log("Work added, putCode: $putCode");
+					$putCode = intval(basename(parse_url($location, PHP_URL_PATH)));					
+					self::log("Work added to profile, putCode: $putCode");
+					$author->setData("orcidWorkPutCode", $putCode);
+					$authorDao->updateLocaleFields($author);
 					break;
 				case 401:
 					// invalid access token, token was revoked
@@ -714,13 +736,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 					self::log("Work already added to profile.");
 					break;
 				default:
-					self::log("Response body: " . $result);
+					self::log("Unexpected response, body: " . $result);
 			}
-			curl_close($ch);
+			
 		}
 	}
 
-	public function buildOrcidWorkJson($article, $journal, $authors, $issue, $request) {
+	public function buildOrcidWork($article, $journal, $authors, $issue, $request) {
 		$articleLocale = $article->getLocale();
 		$titles = $article->getTitle($articleLocale);
 		$publicationDate = new DateTime($article->getDatePublished());
@@ -762,7 +784,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'language-code' => 'en'
 			];
 		}
-		return json_encode($orcidWork);
+		return $orcidWork;
 	}
 
 	private function buildOrcidExternalIds($article, $journal, $issue) {
@@ -839,7 +861,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$host = 'orcid.org';
 				}
 				$contributor['contributor-orcid'] = [
-					'uri' => $uri,
+					#'uri' => $uri,
 					'path' => $orcid,
 					'host' => $host
 				];
@@ -851,7 +873,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	public function removeOrcidAccessToken($author) {
-		$author->setData('orcidAccessToken', null);
+		$author->setData('orcidAccessToken', null);		
 		$author->setData('orcidRefreshToken', null);
 		$author->setData('orcidAccessExpiresOn', null);
 		$authorDao = DAORegistry::getDAO('AuthorDAO');

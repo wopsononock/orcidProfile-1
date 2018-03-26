@@ -10,11 +10,16 @@
  *
  *}
 <script type="text/javascript">
-function openORCID() {ldelim}
-	var oauthWindow = window.open("{$orcidProfileOauthPath|escape}authorize?client_id={$orcidClientId|urlencode}&response_type=code&scope=/authenticate&redirect_uri={url|urlencode router="page" page="orcidapi" op="orcidAuthorize" targetOp=$targetOp params=$params escape=false}", "_blank", "toolbar=no, scrollbars=yes, width=500, height=600, top=500, left=500");
-	oauthWindow.opener = self;
-	return false;
-{rdelim}
+	function openORCID() {ldelim}
+		var oauthWindow = window.open("{$orcidProfileOauthPath|escape}authorize?client_id={$orcidClientId|urlencode}&response_type=code&scope=/authenticate&redirect_uri={url|urlencode router="page" page="orcidapi" op="orcidAuthorize" targetOp=$targetOp params=$params escape=false}", "_blank", "toolbar=no, scrollbars=yes, width=500, height=600, top=500, left=500");
+		oauthWindow.opener = self;
+		return false;
+	{rdelim}
+{if $targetOp eq 'profile'}
+	$(document).ready(function() {ldelim}
+		$('input[name=orcid]').attr('readonly', "true");
+	{rdelim});
+{/if}
 </script>
 
 <button id="connect-orcid-button" class="cmp_button" onclick="return openORCID();">

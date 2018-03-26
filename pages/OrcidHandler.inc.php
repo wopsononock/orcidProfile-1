@@ -128,27 +128,32 @@ class OrcidHandler extends Handler {
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 				'message' => 'plugins.generic.orcidProfile.authFailure',
 			));
-			error_log('ORCID verfifcation error: '. $request->getUserVar('error_description'));
+			error_log('OrcidHandler::orcidverify - ORCID verfifcation error: '. $request->getUserVar('error_description'));
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
 		}
 
 		// fetch the access token
-		$curl = curl_init();
-		curl_setopt_array($curl, array(
-			CURLOPT_URL => $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
+		$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL;
+		$header = array('Accept: application/json');
+		$curl = curl_init($url);
+		$postData = http_build_query(array(
+			'code' => $request->getUserVar('code'),
+			'grant_type' => 'authorization_code',
+			'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
+			'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
+		));
+		OrcidProfilePlugin::log('POST ' . $url);
+		OrcidProfilePlugin::log('Request header: ' . var_export($header, true));
+		OrcidProfilePlugin::log('Request body: ' . $postData);
+		curl_setopt_array($curl, array(			
 			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_HTTPHEADER => array('Accept: application/json'),
+			CURLOPT_HTTPHEADER => $header,
 			CURLOPT_POST => true,
-			CURLOPT_POSTFIELDS => http_build_query(array(
-				'code' => $request->getUserVar('code'),
-				'grant_type' => 'authorization_code',
-				'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
-				'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
-			))
+			CURLOPT_POSTFIELDS => $postData
 		));
 		$result = curl_exec($curl);
-		if (!$result) error_log('CURL error: ' . curl_error($curl));
+		if (!$result) error_log('OrcidHandler::orcidverify - CURL error ' . curl_error($curl));
 		
 		$response = json_decode($result, true);
 
@@ -158,7 +163,7 @@ class OrcidHandler extends Handler {
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 				'message' => 'plugins.generic.orcidProfile.authFailure',
 			));
-			error_log('Invalid orcid response: '. $result);
+			error_log('OrcidHandler::orcidverify - Invalid ORCID response '. $result);
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
 		}
@@ -172,17 +177,25 @@ class OrcidHandler extends Handler {
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
 		}
-
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$submissionId = $request->getUserVar('articleId');
-		$authors = $authorDao->getBySubmissionId($submissionId);
+		$authors = $authorDao->getBySubmissionId($submissionId);		
+		$orcidSandbox = false;
+		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
+			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_PUBLIC_URL_MEMBER_SANDBOX) {
+			$orcidSandbox = true;
+		}
+		// Find the author in the database, for whom the authorization link was generated
 		foreach ($authors as $author) {
 			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
 				$orcidAccessExpiresOn = Carbon\Carbon::now();
 				// expires_in field from the response contains the lifetime in seconds of the token
 				// See https://members.orcid.org/api/get-oauthtoken
 				$orcidAccessExpiresOn->addSeconds($response['expires_in']);
-				$author->setData('orcid', 'http://orcid.org/' . $response['orcid']);
+				$author->setData('orcid', 'https://orcid.org' . $response['orcid']);
+				if ($orcidSandbox) {
+					$author->setData('orcidSandbox', $orcidSandbox);
+				}				
 				$author->setData('orcidAccessToken', $response['access_token']);
 				$author->setData('orcidRefreshToken', $response['refresh_token']);
 				$author->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
@@ -198,7 +211,8 @@ class OrcidHandler extends Handler {
 				exit();
 			}
 		}
-
+		// Only reaches here if no Author exists in the database with the supplied orcidToken
+		// Display a failure message
 		$templateMgr->assign(array(
 			'currentUrl' => $request->url(null, 'index'),
 			'pageTitle' => 'plugins.generic.orcidProfile.author.submission',

@@ -19,7 +19,7 @@
 	<message key="plugins.generic.orcidProfile.instructions"><![CDATA[Sie können dieses Formular vorbefüllen mit Informationen aus einem ORCID-Profil. Geben Sie eine E-Mail-Adresse oder ORCID-iD, die mit einem ORCID-Profil verknüpft sind, an und klicken "Abschicken".]]></message>
 	<message key="plugins.generic.orcidProfile.noData">Konnte keine ORCID-Informationen finden.</message>
 	<message key="plugins.generic.orcidProfile.emailOrOrcid">E-Mail-Adresse oder ORCID-iD:</message>
-	<message key="plugins.generic.orcidProfile.manager.orcidProfileSettings">ORCID-Profil-Einstellungen</message>
+	<message key="plugins.generic.orcidProfile.manager.settinorcidProfileSettings">ORCID-Profil-Einstellungen</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.description">Die ORCID-API konfigurieren, um ORCID-Profilinformationen in Nutzerprofile einlesen zu können.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath">ORCID-API</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public">Public</message>
