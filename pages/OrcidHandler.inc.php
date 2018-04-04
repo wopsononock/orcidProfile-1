@@ -33,6 +33,15 @@ class OrcidHandler extends Handler {
 
 		// fetch the access token
 		$curl = curl_init();
+		// Use proxy if configured
+		if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
+			curl_setopt($curl, CURLOPT_PROXY, $httpProxyHost);
+			curl_setopt($curl, CURLOPT_PROXYPORT, Config::getVar('proxy', 'http_port', '80'));
+			if ($username = Config::getVar('proxy', 'username')) {
+				curl_setopt($curl, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
+			}
+		}
+
 		curl_setopt_array($curl, array(
 			CURLOPT_URL => $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
 			CURLOPT_RETURNTRANSFER => true,
@@ -75,7 +84,7 @@ class OrcidHandler extends Handler {
 			$json_email = json_decode($result, true);
 			$json['email']['value'] = $json_email['email'][0]['email'];
 		}
-
+		curl_close($curl);
 		$orcid_uri = 'http://orcid.org/' . $response['orcid'];
 
 		switch (Request::getUserVar('targetOp')) {
@@ -163,7 +172,7 @@ class OrcidHandler extends Handler {
 		// fetch the access token
 		$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL;
 		$header = array('Accept: application/json');
-		$curl = curl_init($url);
+		$ch = curl_init($url);
 		$postData = http_build_query(array(
 			'code' => $request->getUserVar('code'),
 			'grant_type' => 'authorization_code',
@@ -173,14 +182,23 @@ class OrcidHandler extends Handler {
 		OrcidProfilePlugin::log('POST ' . $url);
 		OrcidProfilePlugin::log('Request header: ' . var_export($header, true));
 		OrcidProfilePlugin::log('Request body: ' . $postData);
-		curl_setopt_array($curl, array(			
+		// Use proxy if configured
+		if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
+			curl_setopt($ch, CURLOPT_PROXY, $httpProxyHost);
+			curl_setopt($ch, CURLOPT_PROXYPORT, Config::getVar('proxy', 'http_port', '80'));
+			if ($username = Config::getVar('proxy', 'username')) {
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
+			}
+		}
+		curl_setopt_array($ch, array(			
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HTTPHEADER => $header,
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => $postData
 		));
-		$result = curl_exec($curl);
-		if (!$result) error_log('OrcidHandler::orcidverify - CURL error ' . curl_error($curl));
+		$result = curl_exec($ch);
+		if (!$result) error_log('OrcidHandler::orcidverify - CURL error: ' . curl_error($ch));
+		curl_close($ch)
 		
 		$response = json_decode($result, true);
 
@@ -190,7 +208,7 @@ class OrcidHandler extends Handler {
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 				'message' => 'plugins.generic.orcidProfile.authFailure',
 			));
-			error_log('OrcidHandler::orcidverify - Invalid ORCID response '. $result);
+			error_log('OrcidHandler::orcidverify - Invalid ORCID response: '. $result);
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
 		}

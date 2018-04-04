@@ -685,6 +685,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_HTTPHEADER => $header
 			]);
+			// Use proxy if configured
+			if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
+				curl_setopt($ch, CURLOPT_PROXY, $httpProxyHost);
+				curl_setopt($ch, CURLOPT_PROXYPORT, Config::getVar('proxy', 'http_port', '80'));
+				if ($username = Config::getVar('proxy', 'username')) {
+					curl_setopt($ch, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
+				}
+			}
 			$responseHeaders = [];
 			// Needed to correctly process response headers.
 			// This function is called by curl for each received line of the header.
