@@ -298,7 +298,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$form->readUserVars(array('requestOrcidAuthorization'));
 		$requestAuthorization = $form->getData('requestOrcidAuthorization');
 		$author = $form->getAuthor();
-		if ($author) {
+		if ($author && $requestAuthorization) {
 			$this->sendAuthorMail($author);
 		}		
 	}
@@ -349,6 +349,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$fields[] = 'orcidAccessToken';
 		$fields[] = 'orcidRefreshToken';
 		$fields[] = 'orcidAccessExpiresOn';
+		$fields[] = 'orcidAccessDenied';
 		// holds the id of the added work entry in the corresponding ORCID profile for updates
 		$fields[] = 'orcidWorkPutCode';
 		return false;
@@ -503,23 +504,23 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @return MailTemplate
 	 */
-	function &getMailTemplate($emailKey, $context = null) {
-		if (!isset($this->_mailTemplates[$emailKey])) {
-			import('lib.pkp.classes.mail.MailTemplate');
-			$mailTemplate = new MailTemplate($emailKey, null, null, $context, true, true);
-			$this->_mailTemplates[$emailKey] = $mailTemplate;
-		}
-		return $this->_mailTemplates[$emailKey];
+	function &getMailTemplate($emailKey, $context = null) {		
+		import('lib.pkp.classes.mail.MailTemplate');
+		return new MailTemplate($emailKey, null, null, $context, true, true);
 	}
 
 	/**
+	 * Send mail with ORCID authorisation link to the e-mail address of the supplied Author object.
+	 *
 	 * @param $author Author
+	 * @param $saveAuthor bool If true save the author to the database, use this only if not called from a function,
+	 *        that saves the author in the database anyway.
 	 */
-	public function sendAuthorMail($author)
+	public function sendAuthorMail($author, $saveAuthor = false)
 	{
 		$mail = $this->getMailTemplate('ORCID_COLLECT_AUTHOR_ID');
 
-		$orcidToken = md5(time());
+		$orcidToken = md5(microtime().$author->getEmail());
 		$author->setData('orcidToken', $orcidToken);
 
 		$request = PKPApplication::getRequest();
@@ -536,7 +537,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$redirectUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi',
 			'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()));
 
-		$mail->assignParams(array(
+		// Send to author		
+		$mail->setRecipients(array(array('name' => $author->getFullName(), 'email' => $author->getEmail())));
+		// Send the mail with parameters
+		$mail->sendWithParams(array(
 			'authorOrcidUrl' => $this->getOauthPath() . 'authorize?' . http_build_query(array(
 				'client_id' => $this->getSetting($contextId, 'orcidClientId'),
 				'response_type' => 'code',
@@ -547,12 +551,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 			'editorialContactSignature' => $context->getSetting('contactName'),
 			'articleTitle' => $article->getLocalizedTitle(),
 		));
-
-		// Send to author
-		$mail->addRecipient($author->getEmail(), $author->getFullName());
-
-		// Send the mail.
-		$mail->send($request);
+		if ($saveAuthor) {
+			$authorDao = DAORegistry::getDAO('AuthorDAO');	
+			$authorDao->updateLocaleFields($author);
+		}
 	}
 
 	/**
@@ -573,6 +575,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 		foreach ($publishedArticles as $publishedArticle) {
 			$articleId = $publishedArticle->getId();
 			$this->sendSubmissionToOrcid($articleId, $request, $issue);
+			if ($this->getSetting($journal->getId(), 'sendMailToAuthorsOnPublication')) {
+				$authors = $authorDao->getBySubmissionId($articleId);
+				foreach ($authors as $author) {
+					if ( $author->getData('orcidAccessToken') == null) {
+						$this->sendAuthorMail($author, true);
+					}
+				}
+			}
 		}
 	}
 
@@ -580,8 +590,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$form =& $args[0];
 		$request =& $args[1];
 		$submissionId = $request->getUserVar('submissionId');
-		$this->submissionIdToBePublished = $submissionId;
-		self::log("handleScheduleForPublication: registering callback to send $submissionId");
+		$this->submissionIdToBePublished = $submissionId;		
 		HookRegistry::register('ArticleSearchIndex::articleChangesFinished',
 			[$this, 'handleScheduleForPublicationFinished']);
 	}
@@ -720,20 +729,21 @@ class OrcidProfilePlugin extends GenericPlugin {
 					// Extract the ORCID work put code for updates/deletion.
 					$putCode = intval(basename(parse_url($location, PHP_URL_PATH)));					
 					self::log("Work added to profile, putCode: $putCode");
-					$author->setData("orcidWorkPutCode", $putCode);
+					$author->setData('orcidWorkPutCode', $putCode);
 					$authorDao->updateLocaleFields($author);
 					break;
 				case 401:
 					// invalid access token, token was revoked
 					$error = json_decode($result);
 					if ($error->error === 'invalid_token') {
-						self::log("Error: " . $error->error_description);
-						self::log("Deleting orcidAccessToken from author");
+						self::log('Error: ' . $error->error_description);
+						self::log('Deleting orcidAccessToken from author');
 						$this->removeOrcidAccessToken($author);
 					}	
 					break;
 				case 409:
-					self::log("Work already added to profile.");
+					self::log('Response body: ' . $result);
+					self::log('Error: Work already added to profile.');
 					break;
 				default:
 					self::log("Unexpected response, body: " . $result);
@@ -850,18 +860,18 @@ class OrcidProfilePlugin extends GenericPlugin {
 			if ($role) {
 				$contributor['contributor-attributes']['contributor-role'] = $role;
 			}
-			if ($author->getOrcid()) {				
+			if ($author->getOrcid()) {
 				$orcid = basename(parse_url($author->getOrcid(), PHP_URL_PATH));
-				if( $this->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ) {
-					$uri = 'http://sandbox.orcid.org/'.$orcid;
+				if( $author->getData('orcidSandbox') ) {
+					$uri = 'https://sandbox.orcid.org/' . $orcid;
 					$host = 'sandbox.orcid.org';
 				}
 				else {
-					$uri = 'https://orcid.org/'.$orcid;
+					$uri = $author->getOrcid();
 					$host = 'orcid.org';
 				}
 				$contributor['contributor-orcid'] = [
-					#'uri' => $uri,
+					'uri' => $uri,
 					'path' => $orcid,
 					'host' => $host
 				];

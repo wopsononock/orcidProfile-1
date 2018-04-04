@@ -36,8 +36,10 @@ class OrcidProfileSettingsForm extends Form {
 
 		parent::__construct($plugin->getTemplatePath() . 'settingsForm.tpl');
 
-		$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
-
+		if(!$this->plugin->isGloballyConfigured()) {
+			$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required', 
+				'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
+		}
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
 	}
@@ -52,7 +54,9 @@ class OrcidProfileSettingsForm extends Form {
 		$this->_data = array(
 			'orcidProfileAPIPath' => $plugin->getSetting($contextId, 'orcidProfileAPIPath'),
 			'orcidClientId' => $plugin->getSetting($contextId, 'orcidClientId'),
-			'orcidClientSecret' => $plugin->getSetting($contextId, 'orcidClientSecret'),
+			'orcidClientSecret' => $plugin->getSetting($contextId, 'orcidClientSecret'),			
+			'orcidScope' => $plugin->getSetting($contextId, 'orcidScope'),
+			'sendMailToAuthorsOnPublication' => $plugin->getSetting($contextId, 'sendMailToAuthorsOnPublication'),
 		);
 	}
 
@@ -60,9 +64,8 @@ class OrcidProfileSettingsForm extends Form {
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('orcidProfileAPIPath'));
-		$this->readUserVars(array('orcidClientId'));
-		$this->readUserVars(array('orcidClientSecret'));
+		$this->readUserVars(array('orcidProfileAPIPath', 'orcidClientId', 'orcidClientSecret',
+			'sendMailToAuthorsOnPublication'));
 	}
 
 	/**
@@ -86,6 +89,7 @@ class OrcidProfileSettingsForm extends Form {
 		$plugin->updateSetting($contextId, 'orcidProfileAPIPath', trim($this->getData('orcidProfileAPIPath'), "\"\';"), 'string');
 		$plugin->updateSetting($contextId, 'orcidClientId', $this->getData('orcidClientId'), 'string');
 		$plugin->updateSetting($contextId, 'orcidClientSecret', $this->getData('orcidClientSecret'), 'string');
+		$plugin->updateSetting($contextId, 'sendMailToAuthorsOnPublication', $this->getData('sendMailToAuthorsOnPublication'), 'bool');
 	}
 }
 

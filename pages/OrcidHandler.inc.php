@@ -119,16 +119,43 @@ class OrcidHandler extends Handler {
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$templateMgr = TemplateManager::getManager($request);
 		$contextId = ($context == null) ? 0 : $context->getId();
+		$submissionId = $request->getUserVar('articleId');
+		$authorDao = DAORegistry::getDAO('AuthorDAO');
+		$authors = $authorDao->getBySubmissionId($submissionId);		
 
-		// User denied access
+		$authorToVerify = null;
+		// Find the author entry, for which the ORCID verification was requested
+		foreach ($authors as $author) {
+			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
+				$authorToVerify = $author;
+			}
+		}
+		if ($authorToVerify == null) {
+			// no Author exists in the database with the supplied orcidToken
+			// Display a failure message
+			$templateMgr->assign(array(
+				'currentUrl' => $request->url(null, 'index'),
+				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
+				'message' => 'plugins.generic.orcidProfile.author.submission.failure',
+			));
+			error_log('OrcidHandler::orcidverify - No author found with supplied orcidToken');
+			$templateMgr->display(self::MESSAGE_TPL);
+			exit();
+		}		
 		if ( $request->getUserVar('error') === 'access_denied' ) {
-			// TODO specify special message if user denied access
+			// User denied access			
+			// Store the date time the author denied ORCID access to remember this
+			$authorToVerify->setData('orcidAccessDenied', Core::getCurrentDate());
+			$authorToVerify->setData('orcidToken', null);
+			$authorDao->updateLocaleFields($authorToVerify);
+			// TODO specify special message for this case
 			$templateMgr->assign(array(
 				'currentUrl' => $request->url(null, 'index'),
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 				'message' => 'plugins.generic.orcidProfile.authFailure',
 			));
-			error_log('OrcidHandler::orcidverify - ORCID verfifcation error: '. $request->getUserVar('error_description'));
+			error_log('OrcidHandler::orcidverify - ORCID access denied. Error description: '
+				. $request->getUserVar('error_description'));
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
 		}
@@ -157,7 +184,7 @@ class OrcidHandler extends Handler {
 		
 		$response = json_decode($result, true);
 
-		if (!isset($response['orcid'])) {
+		if (!isset($response['orcid']) || !isset($response['access_token'])) {
 			$templateMgr->assign(array(
 				'currentUrl' => $request->url(null, 'index'),
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
@@ -167,58 +194,32 @@ class OrcidHandler extends Handler {
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
 		}
-
-		if (!isset($response['access_token'])) {
-			$templateMgr->assign(array(
-				'currentUrl' => $request->url(null, 'index'),
-				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
-				'message' => 'plugins.generic.orcidProfile.authFailure',
-			));
-			$templateMgr->display(self::MESSAGE_TPL);
-			exit();
-		}
-		$authorDao = DAORegistry::getDAO('AuthorDAO');
-		$submissionId = $request->getUserVar('articleId');
-		$authors = $authorDao->getBySubmissionId($submissionId);		
 		$orcidSandbox = false;
 		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
 			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_PUBLIC_URL_MEMBER_SANDBOX) {
 			$orcidSandbox = true;
 		}
-		// Find the author in the database, for whom the authorization link was generated
-		foreach ($authors as $author) {
-			if ($author->getData('orcidToken') == $request->getUserVar('orcidToken')) {
-				$orcidAccessExpiresOn = Carbon\Carbon::now();
-				// expires_in field from the response contains the lifetime in seconds of the token
-				// See https://members.orcid.org/api/get-oauthtoken
-				$orcidAccessExpiresOn->addSeconds($response['expires_in']);
-				$author->setData('orcid', 'https://orcid.org' . $response['orcid']);
-				if ($orcidSandbox) {
-					$author->setData('orcidSandbox', $orcidSandbox);
-				}				
-				$author->setData('orcidAccessToken', $response['access_token']);
-				$author->setData('orcidRefreshToken', $response['refresh_token']);
-				$author->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
-				$author->setData('orcidToken', null);
-				$authorDao->updateObject($author);
-				$plugin->sendSubmissionToOrcid($submissionId, $request);
-				$templateMgr->assign(array(
-					'currentUrl' => $request->url(null, 'index'),
-					'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
-					'message' => 'plugins.generic.orcidProfile.author.submission.success',
-				));
-				$templateMgr->display(self::MESSAGE_TPL);
-				exit();
-			}
-		}
-		// Only reaches here if no Author exists in the database with the supplied orcidToken
-		// Display a failure message
+		// Save the access token
+		$orcidAccessExpiresOn = Carbon\Carbon::now();
+		// expires_in field from the response contains the lifetime in seconds of the token
+		// See https://members.orcid.org/api/get-oauthtoken
+		$orcidAccessExpiresOn->addSeconds($response['expires_in']);
+		$authorToVerify->setData('orcid', 'https://orcid.org/' . $response['orcid']);
+		if ($orcidSandbox) {
+			$authorToVerify->setData('orcidSandbox', $orcidSandbox);
+		}				
+		$authorToVerify->setData('orcidAccessToken', $response['access_token']);
+		$authorToVerify->setData('orcidRefreshToken', $response['refresh_token']);
+		$authorToVerify->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
+		$authorToVerify->setData('orcidToken', null);
+		$authorDao->updateObject($authorToVerify);
+		$plugin->sendSubmissionToOrcid($submissionId, $request);
 		$templateMgr->assign(array(
 			'currentUrl' => $request->url(null, 'index'),
 			'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
-			'message' => 'plugins.generic.orcidProfile.author.submission.failure',
+			'message' => 'plugins.generic.orcidProfile.author.submission.success',
 		));
-		$templateMgr->display(self::MESSAGE_TPL);
+		$templateMgr->display(self::MESSAGE_TPL);		
 	}
 }
 
