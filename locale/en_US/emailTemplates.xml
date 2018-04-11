@@ -14,20 +14,34 @@
 <email_texts locale="en_US">
 	<email_text key="ORCID_COLLECT_AUTHOR_ID">
 		<subject>Submission ORCID</subject>
-		<body>Dear {$authorName},
-
-You have been listed as a co-author on the manuscript submission "{$articleTitle}" to {$journalName}. 
-
-To confirm your authorship, please add your ORCID id to this submission by visiting the link provided below.
-
-{$authorOrcidUrl}
-
-If you have any questions, please contact me.
-
-{$editorialContactSignature}
-
-
+		<body>Dear {$authorName},<br/>
+<br/>
+You have been listed as a co-author on the manuscript submission "{$articleTitle}" to {$journalName}.<br/>
+To confirm your authorship, please add your ORCID id to this submission by visiting the link provided below.<br/>
+<br/>
+{$authorOrcidUrl} <br/>
+<br/>
+If you have any questions, please contact me.<br/>
+<br/>
+{$editorialContactSignature}<br/>
 </body>
 		<description>This email template is used to collect the ORCID id's from co-authors.</description>
 	</email_text>
+  <email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
+    <subject>Requesting ORCID profile access</subject>
+    <body>Dear {$authorName},<br/>
+<br/>
+You have been listed as an author on the manuscript submission "{$articleTitle}" to {$journalName}.<br/>
+<br/>
+Please allow us to add your ORCID to this submission and also add the submission to your ORCID profile on publication.<br/>
+Visit the link to the official ORCID website, login with your profile and authorize the access by following the instructions.<br/>
+<br/>
+{$authorOrcidUrl} <br/>
+<br/>
+If you have any questions, please contact me.<br/>
+<br/>
+{$editorialContactSignature}<br/>
+    </body>
+    <description>This email template is used to collect ORCID profile access authorization from authors.</description>
+  </email_text>
 </email_texts>

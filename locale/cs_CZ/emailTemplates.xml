@@ -14,19 +14,17 @@
 <email_texts locale="cs_CZ">
 	<email_text key="ORCID_COLLECT_AUTHOR_ID">
 		<subject>Podání ORCID</subject>
-		<body>Vážený(á) {$authorName},
-
-Byl(a) jste uveden(a) jako spoluautor rukopisu příspěvku "{$articleTitle}" do časopisu {$journalName}. 
-
-K potvrzení vašeho autorství vložte, prosím vaše ORCID k příspěvku na následující webové adrese.
-
-{$authorOrcidUrl}
-
-Pokud máte jakékoliv dotazy, neváhejte mne kontaktovat.
-
-{$editorialContactSignature}
-
-
+		<body>Vážený(á) {$authorName},<br/>
+<br/>
+Byl(a) jste uveden(a) jako spoluautor rukopisu příspěvku "{$articleTitle}" do časopisu {$journalName}.<br/>
+<br/>
+K potvrzení vašeho autorství vložte, prosím vaše ORCID k příspěvku na následující webové adrese.<br/>
+<br/>
+{$authorOrcidUrl} <br/>
+<br/>
+Pokud máte jakékoliv dotazy, neváhejte mne kontaktovat.<br/>
+<br/>
+{$editorialContactSignature}<br/>
 </body>
 		<description>Tato šablona emailu slouží k shromažďování ORCID ID od spoluautorů.</description>
 	</email_text>

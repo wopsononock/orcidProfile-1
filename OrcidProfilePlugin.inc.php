@@ -838,7 +838,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			}	
 		}
 		else {
-			error_log("No pubId plugins could be loaded");
+			error_log("OrcidProfilePlugin::buildOrcidExternalIds: No pubId plugins could be loaded");
 		}
 		// Add journal online ISSN
 		// TODO What about print ISSN?
@@ -902,7 +902,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return Config::getVar('files', 'files_dir') . '/orcid.log';
 	}
 
-	public static function log($message) {
+	public static function log($message) {	
 		error_log(date(DateTime::ISO8601) . " $message\n", 3, self::logFilePath());
 	}
 }
