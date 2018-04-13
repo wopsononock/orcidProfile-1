@@ -50,8 +50,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Add ORCiD hash to author DAO
 			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'authorSubmitGetFieldNames'));
-
-			$this->_registerTemplateResource();
 		}
 		return $success;
 	}
@@ -279,13 +277,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function getDescription() {
 		return __('plugins.generic.orcidProfile.description');
-	}
-
-	/**
-	 * @copydoc PKPPlugin::getTemplatePath
-	 */
-	function getTemplatePath($inCore = false) {
-		return $this->getTemplateResourceName() . ':templates/';
 	}
 
 	/**
