@@ -945,7 +945,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$contextId = $this->currentContextId;
 		}
 		else {
-			error_log('OrcidProfilePlugin::isMemberApiEnabled: No contextId assigned!')
+			error_log('OrcidProfilePlugin::isMemberApiEnabled: No contextId assigned!');
 		}
 		$apiUrl = $this->getSetting($contextId, 'orcidProfileAPIPath');
 		if ( $apiurl === ORCID_API_URL_MEMBER || $apiurl === ORCID_API_URL_MEMBER_SANDBOX ) {
