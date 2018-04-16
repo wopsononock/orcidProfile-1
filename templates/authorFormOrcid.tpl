@@ -12,6 +12,9 @@
 	{if $orcidAccessToken}
     	<p>ORCID access token stored, valid until {$orcidAccessExpiresOn|date_format:$datetimeFormatShort}</p>
     {/if}
+    {if $orcidAccessDenied}
+    	<p>ORCID access was denied at {$orcidAccessDenied|date_format:$datetimeFormatShort}</p>
+    {/if}
     {fbvElement type="checkbox" label="plugins.generic.orcidProfile.author.requestAuthorization" id="requestOrcidAuthorization" checked=false}
     
 {/fbvFormSection}

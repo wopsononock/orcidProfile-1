@@ -29,6 +29,7 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox">Member Sandbox</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientId">Client ID</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidScope">Profile Access Scope</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">E-Mail Settings</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Send e-mail to request ORCID authorization from article authors on publication of a new issue</message>
 	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Send e-mail to request ORCID authorization from author</message>

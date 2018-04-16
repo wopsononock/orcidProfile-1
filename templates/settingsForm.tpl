@@ -13,11 +13,7 @@
 <div id="orcidProfileSettings">
 
 <div id="description">
-	{if $globallyConfigured}
-		{translate key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured" }
-	{else}
-        {translate key="plugins.generic.orcidProfile.manager.settings.description" }
-    {/if}
+	{translate key="plugins.generic.orcidProfile.manager.settings.description" }
 </div>
 
 <h3>{translate key="plugins.generic.orcidProfile.manager.orcidProfileSettings"}</h3>
@@ -35,6 +31,9 @@
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="orcidProfileSettingsFormNotification"}
 	{fbvFormArea id="orcidProfileSettings"}
 	{if $globallyConfigured}
+	<p>
+	{translate key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured" }
+    </p>
 	<table width="100%" class="data">
 		<tr valign="top">
 			<td width="20%" class="label">{translate key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"}</td>
@@ -91,6 +90,9 @@
 	{/if}	
 	{fbvFormSection for="sendMailToAuthorOnPublication" title="plugins.generic.orcidProfile.manager.settings.mailSectionTitle" list="true"}
 		{fbvElement type="checkbox" name="sendMailToAuthorsOnPublication" label="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication" id="sendMailToAuthorsOnPublication" checked=$sendMailToAuthorsOnPublication}
+	{/fbvFormSection}
+	{fbvFormSection for="logLevel" title="plugins.generic.orcidProfile.manager.settings.logSectionTitle"}
+		{fbvElement id="logLevel" name="logLevel" type="select" from=$logLevelOptions}
 	{/fbvFormSection}
 	{/fbvFormArea}
 	{fbvFormButtons}	

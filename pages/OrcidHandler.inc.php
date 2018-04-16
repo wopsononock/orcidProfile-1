@@ -29,9 +29,7 @@ class OrcidHandler extends Handler {
 		$context = Request::getContext();
 		$op = Request::getRequestedOp();
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
-		$contextId = ($context == null) ? 0 : $context->getId();
-
-		// fetch the access token
+		$contextId = ($context == null) ? 0 : $context->getId();		
 		$curl = curl_init();
 		// Use proxy if configured
 		if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
@@ -41,7 +39,6 @@ class OrcidHandler extends Handler {
 				curl_setopt($curl, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
 			}
 		}
-
 		curl_setopt_array($curl, array(
 			CURLOPT_URL => $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
 			CURLOPT_RETURNTRANSFER => true,
@@ -54,6 +51,7 @@ class OrcidHandler extends Handler {
 				'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
 			))
 		));
+		// fetch the access token
 		$result = curl_exec($curl);
 		if (!$result) error_log('CURL error: ' . curl_error($curl));
 		$response = json_decode($result, true);
@@ -85,7 +83,7 @@ class OrcidHandler extends Handler {
 			$json['email']['value'] = $json_email['email'][0]['email'];
 		}
 		curl_close($curl);
-		$orcid_uri = 'http://orcid.org/' . $response['orcid'];
+		$orcid_uri = 'https://orcid.org/' . $response['orcid'];
 
 		switch (Request::getUserVar('targetOp')) {
 			case 'register':
@@ -147,7 +145,7 @@ class OrcidHandler extends Handler {
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 				'message' => 'plugins.generic.orcidProfile.author.submission.failure',
 			));
-			error_log('OrcidHandler::orcidverify - No author found with supplied orcidToken');
+			$plugin->logError('OrcidHandler::orcidverify - No author found with supplied orcidToken');
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
 		}		
@@ -163,7 +161,7 @@ class OrcidHandler extends Handler {
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 				'message' => 'plugins.generic.orcidProfile.authFailure',
 			));
-			error_log('OrcidHandler::orcidverify - ORCID access denied. Error description: '
+			$plugin->logError('OrcidHandler::orcidverify - ORCID access denied. Error description: '
 				. $request->getUserVar('error_description'));
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
@@ -179,9 +177,9 @@ class OrcidHandler extends Handler {
 			'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
 			'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
 		));
-		OrcidProfilePlugin::log('POST ' . $url);
-		OrcidProfilePlugin::log('Request header: ' . var_export($header, true));
-		OrcidProfilePlugin::log('Request body: ' . $postData);
+		$plugin->logInfo('POST ' . $url);
+		$plugin->logInfo('Request header: ' . var_export($header, true));
+		$plugin->logInfo('Request body: ' . $postData);
 		// Use proxy if configured
 		if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
 			curl_setopt($ch, CURLOPT_PROXY, $httpProxyHost);
@@ -190,32 +188,29 @@ class OrcidHandler extends Handler {
 				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
 			}
 		}
-		curl_setopt_array($ch, array(			
+		curl_setopt_array($ch, array(
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HTTPHEADER => $header,
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => $postData
 		));
 		$result = curl_exec($ch);
-		if (!$result) error_log('OrcidHandler::orcidverify - CURL error: ' . curl_error($ch));
-		curl_close($ch)
-		
+		if (!$result) {
+			error_log('OrcidHandler::orcidverify - CURL error: ' . curl_error($ch));
+		}
+		$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);		
+		$plugin->logInfo('Response body: ' . $result);
 		$response = json_decode($result, true);
-
 		if (!isset($response['orcid']) || !isset($response['access_token'])) {
 			$templateMgr->assign(array(
 				'currentUrl' => $request->url(null, 'index'),
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
 				'message' => 'plugins.generic.orcidProfile.authFailure',
 			));
-			error_log('OrcidHandler::orcidverify - Invalid ORCID response: '. $result);
+			$plugin->logError("Response status: $httpstatus . Invalid ORCID response: $result");
 			$templateMgr->display(self::MESSAGE_TPL);
 			exit();
-		}
-		$orcidSandbox = false;
-		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
-			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_PUBLIC_URL_MEMBER_SANDBOX) {
-			$orcidSandbox = true;
 		}
 		// Save the access token
 		$orcidAccessExpiresOn = Carbon\Carbon::now();
@@ -223,8 +218,10 @@ class OrcidHandler extends Handler {
 		// See https://members.orcid.org/api/get-oauthtoken
 		$orcidAccessExpiresOn->addSeconds($response['expires_in']);
 		$authorToVerify->setData('orcid', 'https://orcid.org/' . $response['orcid']);
-		if ($orcidSandbox) {
-			$authorToVerify->setData('orcidSandbox', $orcidSandbox);
+		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
+			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_PUBLIC_URL_MEMBER_SANDBOX) {
+			// Set a flag to mark that the stored orcid id and access token came form the sandbox api			
+			$authorToVerify->setData('orcidSandbox', true);
 		}				
 		$authorToVerify->setData('orcidAccessToken', $response['access_token']);
 		$authorToVerify->setData('orcidRefreshToken', $response['refresh_token']);
