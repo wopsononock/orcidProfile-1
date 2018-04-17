@@ -13,7 +13,7 @@
 <email_texts locale="da_DK">
 	<email_text key="ORCID_COLLECT_AUTHOR_ID">
 		<subject>Indsendelse ORCID</subject>
-		<body>Kære {$authorName},<br/>
+		<body><![CDATA[Kære {$authorName},<br/>
 <br/>
 Du står opført som medforfatter til manuskriptet "{$articleTitle}" i {$journalName}.<br/>
 <br/>
@@ -24,7 +24,7 @@ For at bekræfte forfatterskabet bedes du tilføje din ORCID id til denne indsen
 Har du spørgsmål bedes du kontakte mig.<br/>
 <br/>
 {$editorialContactSignature}<br/>
-</body>
+]]></body>
 		<description>Denne e-mail bruges til at indsamle ORCID id fra medforfattere.</description>
 	</email_text>
 </email_texts>
