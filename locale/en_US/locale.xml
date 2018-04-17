@@ -32,10 +32,13 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidScope">Profile Access Scope</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">E-Mail Settings</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Send e-mail to request ORCID authorization from article authors on publication of a new issue</message>
+	<message key="plugins.generic.orcidProfile.author.accessDenied">ORCID access was denied at</message>
+	<message key="plugins.generic.orcidProfile.author.accessTokenStored">ORCID access token stored, valid until</message>
 	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Send e-mail to request ORCID authorization from author</message>
 	<message key="plugins.generic.orcidProfile.author.submission">Submission ORCID</message>
 	<message key="plugins.generic.orcidProfile.author.submission.success">Your submission has successfully been associated with your ORCID iD.</message>
 	<message key="plugins.generic.orcidProfile.author.submission.failure">Your submission could not be successfully associated with your ORCID iD. Please contact the journal manager with your name, ORCID iD, and details of your submission.</message>
+	<message key="plugins.generic.orcidProfile.authDenied">It seems you denied access to your ORCID record. If this was a mistake, please contact the journal manager with your name, ORCID iD, and details of the submission you contributed to.</message>
 	<message key="plugins.generic.orcidProfile.authFailure">OJS was not able to communicate with the ORCID service. Please contact the journal manager with your name, ORCID iD, and details of your submission.</message>
 	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
 	<message key="plugins.generic.orcidProfile.connect">Create or Connect your ORCID iD</message>

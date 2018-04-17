@@ -35,11 +35,14 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">ORCID Anfragen protokollieren</message>	
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Fehler</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.all">Alle</message>
+	<message key="plugins.generic.orcidProfile.author.accessDenied">ORCID Zugriff abgelehnt</message>
+	<message key="plugins.generic.orcidProfile.author.accessTokenStored">ORCID Zugriff genehmigt, gültig bis</message>
 	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Sende E-Mail an Author um ORCID Authorisierung anzufragen</message>
 	<message key="plugins.generic.orcidProfile.author.submission">ORCID Authorisierung</message>
-	<message key="plugins.generic.orcidProfile.author.submission.success">Ihre Einreichung wurde erfolgreich mit Ihrem ORCID-Datensatz verknüpft.</message>
+	<message key="plugins.generic.orcidProfile.author.submission.successAndWorkNotAdded">Ihre Einreichung wurde erfolgreich mit Ihrem ORCID-Datensatz verknüpft, aber die Einreichung konnte nicht zu ihrem ORCID-Datensatz hinzugefügt werden.</message>
+	<message key="plugins.generic.orcidProfile.author.submission.successAndWorkAdded">Ihre Einreichung wurde erfolgreich mit Ihrem ORCID-Datensatz verknüpft und die Einreichung wurde zu Ihrem ORCID-Datensatz hinzugefügt.</message>
 	<message key="plugins.generic.orcidProfile.author.submission.failure">Ihre Einreichung könnte nicht erfolgreich mit Ihrem ORCID-Datensatz verknüpft werden. Bitte kontaktieren Sie den/die Zeitschriftenverwalter/in und geben Sie Ihren Namen, ORCID-iD und Details zu Ihrer Einreichung an.</message>
-	<message key="plugins.generic.orcidProfile.authDenied">OJS konnte nicht mit ORCID kommunizieren. Bitte kontaktieren Sie den/die Zeitschriftenverwalter/in und geben Sie Ihren Namen, ORCID-iD und Details zu Ihrer Einreichung an.</message>
+	<message key="plugins.generic.orcidProfile.authDenied">Es scheint so als ob Sie den Zugriff auf Ihren ORCID-Datensatz abgelehnt haben. Falls das ein Versehen war, bitte kontaktieren Sie den/die Zeitschriftenverwalter/in und geben Sie Ihren Namen, ORCID-iD und Details zu der Einreichung an.</message>
 	<message key="plugins.generic.orcidProfile.authFailure">OJS konnte nicht mit ORCID kommunizieren. Bitte kontaktieren Sie den/die Zeitschriftenverwalter/in und geben Sie Ihren Namen, ORCID-iD und Details zu Ihrer Einreichung an.</message>
 	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
 	<message key="plugins.generic.orcidProfile.connect">ORCID iD anlegen und verknüpfen</message>

@@ -147,7 +147,7 @@ class OrcidHandler extends Handler {
 			));
 			$plugin->logError('OrcidHandler::orcidverify - No author found with supplied orcidToken');
 			$templateMgr->display(self::MESSAGE_TPL);
-			exit();
+			return;
 		}		
 		if ( $request->getUserVar('error') === 'access_denied' ) {
 			// User denied access			
@@ -159,12 +159,12 @@ class OrcidHandler extends Handler {
 			$templateMgr->assign(array(
 				'currentUrl' => $request->url(null, 'index'),
 				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
-				'message' => 'plugins.generic.orcidProfile.authFailure',
+				'message' => 'plugins.generic.orcidProfile.authDenied',
 			));
 			$plugin->logError('OrcidHandler::orcidverify - ORCID access denied. Error description: '
 				. $request->getUserVar('error_description'));
 			$templateMgr->display(self::MESSAGE_TPL);
-			exit();
+			return;
 		}
 
 		// fetch the access token
@@ -196,7 +196,14 @@ class OrcidHandler extends Handler {
 		));
 		$result = curl_exec($ch);
 		if (!$result) {
-			error_log('OrcidHandler::orcidverify - CURL error: ' . curl_error($ch));
+			$plugin->logError('OrcidHandler::orcidverify - CURL error: ' . curl_error($ch));
+			$templateMgr->assign(array(
+				'currentUrl' => $request->url(null, 'index'),
+				'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
+				'message' => 'plugins.generic.orcidProfile.authFailure',
+			));
+			$templateMgr->display(self::MESSAGE_TPL);			
+			return;
 		}
 		$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);		
@@ -210,31 +217,40 @@ class OrcidHandler extends Handler {
 			));
 			$plugin->logError("Response status: $httpstatus . Invalid ORCID response: $result");
 			$templateMgr->display(self::MESSAGE_TPL);
-			exit();
+			return;
 		}
 		// Save the access token
 		$orcidAccessExpiresOn = Carbon\Carbon::now();
 		// expires_in field from the response contains the lifetime in seconds of the token
 		// See https://members.orcid.org/api/get-oauthtoken
 		$orcidAccessExpiresOn->addSeconds($response['expires_in']);
-		$authorToVerify->setData('orcid', 'https://orcid.org/' . $response['orcid']);
+		$orcidUri = 'https://orcid.org/' . $response['orcid'];
+		$authorToVerify->setData('orcid', $orcidUri);
 		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
 			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_PUBLIC_URL_MEMBER_SANDBOX) {
 			// Set a flag to mark that the stored orcid id and access token came form the sandbox api			
 			$authorToVerify->setData('orcidSandbox', true);
-		}				
+		}
 		$authorToVerify->setData('orcidAccessToken', $response['access_token']);
 		$authorToVerify->setData('orcidRefreshToken', $response['refresh_token']);
 		$authorToVerify->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 		$authorToVerify->setData('orcidToken', null);
 		$authorDao->updateObject($authorToVerify);
-		$plugin->sendSubmissionToOrcid($submissionId, $request);
+		
+		if ( $sendResult = $plugin->sendSubmissionToOrcid($submissionId, $request) === true ) {
+			$message = 'plugins.generic.orcidProfile.author.submission.successAndWorkAdded';
+		} elseif ( is_array( $sendResult ) && $sendResult[$response['orcid']]) {
+			$message = 'plugins.generic.orcidProfile.author.submission.successAndWorkAdded';
+		} else {
+			$message = 'plugins.generic.orcidProfile.author.submission.successAndWorkNotAdded';
+		}
 		$templateMgr->assign(array(
 			'currentUrl' => $request->url(null, 'index'),
 			'pageTitle' => 'plugins.generic.orcidProfile.author.submission',
-			'message' => 'plugins.generic.orcidProfile.author.submission.success',
+			'message' => $message,
+			'backLink' => $orcidUri
 		));
-		$templateMgr->display(self::MESSAGE_TPL);		
+		$templateMgr->display(self::MESSAGE_TPL);
 	}
 }
 

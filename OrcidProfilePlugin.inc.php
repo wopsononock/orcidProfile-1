@@ -518,24 +518,20 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	public function sendAuthorMail($author, $saveAuthor = false)
 	{
-		if ($this->isMemberApiEnabled()) {
+		$request = PKPApplication::getRequest();
+		$context = $request->getContext();
+		// This should only ever happen within a context, never site-wide.
+		assert($context != null);
+		$contextId = $context->getId();
+		if ( $this->isMemberApiEnabled($contextId) ) {			
 			$mailTemplate = 'ORCID_REQUEST_AUTHOR_AUTHORIZATION';
 		}
 		else {
 			$mailTemplate = 'ORCID_COLLECT_AUTHOR_ID';			
 		}
 		$mail = $this->getMailTemplate($mailTemplate);
-
 		$orcidToken = md5(microtime().$author->getEmail());
 		$author->setData('orcidToken', $orcidToken);
-
-		$request = PKPApplication::getRequest();
-		$context = $request->getContext();
-
-		// This should only ever happen within a context, never site-wide.
-		assert($context != null);
-		$contextId = $context->getId();
-
 		$articleDao = DAORegistry::getDAO('ArticleDAO');
 		$article = $articleDao->getById($author->getSubmissionId());		
 		// We need to construct a page url, but the request is using the component router.
@@ -585,7 +581,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$authors = $authorDao->getBySubmissionId($articleId);
 				foreach ($authors as $author) {
 					$orcidAccessExpiresOn = Carbon\Carbon::parse($author->getData('orcidAccessExpiresOn'));
-					if ( $author->getData('orcidAccessToken') == null || $orcidAccessExpiresOn.isPast()) {
+					if ( $author->getData('orcidAccessToken') == null || $orcidAccessExpiresOn->isPast()) {
 						$this->sendAuthorMail($author, true);
 					}
 				}
@@ -626,24 +622,24 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$article = $publishedArticleDao->getByArticleId($submissionId);		
 		if ( $article === null ) {
 			$this->logError("No PublishedArticle found for id $submissionId");
-			return;
+			return false;
 		}
 		if ( $issue === null ) {
 			$issue = DAORegistry::getDAO('IssueDAO')->getById($article->getIssueId());
 		}
 		if ( $issue === null || !$issue->getPublished()) {
 			// Issue not yet published, do not send
-			return;
+			return false;
 		}
 		$journal = $request->getContext();
 		$this->currentContextId = $journal->getId();
 		if ( !$this->isMemberApiEnabled() ) {
 			// Sending to ORCID only works with the member API			
-			return;
+			return false;
 		}
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$authors = $authorDao->getBySubmissionId($submissionId);
-		// Collect valid ORCID profiles from Authors		
+		// Collect valid ORCID ids and access tokens from submission contributors
 		$authorsWithOrcid = [];
 		foreach ($authors as $author) {
 			if ($author->getOrcid() && $author->getData('orcidAccessToken') ) {
@@ -661,10 +657,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 			}
 		}
 		if ( empty($authorsWithOrcid) ) {
-			return;
+			logInfo('No contributor with ORICD id or valid access token for submission ' . $submissionId);
+			return false;
 		}
 		$orcidWork = $this->buildOrcidWork($article, $journal, $authors, $issue, $request);
 		$this::logInfo("Request body (without put-code): " . json_encode($orcidWork));
+		$requestsSuccess = [];
 		foreach ($authorsWithOrcid as $orcid => $author) {
 			$url = $this->getSetting($journal->getId(), 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/'
 					. ORCID_WORK_URL;
@@ -729,50 +727,60 @@ class OrcidProfilePlugin extends GenericPlugin {
 					return $len;
 				}
 			);
-			$result = curl_exec($ch);			
-			$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			$result = curl_exec($ch);
 			if (curl_error($ch)) {
-				error_log('Unable to post to ORCID API, curl error: ' . curl_error($ch));
+				$this->logError('Unable to post to ORCID API, curl error: ' . curl_error($ch));
 				curl_close($ch);
 				return;
 			}
+			$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			curl_close($ch);
 			$this->logInfo("Response status: $httpstatus");
 			switch ($httpstatus) {
 				case 200:
 					// Work updated
 					$this->logInfo("Work updated in profile, putCode: $putCode");
+					$requestsSuccess[$orcid] = true;
 					break;
 				case 201:
 					$location = $responseHeaders['location'][0];
 					// Extract the ORCID work put code for updates/deletion.
-					$putCode = intval(basename(parse_url($location, PHP_URL_PATH)));					
+					$putCode = intval(basename(parse_url($location, PHP_URL_PATH)));
 					$this->logInfo("Work added to profile, putCode: $putCode");
 					$author->setData('orcidWorkPutCode', $putCode);
 					$authorDao->updateLocaleFields($author);
+					$requestsSuccess[$orcid] = true;
 					break;
 				case 401:
 					// invalid access token, token was revoked
 					$error = json_decode($result);
 					if ($error->error === 'invalid_token') {
-						$this->logError("$error->error_description, deleting orcidAccessToken from author");						
+						$this->logError("$error->error_description, deleting orcidAccessToken from author");
 						$this->removeOrcidAccessToken($author);
-					}	
+					}
+					$requestsSuccess[$orcid] = false;
 					break;
 				case 409:
-					$this->logError('Work already added to profile, response body: '. $result);					
+					$this->logError('Work already added to profile, response body: '. $result);
+					$requestsSuccess[$orcid] = false;
 					break;
 				default:
 					$this->logError("Unexpected status $httpstatus response, body: $result");
+					$requestsSuccess[$orcid] = false;
 			}
-			
+		}
+		if (array_product($requestsSuccess) ) {
+			return true;
+		}
+		else {
+			return $requestsSuccess;
 		}
 	}
 
 	public function buildOrcidWork($article, $journal, $authors, $issue, $request) {
 		$articleLocale = $article->getLocale();
 		$titles = $article->getTitle($articleLocale);
-		$publicationDate = new DateTime($article->getDatePublished());
+		$publicationDate = new DateTime($issue->getDatePublished());
 		$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin');
 		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $article, 'bibtex')));
 		$dispatcher = $request->getDispatcher();
@@ -925,7 +933,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	private static function writeLog($message, $level) {		
-		error_log(date(DateTime::ISO8601) . " $level $message\n", 3, self::logFilePath());
+		$fineStamp = date('Y-m-d H:i:s') . substr(microtime(), 1, 4);
+		error_log("$fineStamp $level $message\n", 3, self::logFilePath());
 	}
 
 	/**
@@ -948,7 +957,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			error_log('OrcidProfilePlugin::isMemberApiEnabled: No contextId assigned!');
 		}
 		$apiUrl = $this->getSetting($contextId, 'orcidProfileAPIPath');
-		if ( $apiurl === ORCID_API_URL_MEMBER || $apiurl === ORCID_API_URL_MEMBER_SANDBOX ) {
+		if ( $apiUrl === ORCID_API_URL_MEMBER || $apiUrl === ORCID_API_URL_MEMBER_SANDBOX ) {
 			return true;			
 		}
 		else {
