@@ -867,8 +867,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 			'external-ids' => [ 'external-id' => $this->buildOrcidExternalIds($article, $journal, $issue)],
 			'publication-date' => [
 				'year' => [ 'value' => $publicationDate->format("Y")],
-				//'month' => [ 'value' => $publicationDate->format("m")],
-				//'day' => [ 'value' => $publicationDate->format("d")]
+				'month' => [ 'value' => $publicationDate->format("m")],
+				'day' => [ 'value' => $publicationDate->format("d")]
 			],
 			'url' => $articleUrl,
 			'citation' => [
