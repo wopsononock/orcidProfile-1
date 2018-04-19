@@ -16,7 +16,7 @@
 		<subject>Käsikirjoituksen ORCID-tunnisteet</subject>
 		<body><![CDATA[Arvoisa {$authorName},<br/>
 <br/>
-Teidät mainitaan käsikirjoituksen "{$articleTitle}" yhdeksi kirjoittajaksi, joka on lähetetty lehteen {$journalName}.<br/>
+Teidät mainitaan käsikirjoituksen "{$articleTitle}" yhdeksi kirjoittajaksi, joka on lähetetty lehteen {$contextName}.<br/>
 <br/>
 Varmistaaksesi tekijyytesi, ole hyvä ja lisää ORCID-tunnisteesi käsikirjoitukseen vierailemalla alla olevassa linkissä.<br/>
 <br/>
@@ -24,7 +24,7 @@ Varmistaaksesi tekijyytesi, ole hyvä ja lisää ORCID-tunnisteesi käsikirjoitu
 <br/>
 Mikäli teillä on jotain kysymyksiä, olkaa yhteydessä.<br/>
 <br/>
-{$editorialContactSignature}<br/>
+{$principalContactSignature}<br/>
 ]]></body>
 		<description>Tätä sähköpostipohjaa käytetään kirjoittajien ORCID-tunnisteiden keräämiseen.</description>
 	</email_text>

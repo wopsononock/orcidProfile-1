@@ -16,7 +16,7 @@
 		<subject>Podání ORCID</subject>
 		<body><![CDATA[Vážený(á) {$authorName},<br/>
 <br/>
-Byl(a) jste uveden(a) jako spoluautor rukopisu příspěvku "{$articleTitle}" do časopisu {$journalName}.<br/>
+Byl(a) jste uveden(a) jako spoluautor rukopisu příspěvku "{$articleTitle}" do časopisu {$contextName}.<br/>
 <br/>
 K potvrzení vašeho autorství vložte, prosím vaše ORCID k příspěvku na následující webové adrese.<br/>
 <br/>
@@ -24,7 +24,7 @@ K potvrzení vašeho autorství vložte, prosím vaše ORCID k příspěvku na n
 <br/>
 Pokud máte jakékoliv dotazy, neváhejte mne kontaktovat.<br/>
 <br/>
-{$editorialContactSignature}<br/>
+{$principalContactSignature}<br/>
 ]]></body>
 		<description>Tato šablona emailu slouží k shromažďování ORCID ID od spoluautorů.</description>
 	</email_text>

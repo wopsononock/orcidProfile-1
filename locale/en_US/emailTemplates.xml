@@ -16,31 +16,33 @@
 		<subject>Submission ORCID</subject>
 		<body><![CDATA[Dear {$authorName},<br/>
 <br/>
-You have been listed as a co-author on the manuscript submission "{$articleTitle}" to {$journalName}.<br/>
+You have been listed as an author on the manuscript submission "{$articleTitle}" to {$contextName}.<br/>
 To confirm your authorship, please add your ORCID id to this submission by visiting the link provided below.<br/>
 <br/>
 {$authorOrcidUrl} <br/>
 <br/>
 If you have any questions, please contact me.<br/>
 <br/>
-{$editorialContactSignature}<br/>
+{$principalContactSignature}<br/>
 ]]></body>
 		<description>This email template is used to collect the ORCID id's from authors.</description>
 	</email_text>
   <email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
     <subject>Requesting ORCID record access</subject>
-    <body><![CDATA[Dear {$authorName},<br/>
-<br/>
-You have been listed as an author on the manuscript submission "{$articleTitle}" to {$journalName}.<br/>
-<br/>
-Please allow us to add your ORCID to this submission and also add the submission to your ORCID profile on publication.<br/>
-Visit the link to the official ORCID website, login with your profile and authorize the access by following the instructions.<br/>
-<br/>
-{$authorOrcidUrl} <br/>
-<br/>
-If you have any questions, please contact me.<br/>
-<br/>
-{$editorialContactSignature}<br/>
+    <body><![CDATA[Dear {$authorName},<br>
+<br>
+You have been listed as an author on the manuscript submission "{$articleTitle}" to {$contextName}.
+<br>
+<br>
+Please allow us to add your ORCID id to this submission and also to add the submission to your ORCID profile on publication.<br>
+Visit the link to the official ORCID website, login with your profile and authorize the access by following the instructions.<br>
+<br>
+{$authorOrcidUrl}
+<br>
+<br>
+If you have any questions, please contact me.<br>
+<br>
+{$principalContactSignature}<br>
 ]]></body>
     <description>This email template is used to request ORCID record access from authors.</description>
   </email_text>

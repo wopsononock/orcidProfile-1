@@ -53,12 +53,6 @@
 				<i>hidden</i>
 			</td>
 		</tr>
-		<tr valign="top">
-			<td class="label">{translate key="plugins.generic.orcidProfile.manager.settings.orcidScope"}</td>
-			<td class="value">
-				{$orcidScope|escape}
-			</td>
-		</tr>
 	</table>	
 	{else}	
 	<table width="100%" class="data">
@@ -80,19 +74,13 @@
 				<input type="text" name="orcidClientSecret" id="orcidClientSecret" value="{$orcidClientSecret|escape}" size="40" class="textField" />
 			</td>
 		</tr>
-		<tr valign="top">
-			<td class="label">{fieldLabel name="orcidScope" required="true" key="plugins.generic.orcidProfile.manager.settings.orcidScope"}</td>
-			<td class="value">
-				<input type="text" name="orcidScope" id="orcidScope" value="{$orcidScope|escape}" size="40" class="textField" />
-			</td>
-		</tr>
 	</table>
 	{/if}	
 	{fbvFormSection for="sendMailToAuthorOnPublication" title="plugins.generic.orcidProfile.manager.settings.mailSectionTitle" list="true"}
 		{fbvElement type="checkbox" name="sendMailToAuthorsOnPublication" label="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication" id="sendMailToAuthorsOnPublication" checked=$sendMailToAuthorsOnPublication}
 	{/fbvFormSection}
 	{fbvFormSection for="logLevel" title="plugins.generic.orcidProfile.manager.settings.logSectionTitle"}
-		{fbvElement id="logLevel" name="logLevel" type="select" from=$logLevelOptions}
+		{fbvElement id="logLevel" name="logLevel" type="select" from=$logLevelOptions selected=$logLevel}
 	{/fbvFormSection}
 	{/fbvFormArea}
 	{fbvFormButtons}	

@@ -35,11 +35,15 @@
 	<message key="plugins.generic.orcidProfile.author.accessDenied">ORCID access was denied at</message>
 	<message key="plugins.generic.orcidProfile.author.accessTokenStored">ORCID access token stored, valid until</message>
 	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Send e-mail to request ORCID authorization from author</message>
-	<message key="plugins.generic.orcidProfile.author.submission">Submission ORCID</message>
-	<message key="plugins.generic.orcidProfile.author.submission.success">Your submission has successfully been associated with your ORCID iD.</message>
-	<message key="plugins.generic.orcidProfile.author.submission.failure">Your submission could not be successfully associated with your ORCID iD. Please contact the journal manager with your name, ORCID iD, and details of your submission.</message>
-	<message key="plugins.generic.orcidProfile.authDenied">It seems you denied access to your ORCID record. If this was a mistake, please contact the journal manager with your name, ORCID iD, and details of the submission you contributed to.</message>
-	<message key="plugins.generic.orcidProfile.authFailure">OJS was not able to communicate with the ORCID service. Please contact the journal manager with your name, ORCID iD, and details of your submission.</message>
+	<message key="plugins.generic.orcidProfile.verify.title">ORCID Authorization</message>
+	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.success">The submission has been added to your ORCID record.</message>
+	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.failure">The submission could not be added to your ORCID record.</message>
+	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.notpublished">The submission will be added to your ORCID record during publication.</message>
+	<message key="plugins.generic.orcidProfile.verify.success">Your ORCID iD has been verified and successfully associated with the submission.</message>
+	<message key="plugins.generic.orcidProfile.verify.failure">Your ORCID iD could not be verified or the link you followed is not valid.</message>
+	<message key="plugins.generic.orcidProfile.verify.denied">You denied access to your ORCID record.</message>
+	<message key="plugins.generic.orcidProfile.authFailure">OJS was not able to communicate with the ORCID service.</message>
+	<message key="plugins.generic.orcidProfile.failure.contact">Please contact the journal manager with your name, ORCID iD, and details of your submission.</message>
 	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
 	<message key="plugins.generic.orcidProfile.connect">Create or Connect your ORCID iD</message>
 </locale>
