@@ -6,9 +6,9 @@
 
 Plugin for PKP user profiles and author metadata (for OJS 3.1.x)
 
-Copyright © 2015-2016 University of Pittsburgh
-<br />Copyright © 2014-2017 Simon Fraser University
-<br />Copyright © 2003-2017 John Willinsky
+Copyright © 2015-2018 University of Pittsburgh
+<br />Copyright © 2014-2018 Simon Fraser University
+<br />Copyright © 2003-2018 John Willinsky
 
 Licensed under GPL 2 or better.
 

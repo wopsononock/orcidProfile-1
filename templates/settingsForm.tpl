@@ -1,9 +1,9 @@
 {**
  * plugins/generic/orcidProfile/settingsForm.tpl
  *
- * Copyright (c) 2015-2016 University of Pittsburgh
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2015-2018 University of Pittsburgh
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Copyright (c) 2017-2018 University Library Heidelberg
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
@@ -85,5 +85,6 @@
 	{/fbvFormArea}
 	{fbvFormButtons}	
 </form>
+
 <p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 </div>

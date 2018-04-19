@@ -4,9 +4,9 @@
 <!--
   * plugins/generic/orcidPlugin/locale/ru_RU/locale.xml
   *
-  * Copyright (c) 2015-2016 University of Pittsburgh
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2003-2017 John Willinsky
+  * Copyright (c) 2015-2018 University of Pittsburgh
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2003-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * ORCID Profile plugin localization strings
@@ -33,5 +33,5 @@
 	<message key="plugins.generic.orcidProfile.author.submission.failure">Ваш материал не удалось успешно связать с Вашим ORCID iD. Пожалуйста, свяжитесь с управляющим журнала, сообщив ему Ваше имя, ORCID iD и информацию о Вашем отправленном материале.</message>
 	<message key="plugins.generic.orcidProfile.authFailure">OJS не удалось связаться с сервисом ORCID. Пожалуйста, свяжитесь с управляющим журнала, сообщив ему Ваше имя, ORCID iD и информацию о Вашем отправленном материале.</message>
     <message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
-    <message key="plugins.generic.orcidProfile.connect">Создать или Подключиться к вашему ORCID</message>
+    <message key="plugins.generic.orcidProfile.connect">Создать или Подключиться к вашему ORCID iD</message>
 </locale>

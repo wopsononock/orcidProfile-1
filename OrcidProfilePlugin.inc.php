@@ -3,9 +3,9 @@
 /**
  * @file plugins/generic/orcidProfile/OrcidProfilePlugin.inc.php
  *
- * Copyright (c) 2015-2016 University of Pittsburgh
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2015-2018 University of Pittsburgh
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Copyright (c) 2017-2018 University Library Heidelberg
  * Distributed under the GNU GPL v2. For full terms see the file LICENSE.txt
  *
@@ -41,15 +41,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 	private $currentContextId;
 
 	/**
-	 * Called as a plugin is registered to the registry
-	 * @param $category String Name of category plugin was registered to
-	 * @return boolean True iff plugin initialized successfully; if false,
-	 * 	the plugin will not be registered.
+	 * @copydoc Plugin::register()
 	 */
-	function register($category, $path) {
-		$success = parent::register($category, $path);
+	function register($category, $path, $mainContextId = null) {
+		$success = parent::register($category, $path, $mainContextId);
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
-		if ($success && $this->getEnabled()) {
+		if ($success && $this->getEnabled($mainContextId)) {
 			// Register callback for Smarty filters; add CSS
 			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
 			// Add "Connect ORCID" button to PublicProfileForm
@@ -74,7 +71,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		return $success;
 	}
-
 
 	/**
 	 * Get page handler path for this plugin.
@@ -188,6 +184,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 				break;
 			case 'frontend/pages/article.tpl':
 				$templateMgr->assign('orcidIcon', $this->getIcon());
+				break;
+			case 'user/publicProfileForm.tpl':
+				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
 				break;
 		}
 		return false;
@@ -386,7 +385,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @copydoc PKPPlugin::getTemplatePath
 	 */
 	function getTemplatePath($inCore = false) {
-		return parent::getTemplatePath($inCore) . 'templates/';
+		return $this->getTemplateResourceName() . ':templates/';
 	}
 
 	/**
@@ -1030,5 +1029,4 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 	}
 }
-
 ?>
