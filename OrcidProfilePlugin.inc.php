@@ -95,6 +95,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return false;
 	}
 
+	/**
+	 * Load a setting for a specific journal or load it from the config.inc.php if it is specified there.
+	 *
+	 * @param  int $contextId The id of the journal from which the plugin settings should be loaded.
+	 * @param  string $name   Name of the setting.
+	 * @return mixed          The setting value, either from the database for this context
+	 *                        or from the global configuration file.
+	 */
 	function getSetting($contextId, $name)
 	{
 		switch ($name) {
@@ -113,6 +121,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	    return $config_value ?: parent::getSetting($contextId, $name);
     }
 
+    /**
+     * Check if there exist a valid orcid configuration section in the global config.inc.php of OJS.
+     * @return boolean True, if the config file has api_url, client_id and client_secret set in an [orcid] section
+     */
     function isGloballyConfigured() {
 	    $apiUrl = Config::getVar('orcid','api_url');
 	    $clientId = Config::getVar('orcid','client_id');
@@ -657,6 +669,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 	}
 
+	/**
+	 * Check if the submission with the supplied id is actually published.
+	 * @param  [type]  $submissionId [description]
+	 * @return boolean               [description]
+	 */
 	public function isSubmissionPublished($submissionId) {
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
 		$article = $publishedArticleDao->getByArticleId($submissionId);
@@ -674,8 +691,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * sendSubmissionToOrcid posts JSON consisting of submission, journal and issue meta data
 	 * to ORCID profiles of submission authors.
 	 *
-	 * See https://github.com/ORCID/ORCID-Source/tree/master/orcid-model/src/main/resources/record_2.1
-	 * for documentation of the ORCID JSON format.
+	 * @see https://github.com/ORCID/ORCID-Source/tree/master/orcid-model/src/main/resources/record_2.1
+	 * for documentation and examples of the ORCID JSON format.
 	 *
 	 * @param $submissionId integer Id of the article for which the data will be sent to ORCID
 	 * @return void
@@ -841,6 +858,18 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 	}
 
+	/**
+	 * Build an associative array with submission meta data, which can be encoded to a valid ORCID work JSON structure.
+	 *
+	 * @see https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/write_sample/bulk-work-2.1.json
+	 *  Example of valid ORCID JSON for adding works to an ORCID record.
+	 * @param  Article $article  extract data from this Article
+	 * @param  Journal $journal  Journal (context) object the Article is part of
+	 * @param  Author[] $authors Array of Author objects, the contributors of the article
+	 * @param  Issue $issue      Issue the Article is part of
+	 * @param  Request $request  the current request
+	 * @return array             an associative array with article meta data corresponding to ORCID work JSON structure
+	 */
 	public function buildOrcidWork($article, $journal, $authors, $issue, $request) {
 		$articleLocale = $article->getLocale();
 		$titles = $article->getTitle($articleLocale);
@@ -886,6 +915,16 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return $orcidWork;
 	}
 
+	/**
+	 * Build the external identifiers ORCID JSON structure from article, journal and issue meta data.
+	 *
+	 * @see  https://pub.orcid.org/v2.0/identifiers Table of valid ORCID identifier types.
+	 *
+	 * @param  Article $article The Article object for which the external identifiers should be build.
+	 * @param  Journal $journal Journal the Article is part of.
+	 * @param  Issue   $issue   The Issue object the Article object belongs to.
+	 * @return array            An associative array corresponding to ORCID external-id JSON.
+	 */
 	private function buildOrcidExternalIds($article, $journal, $issue) {
 		$externalIds = array();
 		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true, $article->getContextId());
