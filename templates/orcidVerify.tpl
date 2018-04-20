@@ -6,8 +6,7 @@
  * Copyright (c) 2018 University Library Heidelberg
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * Generic message page.
- * Displays a simple message and (optionally) a return link.
+ * Page template to display from the OrcidHandler to show ORCID verification success or failure.
  *}
 {include file="frontend/components/header.tpl"}
 
@@ -28,7 +27,7 @@
 			{if $sendSubmissionSuccess}
 				<div class="orcid-success">
 				{translate key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.success"}
-				</div>			
+				</div>
 			{else}
 				<div class="orcid-failure">
 				{translate key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.failure"}
@@ -48,7 +47,7 @@
 		{/if}
 		</div>
 		{translate key="plugins.generic.orcidProfile.failure.contact"}
-	{/if}	
+	{/if}
 	</div>
 </div>
 
