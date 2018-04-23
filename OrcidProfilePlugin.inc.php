@@ -673,8 +673,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 	/**
 	 * Check if the submission with the supplied id is actually published.
-	 * @param  [type]  $submissionId [description]
-	 * @return boolean               [description]
+	 * @param  int     $submissionId Id of the submission/article to check.
+	 * @return boolean True, if the article is part of a published issue. False otherwise.
 	 */
 	public function isSubmissionPublished($submissionId) {
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
@@ -843,6 +843,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 					}
 					$requestsSuccess[$orcid] = false;
 					break;
+				case 404:
+					// a work has been deleted from a ORCID record. putCode is no longer valid.
+					if ($method === 'PUT') {
+						$this->logError("Work deleted from ORCID record.");
+					}
 				case 409:
 					$this->logError('Work already added to profile, response body: '. $result);
 					$requestsSuccess[$orcid] = false;
