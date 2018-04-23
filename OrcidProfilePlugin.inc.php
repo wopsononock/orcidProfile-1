@@ -68,6 +68,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 			HookRegistry::register('issueentrypublicationmetadataform::execute', array($this, 'handleScheduleForPublication'));
 			// Send emails to authors without authorised ORCID access on promoting a submission to production
 			HookRegistry::register('EditorAction::recordDecision', array($this, 'handleEditorAction'));
+
+			$this->_registerTemplateResource();
 		}
 		return $success;
 	}

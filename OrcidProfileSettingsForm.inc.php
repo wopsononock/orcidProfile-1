@@ -44,7 +44,7 @@ class OrcidProfileSettingsForm extends Form {
 		parent::__construct($plugin->getTemplatePath() . 'settingsForm.tpl');
 
 		if(!$this->plugin->isGloballyConfigured()) {
-			$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required', 
+			$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required',
 				'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
 		}
 		$this->addCheck(new FormValidatorPost($this));
@@ -74,7 +74,7 @@ class OrcidProfileSettingsForm extends Form {
 	 * Fetch the form.
 	 * @copydoc Form::fetch()
 	 */
-	function fetch($request) {
+	function fetch($request, $template, $display) {
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign('globallyConfigured', $this->plugin->isGloballyConfigured());
 		$templateMgr->assign('pluginName', $this->plugin->getName());
@@ -92,9 +92,9 @@ class OrcidProfileSettingsForm extends Form {
 				$plugin->updateSetting($contextId, $configVar, trim($this->getData($configVar), "\"\';"), $type);
 			}
 			else {
-				$plugin->updateSetting($contextId, $configVar, $this->getData($configVar), $type);	
-			}			
-		}		
+				$plugin->updateSetting($contextId, $configVar, $this->getData($configVar), $type);
+			}
+		}
 	}
 }
 
