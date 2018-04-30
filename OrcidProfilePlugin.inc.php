@@ -733,14 +733,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$authorsWithOrcid[$orcid] = $author;
 				}
 				else {
-					$this::logError("Token expired on $orcidAccessExpiresOn for author ". $author->getId() .
+					$this->logError("Token expired on $orcidAccessExpiresOn for author ". $author->getId() .
 									", deleting orcidAccessToken!");
 					$this->removeOrcidAccessToken($author);
 				}
 			}
 		}
 		if ( empty($authorsWithOrcid) ) {
-			logInfo('No contributor with ORICD id or valid access token for submission ' . $submissionId);
+			$this->logInfo('No contributor with ORICD id or valid access token for submission ' . $submissionId);
 			return false;
 		}
 		$orcidWork = $this->buildOrcidWork($article, $journal, $authors, $issue, $request);
@@ -847,7 +847,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 					// a work has been deleted from a ORCID record. putCode is no longer valid.
 					if ($method === 'PUT') {
 						$this->logError("Work deleted from ORCID record.");
+						$requestsSuccess[$orcid] = false;						
 					}
+					else {
+						$this->logError("Unexpected status $httpstatus response, body: $result");
+						$requestsSuccess[$orcid] = false;	
+					}
+					break;
 				case 409:
 					$this->logError('Work already added to profile, response body: '. $result);
 					$requestsSuccess[$orcid] = false;
@@ -879,8 +885,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	public function buildOrcidWork($article, $journal, $authors, $issue, $request) {
 		$articleLocale = $article->getLocale();
-		$titles = $article->getTitle($articleLocale);
-		$publicationDate = new DateTime($issue->getDatePublished());
+		$titles = $article->getTitle($articleLocale);		
 		$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin');
 		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $article, 'bibtex')));
 		$dispatcher = $request->getDispatcher();
@@ -900,11 +905,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			'short-description' => trim(strip_tags($article->getAbstract('en_US'))),
 			'type' => 'JOURNAL_ARTICLE',
 			'external-ids' => [ 'external-id' => $this->buildOrcidExternalIds($article, $journal, $issue)],
-			'publication-date' => [
-				'year' => [ 'value' => $publicationDate->format("Y")],
-				'month' => [ 'value' => $publicationDate->format("m")],
-				'day' => [ 'value' => $publicationDate->format("d")]
-			],
+			'publication-date' => $this->buildOrcidPublicationDate($issue),
 			'url' => $articleUrl,
 			'citation' => [
 				'citation-type' => 'BIBTEX',
@@ -920,6 +921,24 @@ class OrcidProfilePlugin extends GenericPlugin {
 			];
 		}
 		return $orcidWork;
+	}
+
+	private function buildOrcidPublicationDate($issue) {
+		$issuePublicationDate = Carbon\Carbon::parse($issue->getDatePublished());
+		if( $issue->getYear() < ( $issuePublicationDate->year - 1 ) ) {
+			// The original issue is at least two years older than the
+			// publication date entered in OJS.
+			// We treat it as a retro publication and add the work to ORCID with 
+			// the original publication year.
+			return [ 'year' => [ 'value' => $issue->getYear() ] ];
+		}
+		else {
+			return [
+				'year' => [ 'value' => $issuePublicationDate->format("Y")],
+				'month' => [ 'value' => $issuePublicationDate->format("m")],
+				'day' => [ 'value' => $issuePublicationDate->format("d")]
+			];
+		}
 	}
 
 	/**
