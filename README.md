@@ -47,4 +47,3 @@ Licensed under GPL 2 or better.
 
 ## Install:
 
- * (To be written)
