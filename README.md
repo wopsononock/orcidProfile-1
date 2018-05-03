@@ -1,6 +1,6 @@
 # ORCID Profile Plugin
 
-**NOTE: This plugin is a work in progress and should be tested with your OJS setup before using in production.**
+**NOTE: This plugin is a work in progress and should be tested with your OJS setup in the ORCID Sandbox before using in production.**
 
 **NOTE: Please ensure you're using the correct branch. Use the [master branch](https://github.com/pkp/orcidProfile/tree/master) for OJS 3.0, and the [ojs-dev-2_4 branch](https://github.com/pkp/orcidProfile/tree/ojs-dev-2_4) for OJS 2.4.x.**
 
@@ -39,7 +39,7 @@ Licensed under GPL 2 or better.
   * assigning a submission to an already published issue
   * publishing a new issue
   * author grants permission after the publication of the issue  
-  
+
   Submission meta data will be updated in the ORCID record if the process is triggered again.
 
 ## Install:
