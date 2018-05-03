@@ -20,9 +20,8 @@ Licensed under GPL 2 or better.
 ### New in version 1.1.0
 * Enable site-wide configuration of ORCID API settings using config.inc.php 
 * Support ORCID API Version 2.1  (store only https ORCID Ids)
-* Added checkbox in Author meta data form to send e-mail for requesting ORCID authorization from article authors.  
-  The e-mail will be sent on saving the form data.
-* Added plugin setting to automatically send the e-mail on promoting a submission to production.
+* Allow journal managers to send e-mails requesting authors for ORCID authorization on submission or later.
+* Automated e-mail based authorization requests to authors when submission enters to production stage.
 * Added text to author meta data form to show if the ORCID access has been granted and the expiration date.
 * Updated locale strings, e-mail template texts and added HTML line breaks to existing templates.
 * Added template for showing detailed success or failure message for ORCID authorization redirects.
