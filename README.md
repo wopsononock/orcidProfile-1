@@ -18,8 +18,8 @@ Licensed under GPL 2 or better.
 
 ## Features:
 ### New in version 1.1.0
-* Read ORCID client Id, client secret and API settings from config.inc.php to allow system administrators to provide site wide ORCID API settings.
-* Increased ORCID API Version to 2.1: only store ORCID Ids with https scheme.
+* Enable site-wide configuration of ORCID API settings using config.inc.php 
+* Support ORCID API Version 2.1  (store only https ORCID Ids)
 * Added checkbox in Author meta data form to send e-mail for requesting ORCID authorization from article authors.  
   The e-mail will be sent on saving the form data.
 * Added plugin setting to automatically send the e-mail on promoting a submission to production.
