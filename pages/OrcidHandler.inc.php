@@ -78,8 +78,8 @@ class OrcidHandler extends Handler {
 		switch (Request::getUserVar('targetOp')) {
 			case 'register':
 				echo '<html><body><script type="text/javascript">
-					opener.document.getElementById("firstName").value = ' . json_encode($json['name']['given-names']['value']) . ';
-					opener.document.getElementById("lastName").value = ' . json_encode($json['name']['family-name']['value']) . ';
+					opener.document.getElementById("givenName").value = ' . json_encode($json['name']['given-names']['value']) . ';
+					opener.document.getElementById("familyName").value = ' . json_encode($json['name']['family-name']['value']) . ';
 					opener.document.getElementById("email").value = ' . json_encode($json['email']['value']) . ';
 					opener.document.getElementById("orcid").value = ' . json_encode($orcid_uri). ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
