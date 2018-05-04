@@ -30,7 +30,7 @@ Licensed under GPL 2 or better.
 ### Extra functionalities for ORCID Member organizations
   
   * Extra e-mail template `ORCID_REQUEST_AUTHOR_AUTHORIZATION`  for requesting API access tokens.
-  * Updated template text, e-mail templates for english and german locales. 
+  * Updated template text, e-mail templates for English and German locales. 
   * Member API Email-Template activated upon selection of ORCID member API
   * Support for synchronizing submission meta data to authorized records  in follwing stage changes:
     * Assign a submission to an already published issue
