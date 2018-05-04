@@ -27,7 +27,7 @@ Licensed under GPL 2 or better.
 * Extra configurable (in plugin settings) ORCID log file in `OJS_FILES_DIR/orcid.log` for API communication. 
  *NOTE: Make sure that the files folder is not publicly accessible*
  
-### Extra functionalities for ORCID Member organizations
+#### Extra functionalities for ORCID Member organizations
   
   * Extra e-mail template `ORCID_REQUEST_AUTHOR_AUTHORIZATION`  for requesting API access tokens.
   * Updated template text, e-mail templates for English and German locales. 
