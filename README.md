@@ -38,12 +38,13 @@ Licensed under GPL 2 or better.
     * Author grants permission after the publication of the issue  
    
 
-## Technical Workflow  description
+### Technical Workflow  description
   The included authorization link will have the access scope `/activities/update`. 
   An author can authorize access to his/her ORCID record to allow the adding of the submission to the record.  
   See https://members.orcid.org/api/oauth/orcid-scopes for more information.
 
   
 
-## Install:
+### Installation
+
 
