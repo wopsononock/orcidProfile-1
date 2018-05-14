@@ -18,30 +18,33 @@ Licensed under GPL 2 or better.
 
 ## Features:
 ### New in version 1.1.0
-* Read ORCID client Id, client secret and API settings from config.inc.php to allow system administrators to provide site wide ORCID API settings.
-* Increased ORCID API Version to 2.1: only store ORCID Ids with https scheme.
-* Added checkbox in Author meta data form to send e-mail for requesting ORCID authorization from article authors.  
-  The e-mail will be sent on saving the form data.
-* Added plugin setting to automatically send the e-mail on promoting a submission to production.
-* Added text to author meta data form to show if the ORCID access has been granted and the expiration date.
-* Updated locale strings, e-mail template texts and added HTML line breaks to existing templates.
-* Added template for showing detailed success or failure message for ORCID authorization redirects.
-* Added logging of ORCID API communication to separate ORCID log file in `OJS_FILES_DIR/orcid.log`.  
-  The log level can be adjusted in the plugin settings.
-  **NOTE: Make sure that the files folder is not publicly accessible**
-* **NOTE: ORCID Member organizations only**  
-  Added new e-mail template `ORCID_REQUEST_AUTHOR_AUTHORIZATION` to distinguish between collecting ORCID id and requesting ORCID record access.  
-  If the ORCID member API is selected this template will be used to generate the e-mails to authors.  
-  The included authorization link will have the access scope `/activities/update`. An author can authorize access to his/her ORCID record to allow the adding of the submission to the record.  
+* Enable site-wide configuration of ORCID API settings using config.inc.php 
+* Support ORCID API Version 2.1  (store only https ORCID Ids)
+* Allow journal managers to send e-mails requesting authors for ORCID authorization on submission or later.
+* Automated e-mail based authorization requests to authors when submission enters to production stage.
+* Display  ORCID access status and expiration date in Author metadata
+* Support of template  based  detailed success/failure messages for ORCID authorization redirects.
+* Extra configurable (in plugin settings) ORCID log file in `OJS_FILES_DIR/orcid.log` for API communication. 
+ *NOTE: Make sure that the files folder is not publicly accessible*
+ 
+#### Extra functionalities for ORCID Member organizations
+  
+  * Extra e-mail template `ORCID_REQUEST_AUTHOR_AUTHORIZATION`  for requesting API access tokens.
+  * Updated template text, e-mail templates for English and German locales. 
+  * Member API Email-Template activated upon selection of ORCID member API
+  * Support for synchronizing submission meta data to authorized records  in follwing stage changes:
+    * Assign a submission to an already published issue
+    * Publish a new issue
+    * Author grants permission after the publication of the issue  
+   
+
+### Technical Workflow  description
+  The included authorization link will have the access scope `/activities/update`. 
+  An author can authorize access to his/her ORCID record to allow the adding of the submission to the record.  
   See https://members.orcid.org/api/oauth/orcid-scopes for more information.
-* **NOTE: ORCID Member organizations only**  
-  Added uploading of submission meta data to authorized and connected ORCID records of authors when:
-  * assigning a submission to an already published issue
-  * publishing a new issue
-  * author grants permission after the publication of the issue  
 
-  Submission meta data will be updated in the ORCID record if the process is triggered again.
+  
 
-## Install:
+### Installation
 
- * (To be written)
+
