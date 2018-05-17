@@ -118,24 +118,24 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$config_value = Config::getVar('orcid','client_secret');
 				break;
 			default:
-            	return parent::getSetting($contextId, $name);
+				return parent::getSetting($contextId, $name);
 		}
-	    return $config_value ?: parent::getSetting($contextId, $name);
-    }
+		return $config_value ?: parent::getSetting($contextId, $name);
+	}
 
-    /**
-     * Check if there exist a valid orcid configuration section in the global config.inc.php of OJS.
-     * @return boolean True, if the config file has api_url, client_id and client_secret set in an [orcid] section
-     */
-    function isGloballyConfigured() {
-	    $apiUrl = Config::getVar('orcid','api_url');
-	    $clientId = Config::getVar('orcid','client_id');
-	    $clientSecret = Config::getVar('orcid','client_secret');
-	    return isset($apiUrl) && trim($apiUrl) && isset($clientId) && trim($clientId) &&
-		    isset($clientSecret) && trim($clientSecret);
-    }
+	/**
+	 * Check if there exist a valid orcid configuration section in the global config.inc.php of OJS.
+	 * @return boolean True, if the config file has api_url, client_id and client_secret set in an [orcid] section
+	 */
+	function isGloballyConfigured() {
+		$apiUrl = Config::getVar('orcid','api_url');
+		$clientId = Config::getVar('orcid','client_id');
+		$clientSecret = Config::getVar('orcid','client_secret');
+		return isset($apiUrl) && trim($apiUrl) && isset($clientId) && trim($clientId) &&
+			isset($clientSecret) && trim($clientSecret);
+	}
 
-    /**
+	/**
 	 * Hook callback to handle form display.
 	 * Registers output filter for public user profile and author form.
 	 *
