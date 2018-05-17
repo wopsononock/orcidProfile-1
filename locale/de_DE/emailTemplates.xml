@@ -2,15 +2,17 @@
 <!DOCTYPE email_texts SYSTEM "../../../../../lib/pkp/dtd/emailTemplateData.dtd">
 
 <!--
-  * @file plugins/generic/orcidProfile/locale/de_DE/emailTemplates.xml
-  *
-  * Copyright (c) 2015-2018 University of Pittsburgh
-  * Copyright (c) 2013-2018 Simon Fraser University
-  * Copyright (c) 2003-2018 John Willinsky
-  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
-  *
-  * Localized email templates XML file.
-  -->
+	* @file plugins/generic/orcidProfile/locale/de_DE/emailTemplates.xml
+	*
+	* Copyright (c) 2015-2018 University of Pittsburgh
+	* Copyright (c) 2013-2018 Simon Fraser University
+	* Copyright (c) 2003-2018 John Willinsky
+	* Copyright (c) 2018 University Library Heidelberg
+	* 
+	* Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+	*
+	* Localized email templates XML file.
+	-->
 
 <email_texts locale="de_DE">
 	<email_text key="ORCID_COLLECT_AUTHOR_ID">
@@ -27,11 +29,11 @@ Wenn Sie Fragen dazu haben, melden Sie sich bitte bei mir.<br/>
 <br/>
 {$principalContactSignature}<br/>
 ]]></body>
-    <description>Diese E-Mail-Vorlage wird verwendet, um die ORCID-iDs von Co-Autor/innen einzuholen.</description>
+		<description>Diese E-Mail-Vorlage wird verwendet, um die ORCID-iDs von Co-Autor/innen einzuholen.</description>
 	</email_text>
-  <email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
-    <subject>ORCID Zugriff erbeten</subject>
-    <body><![CDATA[Liebe/r {$authorName},<br>
+	<email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
+		<subject>ORCID Zugriff erbeten</subject>
+		<body><![CDATA[Liebe/r {$authorName},<br>
 <br>
 Sie sind als Autor/in des eingereichten Beitrags "{$articleTitle}" bei der Zeitschrift {$contextName} benannt worden.<br>
 <br>
@@ -45,6 +47,6 @@ Wenn Sie Fragen dazu haben, melden Sie sich bitte.<br>
 <br>
 {$principalContactSignature}<br>
 ]]></body>
-    <description>Diese E-Mail-Vorlage wird verwendet, um die Authorisierung für ORCID Profil Zugriff von Autor/innen einzuholen.</description>
-  </email_text>
+		<description>Diese E-Mail-Vorlage wird verwendet, um die Authorisierung für ORCID Profil Zugriff von Autor/innen einzuholen.</description>
+	</email_text>
 </email_texts>

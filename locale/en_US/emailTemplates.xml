@@ -28,9 +28,9 @@ If you have any questions, please contact me.<br/>
 ]]></body>
 		<description>This email template is used to collect the ORCID id's from authors.</description>
 	</email_text>
-  <email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
-    <subject>Requesting ORCID record access</subject>
-    <body><![CDATA[Dear {$authorName},<br>
+	<email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
+		<subject>Requesting ORCID record access</subject>
+		<body><![CDATA[Dear {$authorName},<br>
 <br>
 You have been listed as an author on the manuscript submission "{$articleTitle}" to {$contextName}.
 <br>
@@ -45,6 +45,6 @@ If you have any questions, please contact me.<br>
 <br>
 {$principalContactSignature}<br>
 ]]></body>
-    <description>This email template is used to request ORCID record access from authors.</description>
-  </email_text>
+		<description>This email template is used to request ORCID record access from authors.</description>
+	</email_text>
 </email_texts>
