@@ -19,9 +19,9 @@
 	<message key="plugins.generic.orcidProfile.instructions"><![CDATA[Sie können dieses Formular vorbefüllen mit Informationen aus Ihrem ORCID-Datensatz. Geben Sie Ihre ORCID-iD oder eine E-Mail-Adresse an, die mit Ihrem ORCID-Datensatz verknüpft ist. Dann klicken Sie "Abschicken".]]></message>
 	<message key="plugins.generic.orcidProfile.noData">Konnte keine ORCID-Informationen finden.</message>
 	<message key="plugins.generic.orcidProfile.emailOrOrcid">E-Mail-Adresse oder ORCID-iD:</message>
-	<message key="plugins.generic.orcidProfile.manager.orcidProfileSettings">ORCID-API-Einstellungen</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.title">ORCID-API-Einstellungen</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.hidden">versteckt</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.description">Die ORCID-API konfigurieren, um Informationen aus ORCID-Datensätzen in Nutzerprofile einlesen zu können und Veröffentlichungen in verknüpfte ORCID-Datensätze zu übertragen (nur ORCID Member).</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.description">Bitte den ORCID-API Zugang konfigurieren, um Informationen aus ORCID-Datensätzen in Nutzer- und Autoreprofile einlesen zu können und Veröffentlichungen in verknüpfte ORCID-Datensätze zu übertragen (nur ORCID Member).</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured">Die ORCID-API wurde in der globalen Konfigurationsdatei konfiguriert.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath">ORCID-API</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public">Public</message>
@@ -34,6 +34,7 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">E-Mail Einstellungen</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Sende E-Mails um ORCID Authorisierung von jedem Author eines Artikels bei Veröffentlichung einer Ausgabe anzufragen</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">ORCID Anfragen protokollieren</message>	
+	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.help">Wählen Sie die Art der Nachrichten die protokolliert werden sollen</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Fehler</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.all">Alle</message>
 	<message key="plugins.generic.orcidProfile.author.accessDenied">ORCID Zugriff abgelehnt</message>
