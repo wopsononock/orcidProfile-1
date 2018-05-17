@@ -100,8 +100,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	/**
 	 * Load a setting for a specific journal or load it from the config.inc.php if it is specified there.
 	 *
-	 * @param  int $contextId The id of the journal from which the plugin settings should be loaded.
-	 * @param  string $name   Name of the setting.
+	 * @param  $contextId int The id of the journal from which the plugin settings should be loaded.
+	 * @param  $name string   Name of the setting.
 	 * @return mixed          The setting value, either from the database for this context
 	 *                        or from the global configuration file.
 	 */
@@ -923,6 +923,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return $orcidWork;
 	}
 
+
+	/**
+	 * Parse issue year and publication date and use the older on of the two as
+	 * the publication date of the ORCID work.
+	 *
+	 * @return array Associative array with year, month and day or only year
+	 */
 	private function buildOrcidPublicationDate($issue) {
 		$issuePublicationDate = Carbon\Carbon::parse($issue->getDatePublished());
 		if( $issue->getYear() < ( $issuePublicationDate->year - 1 ) ) {
@@ -999,6 +1006,15 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return $externalIds;
 	}
 
+	/**
+	 * Build associative array fitting for ORCID contributor mentions in an
+	 * ORCID work from the supplied Authors array.
+	 * 
+	 * @param  $authors Author[] Array of Author objects
+	 * @param  $contextId int    Id of the context the Author objects belong to
+	 * @return array[]           Array of associative arrays,
+	 *                           one for each contributor
+	 */
 	private function buildOrcidContributors($authors, $contextId) {
 		$contributors = [];
 		$first = true;
@@ -1036,6 +1052,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 		return $contributors;
 	}
 
+	/**
+	 * Remove all data fields, which belong to an ORCID access token from the 
+	 * given Author object. Also updates fields in the db.
+	 * 
+	 * @param  $author Author object with ORCID access token
+	 * @return void
+	 */
 	public function removeOrcidAccessToken($author) {
 		$author->setData('orcidAccessToken', null);
 		$author->setData('orcidRefreshToken', null);
@@ -1044,14 +1067,29 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$authorDao->updateLocaleFields($author);
 	}
 
+	/**	 
+	 * @return string Path to a custom ORCID log file.
+	 */
 	public static function logFilePath() {
 		return Config::getVar('files', 'files_dir') . '/orcid.log';
 	}
 
+	/**
+	 * Write error message to log.
+	 * 
+	 * @param  $message string Message to write
+	 * @return void
+	 */
 	public function logError($message) {
 		self::writeLog($message, 'ERROR');
 	}
 
+	/**
+	 * Write info message to log.
+	 * 
+	 * @param  $message string Message to write
+	 * @return void
+	 */
 	public function logInfo($message) {
 		if ($this->getSetting($this->currentContextId, 'logLevel') === 'ERROR') {
 			return;
@@ -1061,6 +1099,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 	}
 
+	/**
+	 * Write a message with specified level to log
+	 * 
+	 * @param  $message string Message to write
+	 * @param  $level   string Error level to add to message
+	 * @return void
+	 */
 	private static function writeLog($message, $level) {
 		$fineStamp = date('Y-m-d H:i:s') . substr(microtime(), 1, 4);
 		error_log("$fineStamp $level $message\n", 3, self::logFilePath());
