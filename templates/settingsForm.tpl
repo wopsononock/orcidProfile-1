@@ -50,7 +50,7 @@
 		<tr valign="top">
 			<td class="label">{translate key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret"}</td>
 			<td class="value">
-				<i>hidden</i>
+				<i>{translate key="plugins.generic.orcidProfile.manager.settings.hidden"}</i>
 			</td>
 		</tr>
 	</table>	
