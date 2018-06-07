@@ -147,7 +147,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
-			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
+			$newOutput .= $templateMgr->fetch($this->getTemplateResource('orcidProfile.tpl'));
 			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
 		}
@@ -178,7 +178,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
-			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
+			$newOutput .= $templateMgr->fetch($this->getTemplateResource('orcidProfile.tpl'));
 			$newOutput .= '<script type="text/javascript">
 					$(document).ready(function() {
 					$(\'input[name=orcid]\').attr(\'readonly\', "true");
@@ -296,7 +296,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	/**
 	 * Extend the {url ...} smarty to support this plugin.
 	 */
-	function smartyPluginUrl($params, &$smarty) {
+	function smartyPluginUrl($params, $smarty) {
 		$path = array($this->getCategory(), $this->getName());
 		if (is_array($params['path'])) {
 			$params['path'] = array_merge($path, $params['path']);
