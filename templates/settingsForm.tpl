@@ -31,17 +31,17 @@
 			{if $globallyConfigured}
 			<p>
 				{translate key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured"}
-    		</p>
-    		{/if}
+			</p>
+			{/if}
 			{fbvElement id="orcidProfileAPIPath" type="select" translate="true" from=$orcidApiUrls selected=$orcidProfileAPIPath required="true" label="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath" disabled=$globallyConfigured}
 			{fbvElement type="text" id="orcidClientId" value=$orcidClientId required="true" label="plugins.generic.orcidProfile.manager.settings.orcidClientId" maxlength="40" size=$fbvStyles.size.MEDIUM disabled=$globallyConfigured}
 			{if $globallyConfigured}
 				<p>
 					{translate key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret"}: <i>{translate key="plugins.generic.orcidProfile.manager.settings.hidden"}</i>
-    			</p>
-    		{else}
-    			{fbvElement type="text" id="orcidClientSecret" value=$orcidClientSecret required="true" label="plugins.generic.orcidProfile.manager.settings.orcidClientSecret" maxlength="40" size=$fbvStyles.size.MEDIUM disabled=$globallyConfigured}
-    		{/if}
+				</p>
+			{else}
+				{fbvElement type="text" id="orcidClientSecret" value=$orcidClientSecret required="true" label="plugins.generic.orcidProfile.manager.settings.orcidClientSecret" maxlength="40" size=$fbvStyles.size.MEDIUM disabled=$globallyConfigured}
+			{/if}
 		{/fbvFormSection}
 	{/fbvFormArea}
 	{fbvFormSection for="sendMailToAuthorOnPublication" title="plugins.generic.orcidProfile.manager.settings.mailSectionTitle" list="true"}

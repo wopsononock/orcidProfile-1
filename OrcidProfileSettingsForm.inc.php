@@ -23,8 +23,7 @@ class OrcidProfileSettingsForm extends Form {
 	const CONFIG_VARS = array(
 		'orcidProfileAPIPath' => 'string',
 		'orcidClientId' => 'string',
-		'orcidClientSecret' => 'string',
-		'orcidScope' => 'string',
+		'orcidClientSecret' => 'string',		
 		'sendMailToAuthorsOnPublication' => 'bool',
 		'logLevel' => 'string');
 	/** @var $contextId int */
