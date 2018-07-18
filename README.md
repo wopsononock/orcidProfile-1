@@ -1,7 +1,5 @@
 # ORCID Profile Plugin
 
-**NOTE: This plugin is a work in progress and should be tested with your OJS setup in the ORCID Sandbox before using in production.**
-
 **NOTE: Please ensure you're using the correct branch. Use the [master branch](https://github.com/pkp/orcidProfile/tree/master) for OJS 3.0, and the [ojs-dev-2_4 branch](https://github.com/pkp/orcidProfile/tree/ojs-dev-2_4) for OJS 2.4.x.**
 
 Plugin for adding and verifying ORCID iD in PKP user profiles and author metadata (for OJS 3.1.1).
