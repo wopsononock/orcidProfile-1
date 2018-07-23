@@ -846,12 +846,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 				case 404:
 					// a work has been deleted from a ORCID record. putCode is no longer valid.
 					if ($method === 'PUT') {
-						$this->logError("Work deleted from ORCID record.");
-						$requestsSuccess[$orcid] = false;						
+						$this->logError("Work deleted from ORCID record, deleting putCode form author");
+						$author->setData('orcidWorkPutCode', null);
+						$authorDao->updateLocaleFields($author);
+						$requestsSuccess[$orcid] = false;
 					}
 					else {
 						$this->logError("Unexpected status $httpstatus response, body: $result");
-						$requestsSuccess[$orcid] = false;	
+						$requestsSuccess[$orcid] = false;
 					}
 					break;
 				case 409:
@@ -932,20 +934,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	private function buildOrcidPublicationDate($issue) {
 		$issuePublicationDate = Carbon\Carbon::parse($issue->getDatePublished());
-		if( $issue->getYear() < ( $issuePublicationDate->year - 1 ) ) {
-			// The original issue is at least two years older than the
-			// publication date entered in OJS.
-			// We treat it as a retro publication and add the work to ORCID with 
-			// the original publication year.
-			return [ 'year' => [ 'value' => $issue->getYear() ] ];
-		}
-		else {
-			return [
-				'year' => [ 'value' => $issuePublicationDate->format("Y")],
-				'month' => [ 'value' => $issuePublicationDate->format("m")],
-				'day' => [ 'value' => $issuePublicationDate->format("d")]
-			];
-		}
+		return [
+			'year' => [ 'value' => $issuePublicationDate->format("Y")],
+			'month' => [ 'value' => $issuePublicationDate->format("m")],
+			'day' => [ 'value' => $issuePublicationDate->format("d")]
+		];
 	}
 
 	/**
