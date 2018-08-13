@@ -19,7 +19,6 @@
 	<message key="plugins.generic.orcidProfile.instructions">Tento formulář můžete předvyplnit informacemi z profilu ORCID. Zadejte emailovou adresu nebo ORCID iD přidruženou k profilu ORCID a klikněte na tlačítko Odeslat.</message>
 	<message key="plugins.generic.orcidProfile.noData">Nelze získat z ORCID žádná data.</message>
 	<message key="plugins.generic.orcidProfile.emailOrOrcid">Emailová adresa nebo ORCID iD:</message>
-	<message key="plugins.generic.orcidProfile.submitAction">Odeslat</message>
 	<message key="plugins.generic.orcidProfile.manager.orcidProfileSettings">Nastavení profilu ORCID</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.description">Nakonfigurujte rozhraní ORCID API pro použití při stahování informací z profilu ORCID do profilu uživatele.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath">ORCID API</message>
@@ -33,4 +32,6 @@
 	<message key="plugins.generic.orcidProfile.author.submission.success">Váš příspěvek byl úspěšně přidružen k vaší ORDID iD.</message>
 	<message key="plugins.generic.orcidProfile.author.submission.failure">Váš příspěvek nemohl být úspěšně přidružen k vašemu ORDID iD. Obraťte se na správce časopisu se svým jménem, ORCID ID a podrobnostmi o vašem příspěvku.</message>
 	<message key="plugins.generic.orcidProfile.authFailure">Systém OJS nebyl schopen komunikovat se službou ORCID. Obraťte se na správce časopisu se svým jménem, ORCID iD a podrobnostmi o vašem příspěvku.</message>
+	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
+	<message key="plugins.generic.orcidProfile.connect">Vytvořte či připojte vaše ORCID iD</message>
 </locale>
