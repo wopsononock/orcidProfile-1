@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE locale SYSTEM "../../../../lib/pkp/dtd/locale.dtd">
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
 
 <!--
-  * locale/tr_TR/locale.xml
+  * plugins/generic/orcidPlugin/locale/tr_TR/locale.xml
   *
+  * Copyright (c) 2015-2018 University of Pittsburgh
   * Copyright (c) 2014-2018 Simon Fraser University
   * Copyright (c) 2003-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
-  * Localization strings.
+  * ORCID Profile plugin localization strings
   -->
 
 <locale name="tr_TR" full_name="Türkçe">
+
 	<message key="plugins.generic.orcidProfile.displayName">ORCID Profil Eklentisi</message>
 	<message key="plugins.generic.orcidProfile.description">ORCID'den kullanıcı profili bilgilerinin içe aktarılmasına izin verir.</message>
 	<message key="plugins.generic.orcidProfile.instructions">ORCID profilinizdeki bilgileri bu forma otomatik aktarabilirsiniz. ORCID profili ile ilişkili e-posta adresini veya ORC ID'yi girin, ardından "Gönder" seçeneğini tıklayın.</message>

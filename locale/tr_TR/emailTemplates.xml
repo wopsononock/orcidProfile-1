@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE email_texts SYSTEM "../../../../lib/pkp/dtd/emailTemplateData.dtd">
+<!DOCTYPE email_texts SYSTEM "../../../../../lib/pkp/dtd/emailTemplateData.dtd">
+
 <!--
-  * emailTemplateData.xml
+  * @file plugins/generic/orcidProfile/locale/tr_TR/emailTemplates.xml
   *
-  * Copyright (c) 2003-2018 Simon Fraser University
+  * Copyright (c) 2015-2018 University of Pittsburgh
+  * Copyright (c) 2013-2018 Simon Fraser University
   * Copyright (c) 2003-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localized email templates XML file.
   -->
+
 <email_texts locale="tr_TR">
 	<email_text key="ORCID_COLLECT_AUTHOR_ID">
 		<subject>ORCID Gönderisi</subject>
@@ -22,7 +25,10 @@ Yazarlığınızı onaylamak için lütfen aşağıdaki bağlantıyı ziyaret ed
 
 Herhangi bir sorunuz olması halinde, lütfen bize yazınız.
 
-{$editorialContactSignature}</body>
+{$editorialContactSignature}
+
+
+</body>
 		<description>Bu e-posta şablonu ORCID kimliklerini ortak yazarlardan istemek için kullanılır.</description>
 	</email_text>
 </email_texts>
