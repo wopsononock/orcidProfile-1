@@ -356,7 +356,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$contextId = ($context == null) ? 0 : $context->getId();
 
 				$templateMgr = TemplateManager::getManager();
-				$templateMgr->register_function('plugin_url', array($this, 'smartyPluginUrl'));
+				$templateMgr->registerPlugin('function', 'plugin_url', array($this->plugin, 'smartyPluginUrl'));
 				$apiOptions = array(
 					ORCID_API_URL_PUBLIC => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public',
 					ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox',
