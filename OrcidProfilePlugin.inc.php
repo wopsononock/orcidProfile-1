@@ -260,10 +260,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param $templateMgr TemplateManager
 	 * @return string
 	 */
-	function profileFilter($output, &$templateMgr) {
-		error_log("OrcidProfilePlugin::profileFilter - $output");
-		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
-			error_log("OrcidProfilePlugin::profileFilter - match!");
+	function profileFilter($output, &$templateMgr) {		
+		if (preg_match('/<label[^>]+for="orcid[^"]*"[^>]*>[^<]+<\/label>/', $output, $matches, PREG_OFFSET_CAPTURE)) {			
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$context = Request::getContext();
