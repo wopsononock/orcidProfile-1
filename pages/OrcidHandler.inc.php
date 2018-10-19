@@ -241,7 +241,7 @@ class OrcidHandler extends Handler {
 		$authorToVerify->setData('orcidAccessToken', $response['access_token']);
 		$authorToVerify->setData('orcidAccessScope', $response['scope']);
 		$authorToVerify->setData('orcidRefreshToken', $response['refresh_token']);
-		$authorToVerify->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());		
+		$authorToVerify->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 		$authorDao->updateObject($authorToVerify);
 		if( $plugin->isMemberApiEnabled($contextId) ) {			
 			if ( $plugin->isSubmissionPublished($submissionId) ) {

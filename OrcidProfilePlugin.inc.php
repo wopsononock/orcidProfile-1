@@ -889,9 +889,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$articleLocale = $article->getLocale();
 		$titles = $article->getTitle($articleLocale);		
 		$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin');
-		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $article, 'bibtex')));
-		$dispatcher = $request->getDispatcher();
-		$articleUrl = $dispatcher->url($request, ROUTE_PAGE, null, 'article', 'view', $article->getBestArticleId());
+		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $article, 'bibtex')));		
+		$articleUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'article', 'view', $article->getBestArticleId());
 		$orcidWork = [
 			'title' => [
 				'title' => [
@@ -906,7 +905,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			],
 			'short-description' => trim(strip_tags($article->getAbstract('en_US'))),
 			'type' => 'JOURNAL_ARTICLE',
-			'external-ids' => [ 'external-id' => $this->buildOrcidExternalIds($article, $journal, $issue)],
+			'external-ids' => [ 'external-id' => $this->buildOrcidExternalIds($article, $journal, $issue, $articleUrl)],
 			'publication-date' => $this->buildOrcidPublicationDate($issue),
 			'url' => $articleUrl,
 			'citation' => [
@@ -951,10 +950,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param  Issue   $issue   The Issue object the Article object belongs to.
 	 * @return array            An associative array corresponding to ORCID external-id JSON.
 	 */
-	private function buildOrcidExternalIds($article, $journal, $issue) {
+	private function buildOrcidExternalIds($article, $journal, $issue, $articleUrl) {
 		$externalIds = array();
 		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true, $article->getContextId());
 		// Add doi, urn, etc. for article
+		$articleHasStoredPubId = false;
 		if (is_array($pubIdPlugins)) {
 			foreach ($pubIdPlugins as $plugin) {
 				if (!$plugin->getEnabled()) {
@@ -970,6 +970,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 						'external-id-url' => [ 'value' => $plugin->getResolvingURL($article->getContextId(), $pubId) ],
 						'external-id-relationship' => 'SELF'
 					];
+					$articleHasStoredPubId = true;
 				}
 				# Add issue ids if they exist
 				$pubId = $issue->getStoredPubId($pubIdType);
@@ -985,6 +986,15 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		else {
 			error_log("OrcidProfilePlugin::buildOrcidExternalIds: No pubId plugins could be loaded");
+		}		
+		if ( !$articleHasStoredPubId ) {
+			// No pubidplugins available or article does not have any stored pubid
+			// Use URL as an external-id
+			$externalIds[] = [
+				'external-id-type' => 'uri',
+				'external-id-value' => $articleUrl,
+				'external-id-relationship' => 'SELF'
+			];
 		}
 		// Add journal online ISSN
 		// TODO What about print ISSN?

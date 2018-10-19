@@ -18,3 +18,8 @@
     {fbvElement type="checkbox" label="plugins.generic.orcidProfile.author.requestAuthorization" id="requestOrcidAuthorization" checked=false}
     
 {/fbvFormSection}
+<script type="text/javascript">
+	$(document).ready(function() {ldelim}
+		$('input[name=orcid]').attr('readonly', "true");
+	{rdelim});
+</script>
