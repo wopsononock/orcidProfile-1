@@ -5,12 +5,13 @@
   * @file plugins/generic/orcidProfile/locale/pt_PT/emailTemplates.xml
   *
   * Copyright (c) 2015-2018 University of Pittsburgh
-  * Copyright (c) 2003-2018 Simon Fraser University
+  * Copyright (c) 2013-2018 Simon Fraser University
   * Copyright (c) 2003-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localized email templates XML file.
   -->
+
 <email_texts locale="pt_PT">
 	<email_text key="ORCID_COLLECT_AUTHOR_ID">
 		<subject>Submissão ao ORCID</subject>
@@ -24,7 +25,10 @@ Para confirmar a sua autoria, por favor adicione o seu identificador ORCID à su
 
 Se tiver alguma dúvida, por favor contacte-me.
 
-{$editorialContactSignature}</body>
+{$editorialContactSignature}
+
+
+</body>
 		<description>Este e-mail é usado para recolher os identificadores ORCID dos co-autores.</description>
 	</email_text>
 </email_texts>
