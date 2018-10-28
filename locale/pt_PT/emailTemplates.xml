@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE email_texts SYSTEM "../../../../../lib/pkp/dtd/emailTemplateData.dtd">
+
 <!--
-  * emailTemplateData.xml
+  * @file plugins/generic/orcidProfile/locale/pt_PT/emailTemplates.xml
   *
-  * Copyright (c) 2003-2018 Simon Fraser University
+  * Copyright (c) 2015-2018 University of Pittsburgh
+  * Copyright (c) 2013-2018 Simon Fraser University
   * Copyright (c) 2003-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localized email templates XML file.
   -->
+
 <email_texts locale="pt_PT">
-	<email_text key="ORCID_COLLECT_AUTHOR_ID">
-		<subject>Submissão de ORCID</subject>
-		<body>Caro {$authorName},
+    <email_text key="ORCID_COLLECT_AUTHOR_ID">
+        <subject>Submissão de ORCID</subject>
+        <body>Caro {$authorName},
 
 Foi indicado como sendo coautor do manuscrito "{$articleTitle}" submetido à revista {$journalName}.
 
@@ -22,7 +25,10 @@ Para confirmar a sua autoria, por favor adicione o seu identificador ORCID à su
 
 Se tiver alguma questão, por favor contacte-me.
 
-{$editorialContactSignature}</body>
-		<description>Este e-mail é usado para recolher os identificadores ORCID dos coautores.</description>
-	</email_text>
+{$editorialContactSignature}
+
+
+</body>
+        <description>Este e-mail é usado para recolher os identificadores ORCID dos coautores.</description>
+    </email_text>
 </email_texts>
