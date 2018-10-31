@@ -56,6 +56,7 @@ class OrcidHandler extends Handler {
 		if (!$result) error_log('CURL error: ' . curl_error($curl));
 		$response = json_decode($result, true);
 
+		$json = null;
 		curl_setopt_array($curl, array(
 			CURLOPT_RETURNTRANSFER => 1,
 			CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($response['orcid']) . '/' . ORCID_PROFILE_URL,
@@ -63,12 +64,15 @@ class OrcidHandler extends Handler {
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 		));
 		$result = curl_exec($curl);
-		if (!$result) error_log('CURL error: ' . curl_error($curl));
+		if (!$result) error_log('ORCID CURL error: ' . curl_error($curl) . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 		$info = curl_getinfo($curl);
 		if ($info['http_code'] == 200) {
 			$json = json_decode($result, true);
+		} else {
+			error_log('Unexpected ORCID API response: ' . $info['http_code'] . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 		}
 
+		$json_email = null;
 		curl_setopt_array($curl, array(
 			CURLOPT_RETURNTRANSFER => 1,
 			CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($response['orcid']) . '/' . ORCID_EMAIL_URL,
@@ -76,25 +80,34 @@ class OrcidHandler extends Handler {
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 		));
 		$result = curl_exec($curl);
-		if (!$result) error_log('CURL error: ' . curl_error($curl));
+		if (!$result) error_log('ORCID CURL error: ' . curl_error($curl) . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 		$info = curl_getinfo($curl);
 		if ($info['http_code'] == 200) {
 			$json_email = json_decode($result, true);
-			$json['email']['value'] = $json_email['email'][0]['email'];
+			if ($json) $json['email']['value'] = $json_email['email'][0]['email'];
+		} else {
+			error_log('Unexpected ORCID API response: ' . $info['http_code'] . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 		}
+
 		curl_close($curl);
 		$orcid_uri = 'https://orcid.org/' . $response['orcid'];
 
 		switch (Request::getUserVar('targetOp')) {
 			case 'register':
-				echo '<html><body><script type="text/javascript">
+				echo '<html><body><script type="text/javascript">';
+				if ($json) echo '
 					opener.document.getElementById("firstName").value = ' . json_encode($json['name']['given-names']['value']) . ';
 					opener.document.getElementById("lastName").value = ' . json_encode($json['name']['family-name']['value']) . ';
 					opener.document.getElementById("email").value = ' . json_encode($json['email']['value']) . ';
+				';
+				echo '
 					opener.document.getElementById("orcid").value = ' . json_encode($orcid_uri). ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
+				';
+				echo '
 					window.close();
-				</script></body></html>';
+					</script></body></html>
+				';
 				break;
 			case 'profile':
 				// Set the ORCiD in the user profile from the response
