@@ -533,7 +533,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @return MailTemplate
 	 */
-	function &getMailTemplate($emailKey, $context = null) {
+	function getMailTemplate($emailKey, $context = null) {
 		import('lib.pkp.classes.mail.MailTemplate');
 		return new MailTemplate($emailKey, null, $context, false);
 	}
