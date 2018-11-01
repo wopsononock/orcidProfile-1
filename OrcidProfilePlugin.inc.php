@@ -715,7 +715,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		$journal = $request->getContext();
 		$this->currentContextId = $journal->getId();
-		if ( !$this->isMemberApiEnabled() ) {
+		if (!$this->isMemberApiEnabled($journal->getId())) {
 			// Sending to ORCID only works with the member API
 			return false;
 		}
@@ -1114,24 +1114,18 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	* Set the current id of the context (atm only considered for logging settings).
-	*
-	* @param $contextId int the Id of the currently active context (journal)
-	*/
+	 * Set the current id of the context (atm only considered for logging settings).
+	 *
+	 * @param $contextId int the Id of the currently active context (journal)
+	 */
 	public function setCurrentContextId($contextId) {
 		$this->currentContextId = $contextId;
 	}
 
 	/**
-	* @return bool True if the ORCID Member API has been selected in this context.
-	*/
+	 * @return bool True if the ORCID Member API has been selected in this context.
+	 */
 	public function isMemberApiEnabled($contextId) {
-		if (!isset($contextId) && isset($this->currentContextId)) {
-			$contextId = $this->currentContextId;
-		}
-		else {
-			error_log('OrcidProfilePlugin::isMemberApiEnabled: No contextId assigned!');
-		}
 		$apiUrl = $this->getSetting($contextId, 'orcidProfileAPIPath');
 		if ( $apiUrl === ORCID_API_URL_MEMBER || $apiUrl === ORCID_API_URL_MEMBER_SANDBOX ) {
 			return true;
@@ -1141,4 +1135,3 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 	}
 }
-?>
