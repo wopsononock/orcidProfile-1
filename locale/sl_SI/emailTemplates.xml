@@ -13,9 +13,9 @@
   -->
 
 <email_texts locale="sl_SI">
-    <email_text key="ORCID_COLLECT_AUTHOR_ID">
-        <subject>ORCID prispevka</subject>
-        <body>Spoštovani {$authorName},
+	<email_text key="ORCID_COLLECT_AUTHOR_ID">
+		<subject>ORCID prispevka</subject>
+		<body>Spoštovani {$authorName},
 
 Navedeni ste bili kot soavtor rokopisa prispevka "{$articleTitle}" za revijo {$journalName}. 
 
@@ -29,7 +29,6 @@ Da potrdite avtorstvo, vas prosimo, da dodate vaš ORCID iD v prispevek s klikom
 
 
 </body>
-        <description>Email se uporablja za zbiranje ORCID iD-jev soavtorjev.</description>
-    </email_text>
+		<description>Email se uporablja za zbiranje ORCID iD-jev soavtorjev.</description>
+	</email_text>
 </email_texts>
-
