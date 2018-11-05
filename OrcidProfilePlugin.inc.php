@@ -28,6 +28,7 @@ define('ORCID_API_SCOPE_PUBLIC', '/authenticate');
 define('ORCID_API_SCOPE_MEMBER', '/activities/update');
 
 define('OAUTH_TOKEN_URL', 'oauth/token');
+define('ORCID_EMPLOYMENTS_URL', 'employments');
 define('ORCID_PROFILE_URL', 'person');
 define('ORCID_EMAIL_URL', 'email');
 define('ORCID_WORK_URL', 'work');
@@ -574,7 +575,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @return MailTemplate
 	 */
-	function &getMailTemplate($emailKey, $context = null) {
+	function getMailTemplate($emailKey, $context = null) {
 		import('lib.pkp.classes.mail.MailTemplate');
 		return new MailTemplate($emailKey, null, $context, false);
 	}
@@ -746,7 +747,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		$journal = $request->getContext();
 		$this->currentContextId = $journal->getId();
-		if ( !$this->isMemberApiEnabled() ) {
+		if (!$this->isMemberApiEnabled($journal->getId())) {
 			// Sending to ORCID only works with the member API
 			return false;
 		}
@@ -1145,24 +1146,18 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	* Set the current id of the context (atm only considered for logging settings).
-	*
-	* @param $contextId int the Id of the currently active context (journal)
-	*/
+	 * Set the current id of the context (atm only considered for logging settings).
+	 *
+	 * @param $contextId int the Id of the currently active context (journal)
+	 */
 	public function setCurrentContextId($contextId) {
 		$this->currentContextId = $contextId;
 	}
 
 	/**
-	* @return bool True if the ORCID Member API has been selected in this context.
-	*/
+	 * @return bool True if the ORCID Member API has been selected in this context.
+	 */
 	public function isMemberApiEnabled($contextId) {
-		if (!isset($contextId) && isset($this->currentContextId)) {
-			$contextId = $this->currentContextId;
-		}
-		else {
-			error_log('OrcidProfilePlugin::isMemberApiEnabled: No contextId assigned!');
-		}
 		$apiUrl = $this->getSetting($contextId, 'orcidProfileAPIPath');
 		if ( $apiUrl === ORCID_API_URL_MEMBER || $apiUrl === ORCID_API_URL_MEMBER_SANDBOX ) {
 			return true;
@@ -1172,4 +1167,3 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 	}
 }
-?>
