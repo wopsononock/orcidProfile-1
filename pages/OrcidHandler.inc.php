@@ -26,10 +26,12 @@ class OrcidHandler extends Handler {
 	 * @param $request Request
 	 */
 	function orcidAuthorize($args, $request) {
-		$context = Request::getContext();
-		$op = Request::getRequestedOp();
+		$context = $request->getContext();
+		$op = $request->getRequestedOp();
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
-		$contextId = ($context == null) ? 0 : $context->getId();		
+		$contextId = ($context == null) ? CONTEXT_ID_NONE : $context->getId();
+
+		// Set up common CURL request details
 		$curl = curl_init();
 		// Use proxy if configured
 		if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
@@ -39,81 +41,108 @@ class OrcidHandler extends Handler {
 				curl_setopt($curl, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
 			}
 		}
+
+		// API request: Get an OAuth token and ORCID.
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL,
+			CURLOPT_URL => $plugin->getSetting($contextId, 'orcidProfileAPIPath') . OAUTH_TOKEN_URL,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HTTPHEADER => array('Accept: application/json'),
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => http_build_query(array(
-				'code' => Request::getUserVar('code'),
+				'code' => $request->getUserVar('code'),
 				'grant_type' => 'authorization_code',
 				'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
 				'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
 			))
 		));
-		// fetch the access token
-		$result = curl_exec($curl);
-		if (!$result) error_log('CURL error: ' . curl_error($curl));
-		$response = json_decode($result, true);
-
-		curl_setopt_array($curl, array(
-			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($response['orcid']) . '/' . ORCID_PROFILE_URL,
-			CURLOPT_POST => false,
-			CURLOPT_HTTPHEADER => array('Accept: application/json'),
-		));
-		$result = curl_exec($curl);
-		if (!$result) error_log('CURL error: ' . curl_error($curl));
-		$info = curl_getinfo($curl);
-		if ($info['http_code'] == 200) {
-			$json = json_decode($result, true);
+		if (!($result = curl_exec($curl))) {
+			error_log('ORCID CURL error: ' . curl_error($curl) . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+			$orcidUri = $orcid = $accessToken = null;
+		} else {
+			$response = json_decode($result, true);
+			$orcid = $response['orcid'];
+			$accessToken = $response['access_token'];
+			$orcidUri = 'https://orcid.org/' . $orcid;
 		}
 
-		curl_setopt_array($curl, array(
-			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($response['orcid']) . '/' . ORCID_EMAIL_URL,
-			CURLOPT_POST => false,
-			CURLOPT_HTTPHEADER => array('Accept: application/json'),
-		));
-		$result = curl_exec($curl);
-		if (!$result) error_log('CURL error: ' . curl_error($curl));
-		$info = curl_getinfo($curl);
-		if ($info['http_code'] == 200) {
-			$json_email = json_decode($result, true);
-			$json['email']['value'] = $json_email['email'][0]['email'];
-		}
-		curl_close($curl);
-		$orcid_uri = 'https://orcid.org/' . $response['orcid'];
-
-		switch (Request::getUserVar('targetOp')) {
+		switch ($request->getUserVar('targetOp')) {
 			case 'register':
-				echo '<html><body><script type="text/javascript">
-					opener.document.getElementById("firstName").value = ' . json_encode($json['name']['given-names']['value']) . ';
-					opener.document.getElementById("lastName").value = ' . json_encode($json['name']['family-name']['value']) . ';
-					opener.document.getElementById("email").value = ' . json_encode($json['email']['value']) . ';
-					opener.document.getElementById("orcid").value = ' . json_encode($orcid_uri). ';
+				// API request: get user profile (for names; email; etc)
+				curl_setopt_array($curl, array(
+					CURLOPT_RETURNTRANSFER => 1,
+					CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($orcid) . '/' . ORCID_PROFILE_URL,
+					CURLOPT_POST => false,
+					CURLOPT_HTTPHEADER => array(
+						'Accept: application/json',
+						'Authorization: Bearer ' . $accessToken,
+					),
+				));
+				if (!($result = curl_exec($curl))) error_log('ORCID CURL error: ' . curl_error($curl) . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+				$info = curl_getinfo($curl);
+				if ($info['http_code'] == 200) {
+					$profileJson = json_decode($result, true);
+				} else {
+					error_log('Unexpected ORCID API response: ' . $info['http_code'] . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+					$profileJson = null;
+				}
+
+				// API request: get employments (for affiliation field)
+				curl_setopt_array($curl, array(
+					CURLOPT_RETURNTRANSFER => 1,
+					CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($orcid) . '/' . ORCID_EMPLOYMENTS_URL,
+					CURLOPT_POST => false,
+					CURLOPT_HTTPHEADER => array(
+						'Accept: application/json',
+						'Authorization: Bearer ' . $accessToken,
+					),
+				));
+				if (!($result = curl_exec($curl))) error_log('ORCID CURL error: ' . curl_error($curl) . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+				$info = curl_getinfo($curl);
+				if ($info['http_code'] == 200) {
+					$employmentJson = json_decode($result, true);
+				} else {
+					error_log('Unexpected ORCID API response: ' . $info['http_code'] . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+					$employmentJson = null;
+				}
+
+				// Suppress errors for nonexistent array indexes
+				echo '
+					<html><body><script type="text/javascript">
+					opener.document.getElementById("firstName").value = ' . json_encode(@$profileJson['name']['given-names']['value']) . ';
+					opener.document.getElementById("lastName").value = ' . json_encode(@$profileJson['name']['family-name']['value']) . ';
+					opener.document.getElementById("email").value = ' . json_encode(@$profileJson['emails']['email'][0]['email']) . ';
+					opener.document.getElementById("country").value = ' . json_encode(@$profileJson['addresses']['address'][0]['country']['value']) . ';
+					opener.document.getElementById("affiliation").value = ' . json_encode(@$employmentJson['employment-summary'][0]['organization']['name']) . ';
+					opener.document.getElementById("orcid").value = ' . json_encode($orcidUri). ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
 					window.close();
-				</script></body></html>';
+					</script></body></html>
+				';
 				break;
 			case 'profile':
 				// Set the ORCiD in the user profile from the response
-				echo '<html><body><script type="text/javascript">
-					opener.document.getElementsByName("orcid")[0].value = ' . json_encode($orcid_uri). ';
-					opener.document.getElementById("connect-orcid-button").style.display = "none";
-					window.close();
-				</script></body></html>';
+				echo '
+					<html><body><script type="text/javascript">
+						opener.document.getElementsByName("orcid")[0].value = ' . json_encode($orcidUri). ';
+						opener.document.getElementById("connect-orcid-button").style.display = "none";
+						window.close();
+					</script></body></html>
+				';
 				break;
 			case 'submit':
 				// Submission process: Pre-fill the first author's ORCiD from the ORCiD data
-				echo '<html><body><script type="text/javascript">
-					opener.document.getElementById("authors-0-orcid").value = ' . json_encode($orcid_uri). ';
-					opener.document.getElementById("connect-orcid-button").style.display = "none";
-					window.close();
-				</script></body></html>';
+				echo '
+					<html><body><script type="text/javascript">
+						opener.document.getElementById("authors-0-orcid").value = ' . json_encode($orcidUri). ';
+						opener.document.getElementById("connect-orcid-button").style.display = "none";
+						window.close();
+					</script></body></html>
+				';
 				break;
 			default: assert(false);
 		}
+
+		curl_close($curl);
 	}
 
 	/**
@@ -125,10 +154,10 @@ class OrcidHandler extends Handler {
 		$context = $request->getContext();
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$templateMgr = TemplateManager::getManager($request);
-		$contextId = ($context == null) ? 0 : $context->getId();
+		$contextId = ($context == null) ? CONTEXT_ID_NONE : $context->getId();
 		$submissionId = $request->getUserVar('articleId');
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
-		$authors = $authorDao->getBySubmissionId($submissionId);		
+		$authors = $authorDao->getBySubmissionId($submissionId);
 
 		$authorToVerify = null;
 		// Find the author entry, for which the ORCID verification was requested
@@ -139,15 +168,16 @@ class OrcidHandler extends Handler {
 				}
 			}
 		}
-		// initialise template parameters
+		// Initialise template parameters
 		$templateMgr->assign(array(
-				'currentUrl' => $request->url(null, 'index'),
-				'verifySuccess' => false,
-				'authFailure' => false,
-				'notPublished' => false,
-				'sendSubmission' => false,
-				'sendSubmissionSuccess' => false,
-				'denied' => false));
+			'currentUrl' => $request->url(null, 'index'),
+			'verifySuccess' => false,
+			'authFailure' => false,
+			'notPublished' => false,
+			'sendSubmission' => false,
+			'sendSubmissionSuccess' => false,
+			'denied' => false,
+		));
 
 		if ($authorToVerify == null) {
 			// no Author exists in the database with the supplied orcidEmailToken
@@ -155,9 +185,9 @@ class OrcidHandler extends Handler {
 			$templateMgr->assign('verifySuccess', false);
 			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
 			return;
-		}		
-		if ( $request->getUserVar('error') === 'access_denied' ) {
-			// User denied access			
+		}
+		if ($request->getUserVar('error') === 'access_denied') {
+			// User denied access
 			// Store the date time the author denied ORCID access to remember this
 			$authorToVerify->setData('orcidAccessDenied', Core::getCurrentDate());
 			// remove all previously stored ORCID access token
@@ -201,18 +231,17 @@ class OrcidHandler extends Handler {
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => $postData
 		));
-		$result = curl_exec($ch);
-		if (!$result) {
+		if (!($result = curl_exec($ch))) {
 			$plugin->logError('OrcidHandler::orcidverify - CURL error: ' . curl_error($ch));
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
 			return;
 		}
 		$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		curl_close($ch);		
+		curl_close($ch);
 		$plugin->logInfo('Response body: ' . $result);
 		$response = json_decode($result, true);
-		if (!isset($response['orcid']) || !isset($response['access_token'])) {			
+		if (!isset($response['orcid']) || !isset($response['access_token'])) {
 			$plugin->logError("Response status: $httpstatus . Invalid ORCID response: $result");
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
@@ -227,11 +256,10 @@ class OrcidHandler extends Handler {
 		$authorToVerify->setData('orcid', $orcidUri);
 		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
 			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_PUBLIC_SANDBOX) {
-			// Set a flag to mark that the stored orcid id and access token came form the sandbox api			
+			// Set a flag to mark that the stored orcid id and access token came form the sandbox api
 			$authorToVerify->setData('orcidSandbox', true);
 			$templateMgr->assign('orcid', 'https://sandbox.orcid.org/' . $response['orcid']);
-		}
-		else {
+		} else {
 			$templateMgr->assign('orcid', $orcidUri);
 		}
 		// remove the email token
@@ -243,24 +271,22 @@ class OrcidHandler extends Handler {
 		$authorToVerify->setData('orcidRefreshToken', $response['refresh_token']);
 		$authorToVerify->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 		$authorDao->updateObject($authorToVerify);
-		if( $plugin->isMemberApiEnabled($contextId) ) {			
+		if( $plugin->isMemberApiEnabled($contextId) ) {
 			if ( $plugin->isSubmissionPublished($submissionId) ) {
 				$templateMgr->assign('sendSubmission', true);
-				$sendResult = $plugin->sendSubmissionToOrcid($submissionId, $request);	
-				if ( $sendResult === true || ( is_array( $sendResult ) && $sendResult[$response['orcid']] ) ) {
+				$sendResult = $plugin->sendSubmissionToOrcid($submissionId, $request);
+				if ($sendResult === true || (is_array($sendResult) && $sendResult[$response['orcid']])) {
 					$templateMgr->assign('sendSubmissionSuccess', true);
 				}
-			}
-			else {
+			} else {
 				$templateMgr->assign('submissionNotPublished', true);
 			}
-		}		
-		$templateMgr->assign([
+		}
+		$templateMgr->assign(array(
 			'verifySuccess' => true,
 			'orcidIcon' => $plugin->getIcon()
-			]);
+		));
 		$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
 	}
 }
 
-?>
