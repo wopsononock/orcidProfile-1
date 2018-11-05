@@ -11,7 +11,19 @@
  *}
 <script type="text/javascript">
 	function openORCID() {ldelim}
-		var oauthWindow = window.open("{$orcidProfileOauthPath|escape}authorize?client_id={$orcidClientId|urlencode}&response_type=code&scope=/authenticate&redirect_uri={url|urlencode router="page" page="orcidapi" op="orcidAuthorize" targetOp=$targetOp params=$params escape=false}", "_blank", "toolbar=no, scrollbars=yes, width=500, height=600, top=500, left=500");
+		// First sign out from ORCID to make sure no other user is logged in
+		// with ORCID
+		$.ajax({ldelim}
+            url: '{$orcidUrl|escape}userStatus.json?logUserOut=true',
+            dataType: 'jsonp',
+            success: function(result,status,xhr) {ldelim}
+                console.log("ORCID Logged In: " + result.loggedIn);
+            {rdelim},
+            error: function (xhr, status, error) {ldelim}
+                console.log(status + ", error: " + error);
+            {rdelim}
+        {rdelim});
+		var oauthWindow = window.open("{$orcidOAuthUrl}", "_blank", "toolbar=no, scrollbars=yes, width=500, height=700, top=500, left=500");
 		oauthWindow.opener = self;
 		return false;
 	{rdelim}

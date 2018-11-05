@@ -155,9 +155,9 @@ class OrcidHandler extends Handler {
 			$templateMgr->assign('verifySuccess', false);
 			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
 			return;
-		}		
+		}
 		if ( $request->getUserVar('error') === 'access_denied' ) {
-			// User denied access			
+			// User denied access
 			// Store the date time the author denied ORCID access to remember this
 			$authorToVerify->setData('orcidAccessDenied', Core::getCurrentDate());
 			// remove all previously stored ORCID access token
@@ -173,7 +173,7 @@ class OrcidHandler extends Handler {
 			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
 			return;
 		}
-
+		
 		// fetch the access token
 		$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL;
 		$header = array('Accept: application/json');
@@ -212,7 +212,7 @@ class OrcidHandler extends Handler {
 		curl_close($ch);		
 		$plugin->logInfo('Response body: ' . $result);
 		$response = json_decode($result, true);
-		if (!isset($response['orcid']) || !isset($response['access_token'])) {			
+		if (!isset($response['orcid']) || !isset($response['access_token'])) {
 			$plugin->logError("Response status: $httpstatus . Invalid ORCID response: $result");
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
@@ -227,7 +227,7 @@ class OrcidHandler extends Handler {
 		$authorToVerify->setData('orcid', $orcidUri);
 		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
 			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_PUBLIC_SANDBOX) {
-			// Set a flag to mark that the stored orcid id and access token came form the sandbox api			
+			// Set a flag to mark that the stored orcid id and access token came form the sandbox api
 			$authorToVerify->setData('orcidSandbox', true);
 			$templateMgr->assign('orcid', 'https://sandbox.orcid.org/' . $response['orcid']);
 		}
@@ -243,10 +243,10 @@ class OrcidHandler extends Handler {
 		$authorToVerify->setData('orcidRefreshToken', $response['refresh_token']);
 		$authorToVerify->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 		$authorDao->updateObject($authorToVerify);
-		if( $plugin->isMemberApiEnabled($contextId) ) {			
+		if( $plugin->isMemberApiEnabled($contextId) ) {
 			if ( $plugin->isSubmissionPublished($submissionId) ) {
 				$templateMgr->assign('sendSubmission', true);
-				$sendResult = $plugin->sendSubmissionToOrcid($submissionId, $request);	
+				$sendResult = $plugin->sendSubmissionToOrcid($submissionId, $request);
 				if ( $sendResult === true || ( is_array( $sendResult ) && $sendResult[$response['orcid']] ) ) {
 					$templateMgr->assign('sendSubmissionSuccess', true);
 				}

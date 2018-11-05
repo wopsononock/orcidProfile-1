@@ -17,8 +17,8 @@
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 
-define('ORCID_OAUTH_URL', 'https://orcid.org/oauth/');
-define('ORCID_OAUTH_URL_SANDBOX', 'https://sandbox.orcid.org/oauth/');
+define('ORCID_URL', 'https://orcid.org/');
+define('ORCID_URL_SANDBOX', 'https://sandbox.orcid.org/');
 define('ORCID_API_URL_PUBLIC', 'https://pub.orcid.org/');
 define('ORCID_API_URL_PUBLIC_SANDBOX', 'https://pub.sandbox.orcid.org/');
 define('ORCID_API_URL_MEMBER', 'https://api.orcid.org/');
@@ -202,6 +202,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case 'user/publicProfileForm.tpl':
 				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
 				break;
+			case 'user/profile.tpl':
+				$templateMgr->register_outputfilter(array($this, 'profileFilter'));
+				break;
 		}
 		return false;
 	}
@@ -212,15 +215,54 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return string
 	 */
 	function getOauthPath() {
+		return $this->getOrcidUrl() . 'oauth/';
+	}
+
+	/**
+	 * Return the ORCID website url (prod or sandbox) based on the current API configuration
+	 *
+	 * @return string
+	 */
+	function getOrcidUrl() {
 		$context = Request::getContext();
 		$contextId = ($context == null) ? 0 : $context->getId();
 
 		$apiPath =	$this->getSetting($contextId, 'orcidProfileAPIPath');
 		if ($apiPath == ORCID_API_URL_PUBLIC || $apiPath == ORCID_API_URL_MEMBER) {
-			return ORCID_OAUTH_URL;
+			return ORCID_URL;
 		} else {
-			return ORCID_OAUTH_URL_SANDBOX;
+			return ORCID_URL_SANDBOX;
 		}
+	}
+
+	/**
+	 * Return an ORCID OAuth authorization link with 
+	 *
+	 * @param  $handlerMethod string containting a valid method of the OrcidHandler
+	 * @param  $redirectParams Array associative array with additional request parameters for the redirect URL
+	 */
+	function buildOAuthUrl($handlerMethod, $redirectParams) {
+		$request = PKPApplication::getRequest();
+		$context = $request->getContext();
+		// This should only ever happen within a context, never site-wide.
+		assert($context != null);
+		$contextId = $context->getId();
+
+		if ( $this->isMemberApiEnabled($contextId) ) {
+			$scope = ORCID_API_SCOPE_MEMBER;
+		}
+		else {
+			$scope = ORCID_API_SCOPE_PUBLIC;
+		}
+		// We need to construct a page url, but the request is using the component router.
+		// Use the Dispatcher to construct the url and set the page router.		
+		$redirectUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi',
+			$handlerMethod, null, $redirectParams);
+		return $this->getOauthPath() . 'authorize?' . http_build_query(array(
+				'client_id' => $this->getSetting($contextId, 'orcidClientId'),
+				'response_type' => 'code',
+				'scope' => $scope,
+				'redirect_uri' => $redirectUrl));
 	}
 
 	/**
@@ -266,11 +308,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$offset = $matches[0][1];
 			$context = Request::getContext();
 			$contextId = ($context == null) ? 0 : $context->getId();
-
-			// Entering the registration without ORCiD; present the button.
+			$targetOp = 'profile';			
 			$templateMgr->assign(array(
-				'targetOp' => 'profile',
-				'orcidProfileOauthPath' => $this->getOauthPath(),
+				'targetOp' => $targetOp,
+				'orcidUrl' => $this->getOrcidUrl(),
+				'orcidOAuthUrl' => $this->buildOAuthUrl('orcidAuthorize', array('targetOp' => $targetOp)),
 				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
 				'orcidIcon' => $this->getIcon(),
 			));
@@ -552,27 +594,17 @@ class OrcidProfilePlugin extends GenericPlugin {
 		assert($context != null);
 		$contextId = $context->getId();
 		if ( $this->isMemberApiEnabled($contextId) ) {
-			$mailTemplate = 'ORCID_REQUEST_AUTHOR_AUTHORIZATION';
-			$scope = ORCID_API_SCOPE_MEMBER;
+			$mailTemplate = 'ORCID_REQUEST_AUTHOR_AUTHORIZATION';			
 		}
 		else {
-			$mailTemplate = 'ORCID_COLLECT_AUTHOR_ID';
-			$scope = ORCID_API_SCOPE_PUBLIC;
+			$mailTemplate = 'ORCID_COLLECT_AUTHOR_ID';			
 		}
 		$mail = $this->getMailTemplate($mailTemplate, $context);
 		$emailToken = md5(microtime().$author->getEmail());
 		$author->setData('orcidEmailToken', $emailToken);
 		$articleDao = DAORegistry::getDAO('ArticleDAO');
 		$article = $articleDao->getById($author->getSubmissionId());
-		// We need to construct a page url, but the request is using the component router.
-		// Use the Dispatcher to construct the url and set the page router.
-		$redirectUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi',
-			'orcidVerify', null, array('token' => $emailToken, 'articleId' => $author->getSubmissionId()));
-		$oauthUrl = $this->getOauthPath() . 'authorize?' . http_build_query(array(
-				'client_id' => $this->getSetting($contextId, 'orcidClientId'),
-				'response_type' => 'code',
-				'scope' => $scope,
-				'redirect_uri' => $redirectUrl));
+		$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'articleId' => $author->getSubmissionId()));
 		// Set From to primary journal contact
 		$mail->setFrom($context->getSetting('contactEmail'), $context->getSetting('contactName'));
 		// Send to author
