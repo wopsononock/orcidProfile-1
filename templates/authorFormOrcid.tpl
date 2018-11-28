@@ -16,10 +16,25 @@
     	<p>{translate key='plugins.generic.orcidProfile.author.accessDenied'} {$orcidAccessDenied|date_format:$datetimeFormatShort}</p>
     {/if}
     {fbvElement type="checkbox" label="plugins.generic.orcidProfile.author.requestAuthorization" id="requestOrcidAuthorization" checked=false}
-    
+    {if $orcid}
+    {fbvElement type="checkbox" label="plugins.generic.orcidProfile.author.deleteORCID" id="deleteOrcid" checked=false}
+    {else}
+    {fbvElement type="checkbox" label="plugins.generic.orcidProfile.author.deleteORCID" id="deleteOrcid" checked=false disabled=true}
+    {/if}
 {/fbvFormSection}
 <script type="text/javascript">
 	$(document).ready(function() {ldelim}
-		$('input[name=orcid]').attr('readonly', "true");
+        var orcidInput = $('input[name=orcid]');
+        orcidInput.attr('type', 'hidden');
+        // make the container div use the whole available space
+        orcidInput.parent().removeClass('pkp_helpers_quarter');
+        {if $orcid}
+        {* Display the ORCID id as an link *}        
+        var orcidIconHtml = {$orcidIcon|json_encode};
+        var orcidLink = $('<a href="{$orcid}" target="_blank">' + orcidIconHtml + ' {$orcid|escape}</a>');
+        orcidLink.insertAfter(orcidInput);
+        {else}        
+        $('<span>{translate key='plugins.generic.orcidProfile.author.orcidEmptyNotice'}</span>').insertAfter(orcidInput);
+        {/if}
 	{rdelim});
 </script>

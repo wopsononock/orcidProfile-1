@@ -338,11 +338,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if (preg_match('/<input[^>]+name="submissionId"[^>]*>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
-
+			$templateMgr->assign('orcidIcon', $this->getIcon());
 			$newOutput = substr($output, 0, $offset+strlen($match));
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'authorFormOrcid.tpl');
 			$newOutput .= substr($output, $offset+strlen($match));
-			$output = $newOutput;
+			$output = $newOutput;			
 			$templateMgr->unregister_outputfilter('authorFormFilter');
 		}
 		return $output;
@@ -358,11 +358,17 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function handleAuthorFormExecute($hookname, $args) {
 		$form =& $args[0];
-		$form->readUserVars(array('requestOrcidAuthorization'));
+		$form->readUserVars(array('requestOrcidAuthorization', 'deleteOrcid'));
+
 		$requestAuthorization = $form->getData('requestOrcidAuthorization');
+		$deleteOrcid = $form->getData('deleteOrcid');		
 		$author = $form->getAuthor();
 		if ($author && $requestAuthorization) {
 			$this->sendAuthorMail($author);
+		}
+		if ($author && $deleteOrcid) {
+			$author->setOrcid(null);
+			$this->removeOrcidAccessToken($author, false);
 		}
 	}
 
@@ -1093,12 +1099,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param  $author Author object with ORCID access token
 	 * @return void
 	 */
-	public function removeOrcidAccessToken($author) {
+	public function removeOrcidAccessToken($author, $saveAuthor=true) {
 		$author->setData('orcidAccessToken', null);
 		$author->setData('orcidRefreshToken', null);
 		$author->setData('orcidAccessExpiresOn', null);
-		$authorDao = DAORegistry::getDAO('AuthorDAO');
-		$authorDao->updateLocaleFields($author);
+		if ($save) {
+			$authorDao = DAORegistry::getDAO('AuthorDAO');
+			$authorDao->updateLocaleFields($author);
+		}
 	}
 
 	/**	 

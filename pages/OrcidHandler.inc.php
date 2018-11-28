@@ -185,7 +185,7 @@ class OrcidHandler extends Handler {
 			$templateMgr->assign('verifySuccess', false);
 			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
 			return;
-		}
+		}		
 		if ($request->getUserVar('error') === 'access_denied') {
 			// User denied access
 			// Store the date time the author denied ORCID access to remember this
@@ -241,19 +241,30 @@ class OrcidHandler extends Handler {
 		curl_close($ch);
 		$plugin->logInfo('Response body: ' . $result);
 		$response = json_decode($result, true);
-		if (!isset($response['orcid']) || !isset($response['access_token'])) {
-			$plugin->logError("Response status: $httpstatus . Invalid ORCID response: $result");
+		if ($response['error'] === 'invalid_grant') {
+			$plugin->logError("Response status: $httpstatus . Authroization code invalid, maybe already used");			
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
 			return;
+		} elseif (isset($response['error'])) {
+			$plugin->logError("Response status: $httpstatus . Invalid ORCID response: $result");
+			$templateMgr->assign('authFailure', true);
+			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
 		}
 		// Save the access token
 		$orcidAccessExpiresOn = Carbon\Carbon::now();
 		// expires_in field from the response contains the lifetime in seconds of the token
 		// See https://members.orcid.org/api/get-oauthtoken
 		$orcidAccessExpiresOn->addSeconds($response['expires_in']);
+		// Set the orcid id using the full https uri
 		$orcidUri = 'https://orcid.org/' . $response['orcid'];
-		$authorToVerify->setData('orcid', $orcidUri);
+		if (!empty($authorToVerify->getOrcid()) && $orcidUri != $authorToVerify->getOrcid()) {
+			// another ORCID id is stored for the author
+			$templateMgr->assign('duplicateOrcid', true);
+			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
+			return;	
+		}
+		$authorToVerify->setOrcid($orcidUri);
 		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
 			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_PUBLIC_SANDBOX) {
 			// Set a flag to mark that the stored orcid id and access token came form the sandbox api

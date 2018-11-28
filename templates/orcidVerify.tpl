@@ -12,14 +12,14 @@
 
 <div class="page page_message">
 	{include file="frontend/components/breadcrumbs.tpl" currentTitleKey="plugins.generic.orcidProfile.verify.title"}
+	<h2>
+		{translate key="plugins.generic.orcidProfile.verify.title"}
+	</h2>
 	<div class="description">
 	{if $verifySuccess}
-		<span class="orcid">
-			{$orcidIcon}
-			<a href="{$orcid|escape}" target="_blank">
-				{$orcid|escape}
-			</a>
-		</span>
+		<p>
+			<span class="orcid"><a href="{$orcid|escape}" target="_blank">{$orcidIcon}{$orcid|escape}</a></span>
+		</p>
 		<div class="orcid-success">
 		{translate key="plugins.generic.orcidProfile.verify.success"}
 		</div>
@@ -42,6 +42,8 @@
 			{translate key="plugins.generic.orcidProfile.authDenied"}
 		{elseif $authFailure}
 			{translate key="plugins.generic.orcidProfile.authFailure"}
+		{elseif $duplicateOrcid}
+			{translate key="plugins.generic.orcidProfile.verify.duplicateOrcid"}
 		{else}
 			{translate key="plugins.generic.orcidProfile.verify.failure"}
 		{/if}
