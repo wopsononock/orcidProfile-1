@@ -21,6 +21,33 @@ class OrcidHandler extends Handler {
 	const TEMPLATE = 'orcidVerify.tpl';
 
 	/**
+	 * @copydoc PKPHandler::authorize()
+	 */
+	function authorize($request, &$args, $roleAssignments) {
+		// Authorize all requets
+		import('lib.pkp.classes.security.authorization.PKPSiteAccessPolicy');
+		$this->addPolicy(new PKPSiteAccessPolicy(
+			$request,
+			array('orcidVerify', 'orcidAuthorize'),
+			SITE_ACCESS_ALL_ROLES
+		));
+
+		$op = $request->getRequestedOp();
+		$targetOp = $request->getUserVar('targetOp');
+		if ($op === 'orcidAuthorize' && in_array($targetOp, ['profile', 'submit'])) {
+			// ... but user must be logged in for orcidAuthorize with profile or submit
+			import('lib.pkp.classes.security.authorization.UserRequiredPolicy');
+			$this->addPolicy(new UserRequiredPolicy($request));
+		}
+
+		if (!Config::getVar('general', 'installed')) define('SESSION_DISABLE_INIT', true);
+
+		$this->setEnforceRestrictedSite(false);
+		return parent::authorize($request, $args, $roleAssignments);
+	}
+
+
+	/**
 	 * Authorize handler
 	 * @param $args array
 	 * @param $request Request
