@@ -28,7 +28,7 @@ class OrcidHandler extends Handler {
 		import('lib.pkp.classes.security.authorization.PKPSiteAccessPolicy');
 		$this->addPolicy(new PKPSiteAccessPolicy(
 			$request,
-			array('orcidVerify', 'orcidAuthorize'),
+			array('orcidVerify', 'orcidAuthorize', 'about'),
 			SITE_ACCESS_ALL_ROLES
 		));
 
@@ -147,21 +147,16 @@ class OrcidHandler extends Handler {
 				';
 				break;
 			case 'profile':
-				// Set the ORCiD in the user profile from the response
+				$user = $request->getUser();
+				// Store the access token and other data for the user
+				$this->_setOrcidData($user, $orcidUri, $response);
+				$userDao = DAORegistry::getDAO('UserDAO');
+				$userDao->updateLocaleFields($user);
+				
+				// Reload the public profile tab (incl. form)
 				echo '
 					<html><body><script type="text/javascript">
-						opener.document.getElementsByName("orcid")[0].value = ' . json_encode($orcidUri). ';
-						opener.document.getElementById("connect-orcid-button").style.display = "none";
-						window.close();
-					</script></body></html>
-				';
-				break;
-			case 'submit':
-				// Submission process: Pre-fill the first author's ORCiD from the ORCiD data
-				echo '
-					<html><body><script type="text/javascript">
-						opener.document.getElementById("authors-0-orcid").value = ' . json_encode($orcidUri). ';
-						opener.document.getElementById("connect-orcid-button").style.display = "none";
+						opener.$("#profileTabs").tabs("load", 3);
 						window.close();
 					</script></body></html>
 				';
@@ -278,11 +273,6 @@ class OrcidHandler extends Handler {
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
 		}
-		// Save the access token
-		$orcidAccessExpiresOn = Carbon\Carbon::now();
-		// expires_in field from the response contains the lifetime in seconds of the token
-		// See https://members.orcid.org/api/get-oauthtoken
-		$orcidAccessExpiresOn->addSeconds($response['expires_in']);
 		// Set the orcid id using the full https uri
 		$orcidUri = 'https://orcid.org/' . $response['orcid'];
 		if (!empty($authorToVerify->getOrcid()) && $orcidUri != $authorToVerify->getOrcid()) {
@@ -302,12 +292,7 @@ class OrcidHandler extends Handler {
 		}
 		// remove the email token
 		$authorToVerify->setData('orcidEmailToken', null);
-		// remove the access denied marker, because now the access was granted
-		$authorToVerify->setData('orcidAccessDenied', null);
-		$authorToVerify->setData('orcidAccessToken', $response['access_token']);
-		$authorToVerify->setData('orcidAccessScope', $response['scope']);
-		$authorToVerify->setData('orcidRefreshToken', $response['refresh_token']);
-		$authorToVerify->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
+		$this->_setOrcidData($authorToVerify, $orcidUri, $response);
 		$authorDao->updateObject($authorToVerify);
 		if( $plugin->isMemberApiEnabled($contextId) ) {
 			if ( $plugin->isSubmissionPublished($submissionId) ) {
@@ -325,6 +310,32 @@ class OrcidHandler extends Handler {
 			'orcidIcon' => $plugin->getIcon()
 		));
 		$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
+	}
+
+	function _setOrcidData($userOrAuthor, $orcidUri, $orcidResponse) {
+		// Save the access token
+		$orcidAccessExpiresOn = Carbon\Carbon::now();
+		// expires_in field from the response contains the lifetime in seconds of the token
+		// See https://members.orcid.org/api/get-oauthtoken
+		$orcidAccessExpiresOn->addSeconds($orcidResponse['expires_in']);
+		$userOrAuthor->setOrcid($orcidUri);
+		// remove the access denied marker, because now the access was granted
+		$userOrAuthor->setData('orcidAccessDenied', null);
+		$userOrAuthor->setData('orcidAccessToken', $orcidResponse['access_token']);
+		$userOrAuthor->setData('orcidAccessScope', $orcidResponse['scope']);
+		$userOrAuthor->setData('orcidRefreshToken', $orcidResponse['refresh_token']);
+		$userOrAuthor->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
+	}
+
+	/*
+	 * Show explanation and information about ORCID
+	 */
+
+	function about($args, $request) {
+		$templateMgr = TemplateManager::getManager($request);
+		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
+		$templateMgr->assign('orcidIcon', $plugin->getIcon());
+		$templateMgr->display($plugin->getTemplatePath() . 'orcidAbout.tpl');
 	}
 }
 

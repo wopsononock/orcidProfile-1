@@ -9,7 +9,38 @@
  * ORCID Profile authorization form
  *
  *}
+
+{capture name=orcidButton assign=orcidButton}
+<button id="connect-orcid-button" class="cmp_button" onclick="return openORCID();">
+	{$orcidIcon}
+	{if !$orcidAuthenticated}
+	ORCID iD verknüpfen
+	{else}
+	{translate key='plugins.generic.orcidProfile.connect'}
+	{/if}
+</button>
+<a href="{url router="page" page="orcidapi" op="about"}">{translate key='plugins.generic.orcidProfile.about.title'}</a>
+{/capture}
+
+
+{capture name=orcidLink assign=orcidLink}
+{if $orcidAuthenticated}
+	<a href="{$orcid}" target="_blank">{$orcidIcon}{$orcid}</a>
+{else}
+	<a href="{$orcid}" target="_blank">{$orcid}</a>&nbsp;{$orcidButton}
+{/if}
+{/capture}
+
 <script type="text/javascript">
+	function createORCIDLink(orcidUrl) {ldelim}
+		
+		{if $orcidAuthenticated}
+		var orcidIconHtml = {$orcidIcon|json_encode};
+		{else}
+		var orcidIconHtml = '';
+		{/if}
+		return '<a href="' + orcidUrl + '" target="_blank">' + orcidIconHtml + ' ' + orcidUrl + '</a>';
+	{rdelim}
 	function openORCID() {ldelim}
 		// First sign out from ORCID to make sure no other user is logged in
 		// with ORCID
@@ -28,17 +59,27 @@
 		return false;
 	{rdelim}
 {if $targetOp eq 'profile'}
-	$(document).ready(function() {ldelim}
-		$('input[name=orcid]').attr('readonly', "true");
+	function oAuthCallback(orcidResponse) {ldelim}
+		console.log(orcidResponse);
+		$('#connect-orcid-button').replaceWith(createORCIDLink(orcidResponse.orcid));
+		$('input[name=orcid]').prop('value', orcidResponse.orcid);
+		$('#publicProfileForm').submit();
+	{rdelim}
+	$(document).ready(function() {ldelim}        
+		var orcidInput = $('input[name=orcid]');
+        orcidInput.attr('type', 'hidden');
+        var orcidLinkOrButton = $(
+        	{if $orcid}
+        		{$orcidLink|json_encode}
+        	{else}
+        		{$orcidButton|json_encode}
+        	{/if});       
+        orcidLinkOrButton.insertAfter(orcidInput);		
 	{rdelim});
 {/if}
 </script>
 
-<button id="connect-orcid-button" class="cmp_button" onclick="return openORCID();">
-	{$orcidIcon}
-	{translate key='plugins.generic.orcidProfile.connect'}
-</button>
-
 {if $targetOp eq 'register'}
 	{fbvElement type="hidden" name="orcid" id="orcid" value=$orcid maxlength="37"}
+	{$orcidButton}
 {/if}

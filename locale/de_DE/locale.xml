@@ -48,10 +48,16 @@
 	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.notpublished">Die Einreichung wird bei Veröffentlichung zu ihrem ORCID-Datensatz hinzugefügt werden.</message>
 	<message key="plugins.generic.orcidProfile.verify.success">Ihre ORCID-ID wurde verifiziert und die Einreichung erfolgreich mit Ihrer ORCID-ID verknüpft.</message>
 	<message key="plugins.generic.orcidProfile.verify.failure">Ihre ORCID-ID konnte nicht verifiziert werden oder der Link ist nicht mehr gültig.</message>	
-	<message key="plugins.generic.orcidProfile.verify.denied">Sie haben den Zugriff auf Ihren ORCID-Datensatz abgelehnt.</message>
+	<message key="plugins.generic.orcidProfile.verify.denied">Sie haben den Zugriff auf Ihren ORCID-Datensatz abgelehnt.</message>	
 	<message key="plugins.generic.orcidProfile.authFailure">OJS konnte nicht mit ORCID kommunizieren.</message>
 
 	<message key="plugins.generic.orcidProfile.failure.contact">Bitte kontaktieren Sie den/die Zeitschriftenverwalter/in und geben Sie Ihren Namen, ORCID-iD und Details zu der Einreichung an.</message>	
 	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
 	<message key="plugins.generic.orcidProfile.connect">ORCID iD anlegen und verknüpfen</message>
+	<message key="plugins.generic.orcidProfile.about.title">Was ist ORCID?</message>
+	<message key="plugins.generic.orcidProfile.about.orcidExplanation">Dies ist eine kurze orcid beschreibung</message>
+	<message key="plugins.generic.orcidProfile.about.howAndWhy.title">Wie und warum werde ORCID iDs gesammelt?</message>
+	<message key="plugins.generic.orcidProfile.about.howAndWhy">This journal is collecting your ORCID iD so we can [add purpose and distinguish between Member API and Public API].
+	When you click the “Authorize” button in the ORCID popup, we will ask you to share your iD using an authenticated process: either by registering for an ORCID iD or, if you already have one, to sign into your ORCID account, then granting us permission to get your ORCID iD. We do this to ensure that you are correctly identified and securely connecting your ORCID iD.</message>
+	<message key="plugins.generic.orcidProfile.about.learnMore">Erfahren sie mehr über</message>
 </locale>
