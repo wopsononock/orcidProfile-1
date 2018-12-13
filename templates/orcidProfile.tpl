@@ -32,15 +32,6 @@
 {/capture}
 
 <script type="text/javascript">
-	function createORCIDLink(orcidUrl) {ldelim}
-		
-		{if $orcidAuthenticated}
-		var orcidIconHtml = {$orcidIcon|json_encode};
-		{else}
-		var orcidIconHtml = '';
-		{/if}
-		return '<a href="' + orcidUrl + '" target="_blank">' + orcidIconHtml + ' ' + orcidUrl + '</a>';
-	{rdelim}
 	function openORCID() {ldelim}
 		// First sign out from ORCID to make sure no other user is logged in
 		// with ORCID
@@ -59,12 +50,6 @@
 		return false;
 	{rdelim}
 {if $targetOp eq 'profile'}
-	function oAuthCallback(orcidResponse) {ldelim}
-		console.log(orcidResponse);
-		$('#connect-orcid-button').replaceWith(createORCIDLink(orcidResponse.orcid));
-		$('input[name=orcid]').prop('value', orcidResponse.orcid);
-		$('#publicProfileForm').submit();
-	{rdelim}
 	$(document).ready(function() {ldelim}        
 		var orcidInput = $('input[name=orcid]');
         orcidInput.attr('type', 'hidden');
