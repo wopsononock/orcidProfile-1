@@ -196,7 +196,16 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$templateMgr->register_outputfilter(array($this, 'registrationFilter'));
 				break;
 			case 'frontend/pages/article.tpl':
-				$templateMgr->assign('orcidIcon', $this->getIcon());
+				//$templateMgr->assign('orcidIcon', $this->getIcon());
+				$script = 'var orcidIconSvg = $('. json_encode($this->getIcon()) .');';
+				$article =& $templateMgr->get_template_vars('article');
+				$authors = $article->getAuthors();
+				foreach ($authors as $author) {
+					if(!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
+						$script .= '$("a[href=\"'.$author->getOrcid().'\"]").prepend(orcidIconSvg);';
+					}
+				}		
+				$templateMgr->addJavaScript('orcidIconDisplay', $script, ['inline' => true]);
 				break;
 		}
 		return false;
@@ -295,7 +304,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @param $output string
 	 * @param $templateMgr TemplateManager
-	 * @return string
+	 * @return bool
 	 */
 	function handleUserPublicProfileDisplay($hookName, $params) {
 		$templateMgr =& $params[1];
