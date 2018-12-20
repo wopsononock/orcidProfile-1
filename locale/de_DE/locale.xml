@@ -56,8 +56,11 @@
 	<message key="plugins.generic.orcidProfile.connect">ORCID iD anlegen und verknüpfen</message>
 	<message key="plugins.generic.orcidProfile.about.title">Was ist ORCID?</message>
 	<message key="plugins.generic.orcidProfile.about.orcidExplanation">Dies ist eine kurze orcid beschreibung</message>
-	<message key="plugins.generic.orcidProfile.about.howAndWhy.title">Wie und warum werde ORCID iDs gesammelt?</message>
-	<message key="plugins.generic.orcidProfile.about.howAndWhy">This journal is collecting your ORCID iD so we can [add purpose and distinguish between Member API and Public API].
-	When you click the “Authorize” button in the ORCID popup, we will ask you to share your iD using an authenticated process: either by registering for an ORCID iD or, if you already have one, to sign into your ORCID account, then granting us permission to get your ORCID iD. We do this to ensure that you are correctly identified and securely connecting your ORCID iD.</message>
-	<message key="plugins.generic.orcidProfile.about.learnMore">Erfahren sie mehr über</message>
+	<message key="plugins.generic.orcidProfile.about.howAndWhy.title">Wie und warum werden ORCID iDs gesammelt?</message>
+	<message key="plugins.generic.orcidProfile.about.howAndWhy"><![CDATA[This journal is collecting your ORCID iD so we can [add purpose and distinguish between Member API and Public API].
+	When you click the “Authorize” button in the ORCID popup, we will ask you to share your iD using an authenticated process: either by <a href="https://support.orcid.org/hc/en-us/articles/360006897454">registering for an ORCID iD</a> or, if you already have one, <a href="https://support.orcid.org/hc/en-us/categories/360000661673">to sign into your ORCID account</a>, then granting us permission to get your ORCID iD. We do this to ensure that you are correctly identified and securely connecting your ORCID iD.<br>
+	Learn more in <a href="https://orcid.org/blog/2017/02/20/whats-so-special-about-signing">What’s so special about signing in.</a>]]></message>
+	<message key="plugins.generic.orcidProfile.about.display.title">Wo werden ORCID iDs angezeigt?</message>
+	<message key="plugins.generic.orcidProfile.about.display"><![CDATA[To acknowledge that you have used your iD and that it has been authenticated, we display the ORCID iD icon <img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" alt="iD icon" width="16" height="16" border="0"> alongside your name on the article page of your submission and on your public user profile.<br>
+	Learn more in <a href="https://orcid.org/blog/2013/02/22/how-should-orcid-id-be-displayed">How should an ORCID iD be displayed.</a>]]></message>
 </locale>
