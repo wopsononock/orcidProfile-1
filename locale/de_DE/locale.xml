@@ -42,6 +42,7 @@
 	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Sende E-Mail an Beiträger/in um ORCID Authorisierung anzufragen</message>
 	<message key="plugins.generic.orcidProfile.author.deleteORCID">Lösche ORCID iD und Zugriffsberechtigung!</message>
 	<message key="plugins.generic.orcidProfile.author.orcidEmptyNotice">Siehe unten zur Authentifizierung der ORCID iD</message>
+	<message key="plugins.generic.orcidProfile.author.unauthenticated">ORCID iD nicht authentifiziert! Bitte Authorisierung anfragen.</message>
 	<message key="plugins.generic.orcidProfile.verify.title">ORCID Authorisierung</message>
 	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.success">Die Einreichung wurde zu Ihrem ORCID-Datensatz hinzugefügt.</message>	
 	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.failure">Die Einreichung konnte nicht zu ihrem ORCID-Datensatz hinzugefügt werden.</message>
