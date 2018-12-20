@@ -38,10 +38,11 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Errors</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.all">All</message>
 	<message key="plugins.generic.orcidProfile.author.accessDenied">ORCID access was denied at</message>
-	<message key="plugins.generic.orcidProfile.author.accessTokenStored">ORCID access token stored, valid until</message>
-	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Send e-mail to request ORCID authorization from author</message>
+	<message key="plugins.generic.orcidProfile.author.accessTokenStored">ORCID record access granted with scope {$orcidAccessScope}, valid until</message>
+	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Send e-mail to request ORCID authorization from contributor</message>
 	<message key="plugins.generic.orcidProfile.author.deleteORCID">Delete ORCID iD and access token!</message>
 	<message key="plugins.generic.orcidProfile.author.orcidEmptyNotice">See below to request authenticated ORCID iD</message>
+	<message key="plugins.generic.orcidProfile.author.unauthenticated">ORCID iD not authenticated! Please request authentication from the contributor.</message>
 	<message key="plugins.generic.orcidProfile.verify.title">ORCID Authorization</message>
 	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.success">The submission has been added to your ORCID record.</message>
 	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.failure">The submission could not be added to your ORCID record.</message>

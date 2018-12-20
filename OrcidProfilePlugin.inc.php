@@ -156,10 +156,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$authorForm =& $args[0];
 				$author = $authorForm->getAuthor();
 				if ($author) {
+					$authenticated = !empty($author->getData('orcidAccessToken'));
 					$templateMgr->assign( array(
 						'orcidAccessToken' => $author->getData('orcidAccessToken'),
+						'orcidAccessScope' => $author->getData('orcidAccessScope'),
 						'orcidAccessExpiresOn' => $author->getData('orcidAccessExpiresOn'),
-						'orcidAccessDenied' => $author->getData('orcidAccessDenied')
+						'orcidAccessDenied' => $author->getData('orcidAccessDenied'),
+						'orcidAuthenticated' => $authenticated
 					));
 				}
 				$templateMgr->register_outputfilter(array($this, 'authorFormFilter'));
@@ -341,7 +344,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$newOutput = substr($output, 0, $offset+strlen($match));
 			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'authorFormOrcid.tpl');
 			$newOutput .= substr($output, $offset+strlen($match));
-			$output = $newOutput;			
+			$output = $newOutput;
 			$templateMgr->unregister_outputfilter('authorFormFilter');
 		}
 		return $output;

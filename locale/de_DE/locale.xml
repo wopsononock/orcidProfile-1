@@ -32,14 +32,14 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidScope">Umfang des ORCID-API Zugriffs</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">E-Mail Einstellungen</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Sende E-Mails um ORCID Authorisierung von jedem Author eines Artikels bei Veröffentlichung einer Ausgabe anzufragen</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Sende E-Mails um ORCID Authorisierung von jedem/jeder Beiträger/in eines Artikels bei Veröffentlichung einer Ausgabe anzufragen</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">ORCID Anfragen protokollieren</message>	
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.help">Wählen Sie die Art der Nachrichten die protokolliert werden sollen</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Fehler</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.all">Alle</message>
 	<message key="plugins.generic.orcidProfile.author.accessDenied">ORCID Zugriff abgelehnt</message>
-	<message key="plugins.generic.orcidProfile.author.accessTokenStored">ORCID Zugriff genehmigt, gültig bis</message>
-	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Sende E-Mail an Author um ORCID Authorisierung anzufragen</message>
+	<message key="plugins.generic.orcidProfile.author.accessTokenStored">ORCID Zugriff genehmigt mit Berechtigung {$orcidAccessScope}, gültig bis</message>
+	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Sende E-Mail an Beiträger/in um ORCID Authorisierung anzufragen</message>
 	<message key="plugins.generic.orcidProfile.author.deleteORCID">Lösche ORCID iD und Zugriffsberechtigung!</message>
 	<message key="plugins.generic.orcidProfile.author.orcidEmptyNotice">Siehe unten zur Authentifizierung der ORCID iD</message>
 	<message key="plugins.generic.orcidProfile.verify.title">ORCID Authorisierung</message>

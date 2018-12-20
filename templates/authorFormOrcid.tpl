@@ -10,10 +10,13 @@
  *}
 {fbvFormSection list="true" title="ORCID" translate=false}
 	{if $orcidAccessToken}
-    	<p>{translate key='plugins.generic.orcidProfile.author.accessTokenStored'} {$orcidAccessExpiresOn|date_format:$datetimeFormatShort}</p>
+    	<p>{translate key='plugins.generic.orcidProfile.author.accessTokenStored' orcidAccessScope=$orcidAccessScope}  {$orcidAccessExpiresOn|date_format:$datetimeFormatShort}</p>
     {/if}
     {if $orcidAccessDenied}
     	<p>{translate key='plugins.generic.orcidProfile.author.accessDenied'} {$orcidAccessDenied|date_format:$datetimeFormatShort}</p>
+    {/if}
+    {if !$orcidAuthenticated}
+        <p>{translate key='plugins.generic.orcidProfile.author.unauthenticated'}</p>
     {/if}
     {fbvElement type="checkbox" label="plugins.generic.orcidProfile.author.requestAuthorization" id="requestOrcidAuthorization" checked=false}
     {if $orcid}
@@ -29,10 +32,14 @@
         // make the container div use the whole available space
         orcidInput.parent().removeClass('pkp_helpers_quarter');
         {if $orcid}
-        {* Display the ORCID id as an link *}        
-        var orcidIconHtml = {$orcidIcon|json_encode};
-        var orcidLink = $('<a href="{$orcid}" target="_blank">' + orcidIconHtml + ' {$orcid|escape}</a>');
-        orcidLink.insertAfter(orcidInput);
+        {* Display the ORCID id as an link *}
+        {if $orcidAuthenticated}
+        var orcidIconSvg = {$orcidIcon|json_encode}
+        {else}
+        var orcidIconSvg = '';
+        {/if}
+        var orcidLink = $('<a href="{$orcid}" target="_blank">' + orcidIconSvg + '{$orcid|escape}</a>');
+        orcidLink.insertAfter(orcidInput);        
         {else}        
         $('<span>{translate key='plugins.generic.orcidProfile.author.orcidEmptyNotice'}</span>').insertAfter(orcidInput);
         {/if}
