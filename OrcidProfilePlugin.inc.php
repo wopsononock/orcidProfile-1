@@ -283,11 +283,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$offset = $matches[0][1];
 			$context = Request::getContext();
 			$contextId = ($context == null) ? 0 : $context->getId();
-
+			$targetOp = 'register';
 			$templateMgr->assign(array(
-				'targetOp' => 'register',
-				'orcidProfileOauthPath' => $this->getOauthPath(),
-				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
+				'targetOp' => $targetOp,
+				'orcidUrl' => $this->getOrcidUrl(),
+				'orcidOAuthUrl' => $this->buildOAuthUrl('orcidAuthorize', array('targetOp' => $targetOp)),
 				'orcidIcon' => $this->getIcon(),
 			));
 

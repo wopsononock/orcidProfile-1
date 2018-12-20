@@ -55,6 +55,7 @@
 	<message key="plugins.generic.orcidProfile.failure.contact">Bitte kontaktieren Sie den/die Zeitschriftenverwalter/in und geben Sie Ihren Namen, ORCID-iD und Details zu der Einreichung an.</message>	
 	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
 	<message key="plugins.generic.orcidProfile.connect">ORCID iD anlegen und verknüpfen</message>
+	<message key="plugins.generic.orcidProfile.authorise">ORCID iD authorisieren und verknüpfen</message>
 	<message key="plugins.generic.orcidProfile.about.title">Was ist ORCID?</message>
 	<message key="plugins.generic.orcidProfile.about.orcidExplanation">Dies ist eine kurze orcid beschreibung</message>
 	<message key="plugins.generic.orcidProfile.about.howAndWhy.title">Wie und warum werden ORCID iDs gesammelt?</message>
