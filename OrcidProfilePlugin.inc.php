@@ -241,7 +241,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					'redirect_uri' => Request::url(null, 'orcidapi', 'orcidVerify', null, array('orcidToken' => $orcidToken, 'articleId' => $author->getSubmissionId()))
 				)),
 				'authorName' => $author->getFullName(),
-				'editorialContactSignature' => $context->getSetting('contactName'),
+				'editorialContactSignature' => $context->getData('contactName'),
 				'articleTitle' => $article->getLocalizedTitle(),
 			));
 
