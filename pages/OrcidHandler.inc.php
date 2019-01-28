@@ -180,7 +180,7 @@ class OrcidHandler extends Handler {
 		$submissionId = $request->getUserVar('articleId');
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$authors = $authorDao->getBySubmissionId($submissionId);
-
+		$templatePath = $plugin->getTemplateResource(self::TEMPLATE);
 		$authorToVerify = null;
 		// Find the author entry, for which the ORCID verification was requested
 		if($request->getUserVar('token')) {
@@ -205,7 +205,7 @@ class OrcidHandler extends Handler {
 			// no Author exists in the database with the supplied orcidEmailToken
 			$plugin->logError('OrcidHandler::orcidverify - No author found with supplied token');
 			$templateMgr->assign('verifySuccess', false);
-			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
+			$templateMgr->display($templatePath);
 			return;
 		}		
 		if ($request->getUserVar('error') === 'access_denied') {
@@ -222,7 +222,7 @@ class OrcidHandler extends Handler {
 			$plugin->logError('OrcidHandler::orcidverify - ORCID access denied. Error description: '
 				. $request->getUserVar('error_description'));
 			$templateMgr->assign('denied', true);
-			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
+			$templateMgr->display($templatePath);
 			return;
 		}
 
@@ -256,7 +256,7 @@ class OrcidHandler extends Handler {
 		if (!($result = curl_exec($ch))) {
 			$plugin->logError('OrcidHandler::orcidverify - CURL error: ' . curl_error($ch));
 			$templateMgr->assign('authFailure', true);
-			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
+			$templateMgr->display($templatePath);
 			return;
 		}
 		$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -266,19 +266,19 @@ class OrcidHandler extends Handler {
 		if ($response['error'] === 'invalid_grant') {
 			$plugin->logError("Response status: $httpstatus . Authroization code invalid, maybe already used");			
 			$templateMgr->assign('authFailure', true);
-			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
+			$templateMgr->display($templatePath);
 			return;
 		} elseif (isset($response['error'])) {
 			$plugin->logError("Response status: $httpstatus . Invalid ORCID response: $result");
 			$templateMgr->assign('authFailure', true);
-			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
+			$templateMgr->display($templatePath);
 		}
 		// Set the orcid id using the full https uri
 		$orcidUri = 'https://orcid.org/' . $response['orcid'];
 		if (!empty($authorToVerify->getOrcid()) && $orcidUri != $authorToVerify->getOrcid()) {
 			// another ORCID id is stored for the author
 			$templateMgr->assign('duplicateOrcid', true);
-			$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
+			$templateMgr->display($templatePath);
 			return;	
 		}
 		$authorToVerify->setOrcid($orcidUri);
@@ -309,7 +309,7 @@ class OrcidHandler extends Handler {
 			'verifySuccess' => true,
 			'orcidIcon' => $plugin->getIcon()
 		));
-		$templateMgr->display($plugin->getTemplatePath() . self::TEMPLATE);
+		$templateMgr->display($templatePath);
 	}
 
 	function _setOrcidData($userOrAuthor, $orcidUri, $orcidResponse) {
@@ -335,7 +335,7 @@ class OrcidHandler extends Handler {
 		$templateMgr = TemplateManager::getManager($request);
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$templateMgr->assign('orcidIcon', $plugin->getIcon());
-		$templateMgr->display($plugin->getTemplatePath() . 'orcidAbout.tpl');
+		$templateMgr->display($plugin->getTemplateResource('orcidAbout.tpl'));
 	}
 }
 

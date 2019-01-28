@@ -41,7 +41,7 @@ class OrcidProfileSettingsForm extends Form {
 		$this->contextId = $contextId;
 		$this->plugin =& $plugin;
 
-		parent::__construct($plugin->getTemplatePath() . 'settingsForm.tpl');
+		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
 		if(!$this->plugin->isGloballyConfigured()) {
 			$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required',

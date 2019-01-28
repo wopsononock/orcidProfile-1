@@ -165,7 +165,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 						'orcidAuthenticated' => $authenticated
 					));
 				}
-				$templateMgr->register_outputfilter(array($this, 'authorFormFilter'));
+				$templateMgr->registerFilter("output", array($this, 'authorFormFilter'));
 				break;
 		}
 		return false;
@@ -196,12 +196,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		switch ($template) {
 			case 'frontend/pages/userRegister.tpl':
-				$templateMgr->register_outputfilter(array($this, 'registrationFilter'));
+				$templateMgr->registerFilter("output", array($this, 'registrationFilter'));
 				break;
 			case 'frontend/pages/article.tpl':
 				//$templateMgr->assign('orcidIcon', $this->getIcon());
 				$script = 'var orcidIconSvg = $('. json_encode($this->getIcon()) .');';
-				$article =& $templateMgr->get_template_vars('article');
+				$article = $templateMgr->getTemplateVars('article');
 				$authors = $article->getAuthors();
 				foreach ($authors as $author) {
 					if(!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
@@ -292,10 +292,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 			));
 
 			$newOutput = substr($output, 0, $offset+strlen($match));
-			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');
+			$newOutput .= $templateMgr->fetch($this->getTemplateResource('orcidProfile.tpl'));
 			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
-			$templateMgr->unregister_outputfilter(array($this, 'registrationFilter'));
+			$templateMgr->unregisterFilter('output', array($this, 'registrationFilter'));
 		}
 		return $output;
 	}
@@ -325,7 +325,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			'orcidAuthenticated' => !empty($user->getData('orcidAccessToken')),
 		));
 		
-		$output = $templateMgr->fetch($this->getTemplatePath() . 'orcidProfile.tpl');		
+		$output = $templateMgr->fetch($this->getTemplateResource('orcidProfile.tpl'));
 		return true;
 	}
 
@@ -336,16 +336,16 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param $templateMgr TemplateManager
 	 * @return string
 	 */
-	function authorFormFilter($output, &$templateMgr) {
+	function authorFormFilter($output, $templateMgr) {
 		if (preg_match('/<input[^>]+name="submissionId"[^>]*>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
 			$templateMgr->assign('orcidIcon', $this->getIcon());
 			$newOutput = substr($output, 0, $offset+strlen($match));
-			$newOutput .= $templateMgr->fetch($this->getTemplatePath() . 'authorFormOrcid.tpl');
+			$newOutput .= $templateMgr->fetch($this->getTemplateResource('authorFormOrcid.tpl'));
 			$newOutput .= substr($output, $offset+strlen($match));
 			$output = $newOutput;
-			$templateMgr->unregister_outputfilter('authorFormFilter');
+			$templateMgr->unregisterFilter('output', array($this, 'authorFormFilter'));
 		}
 		return $output;
 	}
@@ -460,13 +460,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 	/**
-	 * @copydoc PKPPlugin::getTemplatePath
-	 */
-	function getTemplatePath($inCore = false) {
-		return $this->getTemplateResourceName() . ':templates/';
-	}
-
-	/**
 	 * @see PKPPlugin::getInstallEmailTemplatesFile()
 	 */
 	function getInstallEmailTemplatesFile() {
@@ -543,7 +536,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$contextId = ($context == null) ? 0 : $context->getId();
 
 				$templateMgr = TemplateManager::getManager();
-				$templateMgr->register_function('plugin_url', array($this, 'smartyPluginUrl'));
+				$templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
 				$apiOptions = [
 					ORCID_API_URL_PUBLIC => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public',
 					ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox',
