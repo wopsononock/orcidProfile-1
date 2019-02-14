@@ -19,6 +19,12 @@ import('lib.pkp.classes.form.Form');
 
 class OrcidProfileSettingsForm extends Form {
 
+	const CONFIG_VARS = array(
+		'orcidProfileAPIPath' => 'string',
+		'orcidClientId' => 'string',
+		'orcidClientSecret' => 'string',		
+		'sendMailToAuthorsOnPublication' => 'bool',
+		'logLevel' => 'string');
 	/** @var $contextId int */
 	var $contextId;
 
@@ -36,8 +42,10 @@ class OrcidProfileSettingsForm extends Form {
 
 		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
-		$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
-
+		if(!$this->plugin->isGloballyConfigured()) {
+			$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required',
+				'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
+		}
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
 	}
@@ -48,24 +56,21 @@ class OrcidProfileSettingsForm extends Form {
 	function initData() {
 		$contextId = $this->contextId;
 		$plugin =& $this->plugin;
-
-		$this->_data = array(
-			'orcidProfileAPIPath' => $plugin->getSetting($contextId, 'orcidProfileAPIPath'),
-			'orcidClientId' => $plugin->getSetting($contextId, 'orcidClientId'),
-			'orcidClientSecret' => $plugin->getSetting($contextId, 'orcidClientSecret'),
-		);
+		$this->_data = array();
+		foreach (self::CONFIG_VARS as $configVar => $type) {
+			$this->_data[$configVar] = $plugin->getSetting($contextId, $configVar);
+		}
 	}
 
 	/**
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('orcidProfileAPIPath'));
-		$this->readUserVars(array('orcidClientId'));
-		$this->readUserVars(array('orcidClientSecret'));
+		$this->readUserVars(array_keys(self::CONFIG_VARS));
 	}
 
 	/**
+	 * Fetch the form.
 	 * @copydoc Form::fetch()
 	 */
 	function fetch($request, $template = null, $display = false) {
@@ -81,10 +86,14 @@ class OrcidProfileSettingsForm extends Form {
 	function execute() {
 		$plugin =& $this->plugin;
 		$contextId = $this->contextId;
-
-		$plugin->updateSetting($contextId, 'orcidProfileAPIPath', trim($this->getData('orcidProfileAPIPath'), "\"\';"), 'string');
-		$plugin->updateSetting($contextId, 'orcidClientId', $this->getData('orcidClientId'), 'string');
-		$plugin->updateSetting($contextId, 'orcidClientSecret', $this->getData('orcidClientSecret'), 'string');
+		foreach (self::CONFIG_VARS as $configVar => $type) {
+			if ($configVar === 'orcidProfileAPIPath') {
+				$plugin->updateSetting($contextId, $configVar, trim($this->getData($configVar), "\"\';"), $type);
+			}
+			else {
+				$plugin->updateSetting($contextId, $configVar, $this->getData($configVar), $type);
+			}
+		}
 	}
 }
 

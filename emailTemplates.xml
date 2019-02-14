@@ -12,4 +12,5 @@
   -->
 <emails>
 	<email key="ORCID_COLLECT_AUTHOR_ID" can_edit="1" can_disable="0"/>
+	<email key="ORCID_REQUEST_AUTHOR_AUTHORIZATION" can_edit="1" can_disable="0"/>
 </emails>
