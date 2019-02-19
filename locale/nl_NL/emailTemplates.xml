@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+  * emailTemplateData.xml
+  *
+  * Copyright (c) 2003-2018 Simon Fraser University
+  * Copyright (c) 2003-2018 John Willinsky
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * Localized email templates XML file.
+  -->
+	
+<email_texts locale="nl_NL">
+	<email_text key="ORCID_COLLECT_AUTHOR_ID">
+		<subject>ORCID van uw inzending</subject>
+		<body><![CDATA[Beste {$authorName},
+
+U bent co-auteur van het manuscript "{$articleTitle}" dat werd ingediend voor {$journalName}. 
+
+Wilt u bevestigen dat u co-auteur bent door uw ORCID id toe te voegen via volgende link?
+
+{$authorOrcidUrl}
+
+Neemt u alstublieft contact op als u vragen heeft.
+
+{$editorialContactSignature}]]></body>
+		<description>Deze e-mail wordt verstuurd om de ORCID id's van co-auteurs te verzamelen.</description>
+	</email_text>
+	<email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
+		<subject/>
+		<body/>
+		<description/>
+	</email_text>
+</email_texts>
