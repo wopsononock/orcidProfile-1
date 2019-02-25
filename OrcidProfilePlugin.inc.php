@@ -346,7 +346,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$output = $newOutput;
 			$templateMgr->unregisterFilter('output', array($this, 'authorFormFilter'));
 		}
-		$templateMgr->unregister_outputfilter('profileFilter');
 		return $output;
 	}
 
