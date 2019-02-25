@@ -19,8 +19,10 @@
 	<message key="plugins.generic.orcidProfile.instructions"><![CDATA[Вы можете предварительно заполнить эту форму информацией из профиля ORCID. Введите адрес электронной почты или ORCID iD, связанный с профилем ORCID, а затем нажмите «Отправить».]]></message>
 	<message key="plugins.generic.orcidProfile.noData">Не удается найти данные в ORCID.</message>
 	<message key="plugins.generic.orcidProfile.emailOrOrcid">Адрес электронной почты или ORCID iD:</message>
-	<message key="plugins.generic.orcidProfile.manager.orcidProfileSettings">Настройки профиля ORCID</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.description">Настройте ORCID API для получения информации профиля ORCID в профиль пользователя.</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.title">Настройки ORCID API</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.hidden">скрыто</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.description">Пожалуйста, настройте доступ ORCID API для получения информации из профиля ORCID в профили пользователя и автора, а также обновления ORCID-записей, связанных с новыми публикациями (только для членов ORCID).</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured">ORCID API был настроен глобально для всего сервера. Были сохранены следующие учетные данные.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath">ORCID API</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public">Public</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox">Public Sandbox</message>
@@ -28,10 +30,39 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox">Member Sandbox</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientId">Client ID</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
-	<message key="plugins.generic.orcidProfile.author.submission">ORCID материала</message>
-	<message key="plugins.generic.orcidProfile.author.submission.success">Ваш материал успешно связан с Вашим ORCID iD.</message>
-	<message key="plugins.generic.orcidProfile.author.submission.failure">Ваш материал не удалось успешно связать с Вашим ORCID iD. Пожалуйста, свяжитесь с управляющим журнала, сообщив ему Ваше имя, ORCID iD и информацию о Вашем отправленном материале.</message>
-	<message key="plugins.generic.orcidProfile.authFailure">OJS не удалось связаться с сервисом ORCID. Пожалуйста, свяжитесь с управляющим журнала, сообщив ему Ваше имя, ORCID iD и информацию о Вашем отправленном материале.</message>
-    <message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
-    <message key="plugins.generic.orcidProfile.connect">Создать или Подключиться к вашему ORCID iD</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidScope">Profile Access Scope</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">Настройки электронной почты</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Отправлять электронной почтой письмо для запроса авторизации ORCID из авторов статьи о публикации нового выпуска</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">Журнал запросов ORCID</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.help">Выберите глубину ведения журнала данным модулем</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Ошибки</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.all">Все</message>
+	<message key="plugins.generic.orcidProfile.author.accessDenied">Доступ к ORCID был запрещен на</message>
+	<message key="plugins.generic.orcidProfile.author.accessTokenStored">Запись ORCID предоставила доступ к «{$orcidAccessScope}», действительный до</message>
+	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Отправить электронной почтой письмо для запроса авторизации ORCID у поставщика</message>
+	<message key="plugins.generic.orcidProfile.author.deleteORCID">Удалить ORCID iD и токен доступа!</message>
+	<message key="plugins.generic.orcidProfile.author.orcidEmptyNotice">Прочтите ниже для запроса авторизованного ORCID iD</message>
+	<message key="plugins.generic.orcidProfile.author.unauthenticated">ORCID iD не авторизован! Пожалуйста, запросите авторизацию у поставщика.</message>
+	<message key="plugins.generic.orcidProfile.verify.title">Авторизация ORCID</message>
+	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.success">Материал был добавлен к вашей записи ORCID.</message>
+	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.failure">Материал не удается добавить к вашей записи ORCID.</message>
+	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.notpublished">Материал будет добавлен к вашей записи ORCID во время публикации.</message>
+	<message key="plugins.generic.orcidProfile.verify.success">Ваш ORCID iD был проверен и успешно связан с публикацией.</message>
+	<message key="plugins.generic.orcidProfile.verify.failure">Ваш ORCID iD не удается проверить. Ссылка больше не действительна.</message>
+	<message key="plugins.generic.orcidProfile.verify.duplicateOrcid">ORCID iD был уже сохранен для этого материала.</message>	
+	<message key="plugins.generic.orcidProfile.verify.denied">Вы запретили доступ к вашей записи ORCID.</message>
+	<message key="plugins.generic.orcidProfile.authFailure">Ссылка авторизации ORCID уже была использована или является некорректной.</message>
+	<message key="plugins.generic.orcidProfile.failure.contact">Пожалуйста, свяжитесь с управляющим журнала, сообщив ему Ваше имя, ORCID iD и информацию о Вашем материале.</message>
+	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
+	<message key="plugins.generic.orcidProfile.connect">Создать или подключить ваш ORCID iD</message>
+	<message key="plugins.generic.orcidProfile.authorise">Авторизовать или подключить ваш ORCID iD</message>
+	<message key="plugins.generic.orcidProfile.about.title">Что такое ORCID?</message>
+	<message key="plugins.generic.orcidProfile.about.orcidExplanation"><![CDATA[ORCID — это независимая некоммерческая организация, которая предоставляет постоянный идентификатор ORCID iD, отличающий Вас от других исследователей, и механизм связывания результатов Ваших исследований и активности с Вашим iD. ORCID интегрирован во множество систем, используемых издателями, грантовыми фондами, организациями и другими службами, связанными с исследованиями. Подробности на <a href="https://orcid.org">orcid.org</a>.]]></message>
+	<message key="plugins.generic.orcidProfile.about.howAndWhy.title">Как и почему мы собираем ORCID iD?</message>
+	<message key="plugins.generic.orcidProfile.about.howAndWhy"><![CDATA[Этот журнал собирает ORCID iD, чтобы мы могли [добавить цель и отличие между членским API (Member API) и открытым API (Public API)].
+	Когда вы щелкните на кнопке «Авторизовать» во всплывающем окне ORCID, мы попросим Вас поделиться вашим iD, используя процесс авторизации: <a href="https://support.orcid.org/hc/en-us/articles/360006897454">зарегистрируйте себе ORCID iD</a> или, если он у вас уже есть, <a href="https://support.orcid.org/hc/en-us/categories/360000661673">войдите в вашу учетную запись ORCID</a>, а затем дайте нам разрешение получать информацию о Вашем ORCID iD. Мы делаем это, чтобы удостовериться, что Вы правильно идентифицированы, а также чтобы безопасным образом подключить Ваш ORCID iD.<br>
+	Подробности описаны в <a href="https://orcid.org/blog/2017/02/20/whats-so-special-about-signing">«What’s so special about signing in».</a>]]></message>	
+	<message key="plugins.generic.orcidProfile.about.display.title">Где показываются ORCID iDs?</message>
+	<message key="plugins.generic.orcidProfile.about.display"><![CDATA[Чтобы подтвердить, что Вы воспользовались своим iD и Вы были авторизованы, мы показываем значок ORCID iD <img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" alt="iD icon" width="16" height="16" border="0"> рядом с Вашим именем на странице с Вашим опубликованным материалом и на странице Вашего профиля пользователя.<br>
+		Подробности описаны в <a href="https://orcid.org/blog/2013/02/22/how-should-orcid-id-be-displayed">«How should an ORCID iD be displayed».</a>]]></message>
 </locale>
