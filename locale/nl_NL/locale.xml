@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * plugins/generic/orcidPlugin/locale/nl_NL/locale.xml
+  *
+  * Copyright (c) 2015-2018 University of Pittsburgh
+  * Copyright (c) 2014-2019 Simon Fraser University
+  * Copyright (c) 2003-2019 John Willinsky
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * ORCID Profile plugin localization strings for the nl_NL (Nederlands) locale
+  -->
+
+<locale name="nl_NL" full_name="Nederlands">
+
+	<message key="plugins.generic.orcidProfile.displayName">ORCID profiel plugin</message>
+	<message key="plugins.generic.orcidProfile.description"><![CDATA[Maakt het mogelijk om gegevens van ORCID gebruikersprofielen te importeren.]]></message>
+	<message key="plugins.generic.orcidProfile.instructions"><![CDATA[U kan dit formulier vooraf laten invullen met gegevens van een ORCID gebruikersprofiel. Vul het e-mailadres of ORCID ID van het ORCID profiel in, en klik dan op "Indienen".]]></message>
+	<message key="plugins.generic.orcidProfile.noData">Er konden geen ORCID gegevens worden gevonden.</message>
+	<message key="plugins.generic.orcidProfile.emailOrOrcid">E-mailadres of ORCID ID:</message>	
+	<message key="plugins.generic.orcidProfile.manager.orcidProfileSettings">ORCID API instellingen</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.description">Stel de ORCID API in voor het importeren van gegevens van ORCID gebruikersprofielen in het gebruikersprofiel.</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath">ORCID API</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public">Publiek</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox">Publieke sandbox</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member">Lid</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox">Sandbox voor leden</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientId">Client ID</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client sleutel</message>
+	<message key="plugins.generic.orcidProfile.author.submission">ORCID inzending</message>
+	<message key="plugins.generic.orcidProfile.author.submission.success">De inzending werd toegevoegd bij uw ORCID profiel.</message>
+	<message key="plugins.generic.orcidProfile.author.submission.failure">De inzending kon niet worden toegevoegd aan uw ORCID profiel. Contacteer de tijdschriftbeheerder met uw naam, ORCID ID en gegevens van uw inzending.</message>
+	<message key="plugins.generic.orcidProfile.authFailure">OJS kon niet communiceren met de ORCID service. Contacteer de tijdschriftbeheerder met uw naam, ORCID ID en gegevens over uw inzending.</message>
+	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
+	<message key="plugins.generic.orcidProfile.connect">Maak of koppel uw ORCID ID</message>	
+</locale>
