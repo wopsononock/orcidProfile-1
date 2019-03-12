@@ -206,7 +206,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					if(!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
 						$script .= '$("a[href=\"'.$author->getOrcid().'\"]").prepend(orcidIconSvg);';
 					}
-				}		
+				}
 				$templateMgr->addJavaScript('orcidIconDisplay', $script, ['inline' => true]);
 				break;
 		}
@@ -397,9 +397,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return bool
 	 */
 	function handleSubmissionSubmitStep3FormExecute($hookName, $params) {
-		$submission =& $params[1];
+		$form = $params[0];
 		// Have to use global Request access because request is not passed to hook
-		$authors = $submission->getAuthors();
+		$authors = $form->submission->getAuthors();
 		$user = Request::getUser();
 		//error_log("OrcidProfilePlugin: authors[0] = " . var_export($authors[0], true));
 		//error_log("OrcidProfilePlugin: user = " . var_export($user, true));
@@ -410,7 +410,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$authors[0]->setData('orcidAccessToken', $user->getData('orcidAccessToken'));
 			$authors[0]->setData('orcidAccessScope', $user->getData('orcidAccessScope'));
 			$authors[0]->setData('orcidRefreshToken', $user->getData('orcidRefreshToken'));
-			$authors[0]->setData('orcidAccessExpiresOn', $user->getData('orcidAccessExpiresOn'));			
+			$authors[0]->setData('orcidAccessExpiresOn', $user->getData('orcidAccessExpiresOn'));
 			$authors[0]->setData('orcidSandbox', $user->getData('orcidSandbox'));
 			$authorDao = DAORegistry::getDAO('AuthorDAO');
 			$authorDao->updateObject($authors[0]);
@@ -674,9 +674,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	* @see IssueEntryPublicationMetadataForm::execute() The function calling the hook.
 	*/
 	public function handleScheduleForPublication($hookName, $args) {
-		$form =& $args[0];
-		$request =& $args[1];
-		$submissionId = $request->getUserVar('submissionId');
+		$form = $args[0];
+		$submissionId = $form->getSubmission()->getId();
 		$this->submissionIdToBePublished = $submissionId;
 		HookRegistry::register('ArticleSearchIndex::articleChangesFinished',
 			[$this, 'handleScheduleForPublicationFinished']);
