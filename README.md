@@ -6,11 +6,11 @@ Plugin for adding and verifying ORCID iD in PKP user profiles and author metadat
 
 Plugin for PKP user profiles (for OJS 3.1.2)
 
-Copyright © 2015-2018 University of Pittsburgh
+Copyright © 2015-2019 University of Pittsburgh
 
-Copyright © 2014-2018 Simon Fraser University
+Copyright © 2014-2019 Simon Fraser University
 
-Copyright © 2003-2018 John Willinsky
+Copyright © 2003-2019 John Willinsky
 
 Licensed under GPL 2 or better.
 
