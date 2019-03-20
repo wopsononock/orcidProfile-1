@@ -382,7 +382,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function collectUserOrcidId($hookName, $params) {
 		$form = $params[0];
-		$user =& $params[1];
+		$user = $form->user;
 
 		$form->readUserVars(array('orcid'));
 		$user->setOrcid($form->getData('orcid'));
