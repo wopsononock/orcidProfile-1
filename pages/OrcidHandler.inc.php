@@ -134,8 +134,8 @@ class OrcidHandler extends Handler {
 				// Suppress errors for nonexistent array indexes
 				echo '
 					<html><body><script type="text/javascript">
-					opener.document.getElementById("firstName").value = ' . json_encode(@$profileJson['name']['given-names']['value']) . ';
-					opener.document.getElementById("lastName").value = ' . json_encode(@$profileJson['name']['family-name']['value']) . ';
+					opener.document.getElementById("givenName").value = ' . json_encode(@$profileJson['name']['given-names']['value']) . ';
+					opener.document.getElementById("familyName").value = ' . json_encode(@$profileJson['name']['family-name']['value']) . ';
 					opener.document.getElementById("email").value = ' . json_encode(@$profileJson['emails']['email'][0]['email']) . ';
 					opener.document.getElementById("country").value = ' . json_encode(@$profileJson['addresses']['address'][0]['country']['value']) . ';
 					opener.document.getElementById("affiliation").value = ' . json_encode(@$employmentJson['employment-summary'][0]['organization']['name']) . ';
