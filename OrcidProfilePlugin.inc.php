@@ -385,7 +385,17 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$user =& $params[1];
 
 		$form->readUserVars(array('orcid'));
-		$user->setOrcid($form->getData('orcid'));
+		$orcid = $form->getData('orcid');
+		$username = $form->getData('username');
+		$userDao = DAORegistry::getDAO('UserDAO');
+
+		// On shutdown, persist the ORCID to the new user account. (https://github.com/pkp/pkp-lib/issues/4601)
+		register_shutdown_function(function() use ($orcid, $username, $userDao) {
+			$user = $userDao->getByUsername($username);
+			$user->setOrcid($orcid);
+			$userDao->updateObject($user);
+		});
+
 		return false;
 	}
 
