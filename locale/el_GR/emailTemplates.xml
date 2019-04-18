@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE email_texts SYSTEM "../../../../../lib/pkp/dtd/emailTemplateData.dtd">
+
+<!--
+  * @file plugins/generic/orcidProfile/locale/el_GR/emailTemplates.xml
+  *
+  * Copyright (c) 2015-2018 University of Pittsburgh
+  * Copyright (c) 2013-2019 Simon Fraser University
+  * Copyright (c) 2003-2019 John Willinsky
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * Localized email templates XML file.
+  -->
+
+<email_texts locale="el_GR">
+	<email_text key="ORCID_COLLECT_AUTHOR_ID">
+		<subject>Υποβολή ORCID</subject>
+		<body>Αγαπητέ/η {$authorName},
+
+Έχετε καταχωρηθεί ως ένας/μια από τους συγγραφείς στην υποβολή "{$articleTitle}" στο "{$journalName}".
+
+Παρακαλούμε συμπληρώστε το ORCID iD σας στα στοιχεία της υποβολής, επιλέγοντας τον ακόλουθο σύνδεσμο:
+
+{$authorOrcidUrl}
+
+Παρακαλώ επικοινωνήστε μαζί μας εάν χρειάζεστε πρόσθετες διευκρινίσεις.
+
+{$editorialContactSignature}
+
+
+</body>
+		<description>Αυτό το μήνυμα χρησιμοποιείται για τη συλλογή του ORCID iD των συγγραφέων.</description>
+	</email_text>
+	<email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
+		<subject>Αίτημα πρόσβασης στο ORCID σας</subject>
+		<body><![CDATA[Αγαπητέ/η {$authorName},<br>
+<br>
+Έχετε καταχωρηθεί ως συγγραφέας στην υποβολή "{$articleTitle}" στο "{$contextName}".
+<br>
+<br>
+Παρακαλούμε επιτρέψτε μας να προσθέσουμε το ORCID id σας στην υποβολή, καθώς και να καταχωρήσουμε την υποβολή στο ORCID προφίλ σας κατά τη δημοσίευσή της.<br>
+Επιλέξτε τον σύνδεσμο προς τον ιστότοπο του ORCID, εισέλθετε στον λογαριασμό σας και ενεργοποιήστε τη δυνατότητα πρόσβασης ακολουθώντας τις σχετικές οδηγίες.<br>
+<a href="{$authorOrcidUrl}"><img id="orcid-id-logo" src="https://orcid.org/sites/default/files/images/orcid_16x16.png" width='16' height='16' alt="ORCID iD icon" style="display: block; margin: 0 .5em 0 0; padding: 0; float: left;"/>Register or Connect your ORCID iD</a><br/>
+<br>
+<br>
+<a href="{$orcidAboutUrl}">Περισσότερες πληροφορίες για το ORCID στο {$contextName}</a><br/>
+<br>
+Παρακαλώ επικοινωνήστε μαζί μας εάν χρειάζεστε πρόσθετες διευκρινίσεις.<br>
+<br>
+{$principalContactSignature}<br>
+]]></body>
+		<description>Αυτό το μήνυμα χρησιμοποιείται ως αίτημα πρόσβασης στο μητρώο ORCID των συγγραφέων.</description>
+	</email_text>
+</email_texts>
