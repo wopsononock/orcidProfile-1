@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * plugins/generic/orcidPlugin/locale/el_GR/locale.xml
+  *
+  * Copyright (c) 2015-2018 University of Pittsburgh
+  * Copyright (c) 2014-2019 Simon Fraser University
+  * Copyright (c) 2003-2019 John Willinsky
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * ORCID Profile plugin localization strings
+  -->
+
+<locale name="el_GR" full_name="ελληνικά">
+
+	<message key="plugins.generic.orcidProfile.displayName">Πρόσθετο Προφίλ ORCID</message>
+	<message key="plugins.generic.orcidProfile.description"><![CDATA[Ενεργοποιεί την εισαγωγή στοιχείων Χρηστών από το ORCID.]]></message>
+	<message key="plugins.generic.orcidProfile.instructions"><![CDATA[Είναι δυνατή η προσυμπλήρωση της φόρμας με πληροφορίες προφίλ από το ORCID. Παρακαλούμε εισάγετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου ή το ORCID iD και στη συνέχεια πατήστε "Υποβολή".]]></message>
+	<message key="plugins.generic.orcidProfile.noData">Δεν ήταν δυνατή η εύρεση στοιχείων από το ORCID.</message>
+	<message key="plugins.generic.orcidProfile.emailOrOrcid">Διεύθυνση ηλεκτρονικού ταχυδρομείου ή ORCID iD:</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.title">Ρυθμίσεις ORCID API</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.hidden">κρυφό</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.description">Ρύθμιση του ORCID API για τη μετάπτωση στοιχείων από το ORCID στο προφίλ του Χρήστη.</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured">Το ORCID API έχει ρυθμιστεί ενιαία από τον εξυπηρετητή. Τα ακόλουθα στοιχεία πρόσβασης έχουν αποθηκευτεί.</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath">ORCID API</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public">Δημόσιο</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox">Δημόσιο Sandbox</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member">Μέλος</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox">Sandbox Μέλους</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientId">ID Client</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.orcidScope">Σκοπός πρόσβασης στο προφίλ</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">Ρυθμίσεις ηλεκτρονικού ταχυδρομείου</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Αποστολή αιτήματος πρόσβασης στο ORCID των συγγραφέων, κατά τη δημοσίευση νέου τεύχους</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">Αρχείο αιτημάτων ORCID</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.help">Επιλογή αριθμού καταχωρήσεων στο αρχείο αιτημάτων</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Σφάλματα</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.all">Όλα</message>
+	<message key="plugins.generic.orcidProfile.author.accessDenied">Η πρόσβαση στο ORCID δεν επετράπη.</message>
+	<message key="plugins.generic.orcidProfile.author.accessTokenStored">Δόθηκε πρόσβαση στο προφίλ ORCID για τον σκοπό {$orcidAccessScope} και ισχύει έως:</message>
+	<message key="plugins.generic.orcidProfile.author.requestAuthorization">Αποστολή στον συντελεστή αιτήματος πρόσβασης στο ORCID</message>
+	<message key="plugins.generic.orcidProfile.author.deleteORCID">Διαγραφή ORCID iD και token πρόσβασης!</message>
+	<message key="plugins.generic.orcidProfile.author.orcidEmptyNotice">Δείτε ακολούθως σχετικά με το αίτημα πιστοποίησης του ORCID iD</message>
+	<message key="plugins.generic.orcidProfile.author.unauthenticated">Μη πιστοποιημένο ORCID iD! Παρακαλούμε ζητήστε πιστοποίηση από τον Συντελεστή.</message>
+	<message key="plugins.generic.orcidProfile.verify.title">Άδεια χρήσης ORCID</message>
+	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.success">Η υποβολή προστέθηκε στο ORCID προφίλ σας.</message>
+	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.failure">Δεν ήταν δυνατή η προσθήκη της υποβολής στο ORCID προφίλ σας.</message>
+	<message key="plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.notpublished">Η υποβολή θα προστεθεί στο ORCID προφίλ σας κατά την δημοσίευση.</message>
+	<message key="plugins.generic.orcidProfile.verify.success">Το ORCID iD επικυρώθηκε και συνδέθηκε επιτυχώς με την υποβολή.</message>
+	<message key="plugins.generic.orcidProfile.verify.failure">Δεν ήταν δυνατή η επικύρωση του ORCID iD. Ο σύνδεσμος δεν είναι πλέον έγκυρος.</message>
+	<message key="plugins.generic.orcidProfile.verify.duplicateOrcid">Υπάρχει ήδη καταχωρημένο ORCID iD για αυτή την υποβολή.</message>
+	<message key="plugins.generic.orcidProfile.verify.denied">Αρνηθήκατε την πρόσβαση στο ORCID προφίλ σας.</message>
+	<message key="plugins.generic.orcidProfile.authFailure">Δεν ήταν δυνατή η επικοινωνία του OJS με το ORCID. Παρακαλούμε επικοινωνήστε με τον Διαχειριστή δίνοντας το όνομά σας, το ORCID iD και τα στοιχεία της υποβολής σας.</message>
+	<message key="plugins.generic.orcidProfile.failure.contact">Παρακαλούμε επικοινωνήστε με τον Διαχειριστή δίνοντας το όνομά σας, το ORCID iD, και τις λεπτομέρειες της υποβολής.</message>
+	<message key="plugins.generic.orcidProfile.fieldset">ORCID</message>
+	<message key="plugins.generic.orcidProfile.connect">Δημιουργία ή σύνδεση του ΟRCID iD</message>
+	<message key="plugins.generic.orcidProfile.authorise">Άδεια χρήσης και σύνδεσης του ORCID id</message>
+	<message key="plugins.generic.orcidProfile.about.title">Τι είναι το ORCID?</message>
+	<message key="plugins.generic.orcidProfile.about.orcidExplanation"><![CDATA[Το ORCID είναι ένας ανεξάρτητος μη κερδοσκοπικός οργανισμός που παρέχει έναν μοναδικό και μόνιμο προσδιοριστή – το ORCID iD – ο οποίος σας διακρίνει από άλλους ερευνητές, καθώς και έναν μηχανισμό σύνδεσης των δημοσιεύσεών σας με το ORCID id. Το ORCID διαλειτουργεί με συστήματα που χρησιμοποιούν εκδότες, χρηματοδότες έρευνας, ερευνητικά ιδρύματα και άλλες υπηρεσίες, φορείς και υποδομές έρευνας. Μάθετε περισσότερα στο <a href="https://orcid.org">orcid.org</a>.]]></message>
+	<message key="plugins.generic.orcidProfile.about.howAndWhy.title">Πώς και γιατί γίνεται η συλλογή ORCID iD;</message>
+	<message key="plugins.generic.orcidProfile.about.howAndWhy"><![CDATA[Το περιοδικό συλλέγει το ORCID iD προκειμένου να [συμπληρώστε τον σκοπό και διακρίνετε μεταξύ των Member API και Public API].
+	Πατώντας το κουμπί “Authorize” στο αναδυόμενο παράθυρο του ORCID, θα σας ζητηθεί να κοινοποιήσετε το ORCID id σας μέσω πιστοποιημένων διαδικασιών: είτε <a href="https://support.orcid.org/hc/en-us/articles/360006897454">κάνοντας εγγραφή στο ORCID</a> ή -εάν έχετε ήδη ORCID id- <a href="https://support.orcid.org/hc/en-us/categories/360000661673">μπαίνοντας στον λογαριασμό σας</a>, και δίνοντας άδεια πρόσβασης στο ORCID iD. Οι διαδικασίες αυτές διασφαλίζουν την ορθή ταυτοποίηση και διασύνδεση του ORCID iD.<br>
+	Μάθετε περισσότερα στο <a href="https://orcid.org/blog/2017/02/20/whats-so-special-about-signing">εδώ.</a>]]></message>
+	<message key="plugins.generic.orcidProfile.about.display.title">Πού προβάλλονται τα ORCID id;</message>
+	<message key="plugins.generic.orcidProfile.about.display"><![CDATA[Όταν χρησιμοποιείται και έχει πιστοποιηθεί το ORCID id, προβάλλουμε το εικονίδιο ORCID <img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" alt="iD icon" width="16" height="16" border="0"> μαζί με το όνομά σας στη σελίδα του άρθρου και στο δημόσιο προφίλ σας ως Χρήστης.<br>
+		Μάθετε περισσότερα <a href="https://orcid.org/blog/2013/02/22/how-should-orcid-id-be-displayed">εδώ.</a>]]></message>
+</locale>
