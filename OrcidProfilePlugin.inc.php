@@ -148,7 +148,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return bool
 	 */
 	function handleFormDisplay($hookName, $args) {
-		$request = PKPApplication::getRequest();
+		$request = PKPApplication::get()->getRequest();
 		$templateMgr = TemplateManager::getManager($request);
 		switch ($hookName) {
 			case 'authorform::display':
@@ -182,7 +182,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleTemplateDisplay($hookName, $args) {
 		$templateMgr =& $args[0];
 		$template =& $args[1];
-		$request = PKPApplication::getRequest();
+		$request = PKPApplication::get()->getRequest();
 
 		// Assign our private stylesheet, for front and back ends.
 		$templateMgr->addStyleSheet(
@@ -247,7 +247,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param  $redirectParams Array associative array with additional request parameters for the redirect URL
 	 */
 	function buildOAuthUrl($handlerMethod, $redirectParams) {
-		$request = PKPApplication::getRequest();
+		$request = PKPApplication::get()->getRequest();
 		$context = $request->getContext();
 		// This should only ever happen within a context, never site-wide.
 		assert($context != null);
@@ -608,7 +608,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	public function sendAuthorMail($author, $updateAuthor = false)
 	{
-		$request = PKPApplication::getRequest();
+		$request = PKPApplication::get()->getRequest();
 		$context = $request->getContext();
 		// This should only ever happen within a context, never site-wide.
 		assert($context != null);
@@ -658,7 +658,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$publishedArticles = $publishedArticleDao->getPublishedArticles($issue->getId());
-		$request = PKPApplication::getRequest();
+		$request = PKPApplication::get()->getRequest();
 		$journal = $request->getContext();
 
 		foreach ($publishedArticles as $publishedArticle) {
@@ -696,7 +696,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	*/
 	public function handleScheduleForPublicationFinished($hookName, $args) {
 		if ( $this->submissionIdToBePublished ) {
-			$request = PKPApplication::getRequest();
+			$request = PKPApplication::get()->getRequest();
 			$this->sendSubmissionToOrcid($this->submissionIdToBePublished, $request);
 			$this->submissionIdToBePublished = null;
 		}
