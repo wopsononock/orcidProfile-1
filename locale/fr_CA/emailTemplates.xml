@@ -21,9 +21,7 @@ Pour confirmer votre identité, veuillez ajouter votre identifiant ORCID à cett
 
 {$authorOrcidUrl}
 
-Si vous avez des questions, s'il vous plaît communiquez avec nous.
-
-{$editorialContactSignature}]]></body>
+Si vous avez des questions, s'il vous plaît communiquez avec nous.]]></body>
 		<description>Ce modèle de courriel est utilisé pour récupérer les identifiants ORCID des co-auteurs.</description>
 	</email_text>
 </email_texts>

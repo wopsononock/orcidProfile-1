@@ -23,12 +23,7 @@
 
 {$authorOrcidUrl}
 
-إذا كانت لديك أي استفسارات، رجاءً، لا تتردد في مراسلتي.
-
-{$editorialContactSignature}
-
-
-</body>
+إذا كانت لديك أي استفسارات، رجاءً، لا تتردد في مراسلتي.</body>
 		<description>قالب الرسالة هذا يستعمل لجمع الرموز التعريفية في ORCID من المؤلفين المشاركين.</description>
 	</email_text>
 </email_texts>

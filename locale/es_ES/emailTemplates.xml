@@ -20,9 +20,7 @@ Para confirmar su autoría, añada su identificador ORCID a este envío mediante
 
 {$authorOrcidUrl}
 
-Si tiene cualquier pregunta no dude en contactarme.
-
-{$editorialContactSignature}</body>
+Si tiene cualquier pregunta no dude en contactarme.</body>
 		<description>Esta plantilla de correo se utiliza para recopilar los identificadores ORCID de los coautores/as.</description>
 	</email_text>
 </email_texts>

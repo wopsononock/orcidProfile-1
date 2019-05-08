@@ -23,12 +23,7 @@ Para confirmar a sua autoria, por favor adicione o seu identificador ORCID à su
 
 {$authorOrcidUrl}
 
-Se tiver alguma dúvida, por favor contacte-me.
-
-{$editorialContactSignature}
-
-
-</body>
+Se tiver alguma dúvida, por favor contacte-me.</body>
 		<description>Este e-mail é usado para recolher os identificadores ORCID dos co-autores.</description>
 	</email_text>
 </email_texts>

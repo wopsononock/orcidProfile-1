@@ -23,12 +23,7 @@ Da potrdite avtorstvo, vas prosimo, da dodate vaš ORCID iD v prispevek s klikom
 
 {$authorOrcidUrl}
 
-Če imate kakršnakoli vprašanje, me prosim kontaktirajte.
-
-{$editorialContactSignature}
-
-
-</body>
+Če imate kakršnakoli vprašanje, me prosim kontaktirajte.</body>
 		<description>Email se uporablja za zbiranje ORCID iD-jev soavtorjev.</description>
 	</email_text>
 </email_texts>

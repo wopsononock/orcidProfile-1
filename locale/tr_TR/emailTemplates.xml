@@ -23,12 +23,7 @@ Yazarlığınızı onaylamak için lütfen aşağıdaki bağlantıyı ziyaret ed
 
 {$authorOrcidUrl}
 
-Herhangi bir sorunuz olması halinde, lütfen bize yazınız.
-
-{$editorialContactSignature}
-
-
-</body>
+Herhangi bir sorunuz olması halinde, lütfen bize yazınız.</body>
 		<description>Bu e-posta şablonu ORCID kimliklerini ortak yazarlardan istemek için kullanılır.</description>
 	</email_text>
 </email_texts>

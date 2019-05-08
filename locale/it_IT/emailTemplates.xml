@@ -23,12 +23,7 @@ Per confermare la sua responsabilità come autore, le chiediamo di aggiungere il
 
 {$authorOrcidUrl}
 
-Se delle domandi, mi contatti pure.
-
-{$editorialContactSignature}
-
-
-</body>
+Se delle domandi, mi contatti pure.</body>
         <description>Questo template si usa per raccogliere l'ORCID dai coautori</description>
     </email_text>
 </email_texts>

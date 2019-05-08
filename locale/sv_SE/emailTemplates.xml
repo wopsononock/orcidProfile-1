@@ -23,12 +23,7 @@ För att bekräfta ditt författarskap, lägg till ditt ORCID-iD genom att följ
 
 {$authorOrcidUrl}
 
-Kontakta gärna mig om du har några frågor.
-
-{$editorialContactSignature}
-
-
-</body>
+Kontakta gärna mig om du har några frågor.</body>
 		<description>Den här e-postmallen används för att samla in ORCID-iD:n från medförfattare.</description>
 	</email_text>
 </email_texts>
