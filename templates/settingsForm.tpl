@@ -45,7 +45,7 @@
 				{/if}
 			{/fbvFormSection}
 		{/fbvFormArea}
-		{fbvFormSection for="sendMailToAuthorOnPublication" title="plugins.generic.orcidProfile.manager.settings.mailSectionTitle" list="true"}
+		{fbvFormSection for="sendMailToAuthorsOnPublication" title="plugins.generic.orcidProfile.manager.settings.mailSectionTitle" list="true"}
 			{fbvElement type="checkbox" name="sendMailToAuthorsOnPublication" label="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication" id="sendMailToAuthorsOnPublication" checked=$sendMailToAuthorsOnPublication}
 		{/fbvFormSection}
 		{fbvFormSection for="logLevel" title="plugins.generic.orcidProfile.manager.settings.logSectionTitle"}
