@@ -1,0 +1,72 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2019-11-19T11:05:16+00:00\n"
+"PO-Revision-Date: 2019-11-19T11:05:16+00:00\n"
+"Language: \n"
+
+msgid "plugins.generic.orcidProfile.displayName"
+msgstr "ORCID profil-plug-in"
+
+msgid "plugins.generic.orcidProfile.description"
+msgstr "Tillader import af brugerprofil-informationer fra ORCID."
+
+msgid "plugins.generic.orcidProfile.instructions"
+msgstr "Du kan udfylde denne formular på forhånd med information fra en ORCID-profil. Indsæt e-mailadressen eller ORCID-iD tilknyttet ORCID-profilen og klik 'Indsend'."
+
+msgid "plugins.generic.orcidProfile.noData"
+msgstr "Kunne ikke finde data fra ORCID."
+
+msgid "plugins.generic.orcidProfile.emailOrOrcid"
+msgstr "E-mailadresse eller ORCID-iD:"
+
+msgid "plugins.generic.orcidProfile.manager.orcidProfileSettings"
+msgstr "ORCID profilindstillinger"
+
+msgid "plugins.generic.orcidProfile.manager.settings.description"
+msgstr "Konfigurér ORCID API'en til brug for indhentning af profilinformationer til brugerprofil."
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"
+msgstr "ORCID API"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public"
+msgstr "Offentlig"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox"
+msgstr "Offentlig sandkasse"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member"
+msgstr "Medlem"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox"
+msgstr "Medlems-sandkasse"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidClientId"
+msgstr "Klient-ID"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidClientSecret"
+msgstr "Klienthemmelighed (Client Secret)"
+
+msgid "plugins.generic.orcidProfile.author.submission"
+msgstr "Indsendelses-ORCID"
+
+msgid "plugins.generic.orcidProfile.author.submission.success"
+msgstr "Din indsendelse blev forbundet med din ORCID-iD"
+
+msgid "plugins.generic.orcidProfile.author.submission.failure"
+msgstr "Din indsendelse kunne ikke forbindes med din ORCID iD. Kontakt tidsskriftschefen med oplysning om dit navn, ORCID og indsendelsesdetaljer."
+
+msgid "plugins.generic.orcidProfile.authFailure"
+msgstr "OJS var ikke i stand til at kommunikere med ORCID-tjenestem. Kontakt tidsskriftschefen med oplysning om dit navn, ORCID og indsendelsesdetaljer."
+
+msgid "plugins.generic.orcidProfile.fieldset"
+msgstr "ORCID"
+
+msgid "plugins.generic.orcidProfile.connect"
+msgstr "Opret eller tilslut din ORCID iD"

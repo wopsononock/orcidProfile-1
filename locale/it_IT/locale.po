@@ -1,0 +1,72 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2019-11-19T11:05:17+00:00\n"
+"PO-Revision-Date: 2019-11-19T11:05:17+00:00\n"
+"Language: \n"
+
+msgid "plugins.generic.orcidProfile.displayName"
+msgstr "Plugin per il profilo ORCID"
+
+msgid "plugins.generic.orcidProfile.description"
+msgstr "Consente di importare informazioni del profilo dell'utente da ORCID."
+
+msgid "plugins.generic.orcidProfile.instructions"
+msgstr "È possibile pre-compilare questo form con le informazioni del proprio profilo ORCID. Inserici l'indirizzo email o l'ORCID iD associato al profilo ORCID e clicca su \"Invia\"."
+
+msgid "plugins.generic.orcidProfile.noData"
+msgstr "Non sono stati trovati dati su ORCID."
+
+msgid "plugins.generic.orcidProfile.emailOrOrcid"
+msgstr "Indirizzo email o ORCID iD:"
+
+msgid "plugins.generic.orcidProfile.manager.orcidProfileSettings"
+msgstr "Impostazioni del profilo ORCID"
+
+msgid "plugins.generic.orcidProfile.manager.settings.description"
+msgstr "Configura la API ORCID per utilizzarla per l'inserimento di informazioni del profilo ORCID nel profilo utente."
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"
+msgstr "ORCID API"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public"
+msgstr "Public"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox"
+msgstr "Public Sandbox"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member"
+msgstr "Membro"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox"
+msgstr "Member Sandbox"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidClientId"
+msgstr "Client ID"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidClientSecret"
+msgstr "Client Secret"
+
+msgid "plugins.generic.orcidProfile.author.submission"
+msgstr "Submission ORCID"
+
+msgid "plugins.generic.orcidProfile.author.submission.success"
+msgstr "La tua proposta è stata associata al tuo ORCID iD."
+
+msgid "plugins.generic.orcidProfile.author.submission.failure"
+msgstr "Non è stato possibile associare la tua proposta al tuo ORCID iD. Contatta il Direttore della rivista e segnala il tuo nome, ORCID iD e i dettagli della tua proposta."
+
+msgid "plugins.generic.orcidProfile.authFailure"
+msgstr "OJS non è riuscita a comunicare con il servizio ORCID. Contatta il Direttore della rivista e segnala il tuo nome, ORCID iD e i dettagli della tua proposta."
+
+msgid "plugins.generic.orcidProfile.fieldset"
+msgstr "ORCID"
+
+msgid "plugins.generic.orcidProfile.connect"
+msgstr "Crea o connettti il tuo ID ORCID"
