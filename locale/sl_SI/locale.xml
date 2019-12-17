@@ -35,7 +35,6 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured">ORCID API je bil nastavljen globalno na strežniku. Nastavljene so bile naslednje nastavitve.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidScope">Področje dostopnosti profila</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">Email nastavitve</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Pošlji email z zahtevo za ORCID avtorizacijo avtorjev članka ob izdaji nove številke.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">ORCID dnevnik zahtevkov</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.help">Določite količino zapisov v dnevnik vtičnika</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Napake</message>

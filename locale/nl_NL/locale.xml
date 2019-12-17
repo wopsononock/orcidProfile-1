@@ -31,7 +31,6 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client sleutel</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidScope">Bereik van de toegang tot uw profiel</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">E-mail instellingen</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Verstuur een e-mail aan de auteurs om ORCID-authorisatie aan te vragen bij de publicatie van een nieuw nummer.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">Logboek van ORCID aanvragen</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.help">Selecteer welke gegevens worden gelogd.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Fouten</message>

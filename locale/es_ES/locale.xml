@@ -39,7 +39,6 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured">La API de ORCID fue configurada globalmente. Las siguientes credenciales han sido almacenadas.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidScope">Alcance de acceso del perfil</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">Opciones de e-mail</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Enviar e-mail para solicitar a ORCID autorización por parte de los autores de artículos al publicarse un nuevo número</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">Registro de solicitudes de ORCID</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.help">Seleccione el nivel de registro que debe generar el plugin</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Errores</message>

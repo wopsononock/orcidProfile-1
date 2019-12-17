@@ -37,7 +37,7 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.hidden">piilotettu</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.description.globallyconfigured">ORCID-rajapinta on määritetty ylläpitäjän toimesta alla olevien tietojen mukaisesti.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">Sähköpostin asetukset</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Lähetä kirjoittajille sähköposti, jossa pyydetään ORCID-tunnisteiden liittämistä julkaistuihin artikkeleihin, kun uusi numero on julkaistu.</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnAccept">Lähetä kirjoittajille sähköposti, jossa pyydetään ORCID-tunnisteiden liittämistä julkaistuihin artikkeleihin, kun artikkeli hyväksytään julkaistavaksi.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">ORCID-pyyntöjen loki</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.help">Valitse millä tarkkuudella lisäosan tekemät pyynnöt tallennetaan.</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Virheet</message>
