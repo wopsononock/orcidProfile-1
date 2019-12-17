@@ -17,12 +17,13 @@
     <subject>Käsikirjoituksen ORCID-tunnisteet</subject>
     <body><![CDATA[Arvoisa {$authorName},<br/>
 <br/>
-Teidät mainitaan yhtenä kirjoittajana käsikirjoituksessa, joka on lähetetty julkaisuun {$contextName}.<br/>
-Varmistaaksesi tekijyytesi, ole hyvä ja lisää ORCID-tunnisteesi käsikirjoitukseen vierailemalla alla olevassa linkissä.<br/>
+Teidät mainitaan yhtenä kirjoittajana käsikirjoituksessa "{$articleTitle}", joka on lähetetty julkaisuun {$contextName}.<br/>
+<br/>
+Varmistaaksesi tekijyytesi, ole hyvä ja lisää ORCID-tunnisteesi käsikirjoitukseen vierailemalla alla olevassa linkissä ja seuraamalla ohjeita.<br/>
 <br/>
 <a href="{$authorOrcidUrl}"><img id="orcid-id-logo" src="https://orcid.org/sites/default/files/images/orcid_16x16.png" width='16' height='16' alt="ORCID iD icon" style="display: block; margin: 0 .5em 0 0; padding: 0; float: left;"/>Rekisteröi tai yhdistä ORCID</a><br/>
 <br/>
-<br>
+<br/>
 <a href="{$orcidAboutUrl}">Lisätietoja ORCID-tunnisteista julkaisussa {$contextName}</a><br/>
 <br/>
 Mikäli teillä on jotain kysymyksiä, olkaa yhteydessä.<br/>
@@ -34,24 +35,19 @@ Mikäli teillä on jotain kysymyksiä, olkaa yhteydessä.<br/>
   <email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
     <subject>Requesting ORCID record access</subject>
     <body><![CDATA[Dear {$authorName},<br>
-<br>
-Teidät mainitaan yhtenä kirjoittajana käsikirjoituksessa "{$articleTitle}", joka on lähetetty julkaisuun {$contextName}.
-<br>
-Varmistaaksesi tekijyytesi, ole hyvä ja lisää ORCID-tunnisteesi käsikirjoitukseen vierailemalla alla olevassa linkissä.  <br/>
-
-Pyydämme teitä liittämään oman ORCID-tunnuksen käsikirjoitukseen. 
-
-
-Please allow us to add your ORCID id to this submission and also to add the submission to your ORCID profile on publication.<br>
-Visit the link to the official ORCID website, login with your profile and authorize the access by following the instructions.<br>
-<a href="{$authorOrcidUrl}"><img id="orcid-id-logo" src="https://orcid.org/sites/default/files/images/orcid_16x16.png" width='16' height='16' alt="ORCID iD icon" style="display: block; margin: 0 .5em 0 0; padding: 0; float: left;"/>Register or Connect your ORCID iD</a><br/>
-<br>
-<br>
-<a href="{$orcidAboutUrl}">More about ORCID at {$contextName}</a><br/>
-<br>
-If you have any questions, please contact me.<br>
-<br>
-{$principalContactSignature}<br>
+<br/>
+Teidät mainitaan yhtenä kirjoittajana käsikirjoituksessa "{$articleTitle}", joka on lähetetty julkaisuun {$contextName}.<br/>
+<br/>
+Varmistaaksesi tekijyytesi, ole hyvä ja lisää ORCID-tunnisteesi käsikirjoitukseen vierailemalla alla olevassa linkissä ja seuraamalla ohjeita. Artikkelin julkaisun jälkeen sitä koskevat tiedot voidaan liittää ORCID-tiliisi, jos olet antanut siihen luvan.<br/>
+<br/>
+<a href="{$authorOrcidUrl}"><img id="orcid-id-logo" src="https://orcid.org/sites/default/files/images/orcid_16x16.png" width='16' height='16' alt="ORCID iD icon" style="display: block; margin: 0 .5em 0 0; padding: 0; float: left;"/>Rekisteröi tai yhdistä ORCID</a><br/>
+<br/>
+<br/>
+<a href="{$orcidAboutUrl}">Lisätietoja ORCID-tunnisteista julkaisussa {$contextName}</a><br/>
+<br/>
+Mikäli teillä on jotain kysymyksiä, olkaa yhteydessä.<br/>
+<br/>
+{$principalContactSignature}<br/>
 ]]></body>
     <description>This email template is used to request ORCID record access from authors.</description>
   </email_text>
