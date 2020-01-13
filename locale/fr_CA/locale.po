@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T11:05:16+00:00\n"
-"PO-Revision-Date: 2020-01-07 10:25+0000\n"
+"PO-Revision-Date: 2020-01-15 10:35+0000\n"
 "Last-Translator: Marie-Hélène Vézina [UdeMontréal] <marie-"
 "helene.vezina@umontreal.ca>\n"
 "Language-Team: French (Canada) <http://translate.pkp.sfu.ca/projects/plugins/"
@@ -37,7 +37,7 @@ msgid "plugins.generic.orcidProfile.manager.settings.description"
 msgstr "Configurez l'API ORCID à utiliser pour extraire les profils ORCID dans le profil utilisateur."
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"
-msgstr "ORCID API"
+msgstr "API ORCID"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public"
 msgstr "Public"
@@ -52,10 +52,10 @@ msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberS
 msgstr "Bac à sable réservé aux membres"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidClientId"
-msgstr "Client ID"
+msgstr "ID du client"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidClientSecret"
-msgstr "Secret du Client"
+msgstr "Clé secrète du client"
 
 msgid "plugins.generic.orcidProfile.author.submission"
 msgstr "Soumission ORCID"
@@ -89,3 +89,26 @@ msgstr "caché-e"
 
 msgid "plugins.generic.orcidProfile.manager.settings.title"
 msgstr "Paramètres de l'API ORCID"
+
+msgid "plugins.generic.orcidProfile.author.accessDenied"
+msgstr "L'accès à ORCID a été refusé à"
+
+msgid "plugins.generic.orcidProfile.manager.settings.logLevel.help"
+msgstr "Sélectionner le niveau de journalisation enregistré par le plugiciel"
+
+msgid "plugins.generic.orcidProfile.manager.settings.logSectionTitle"
+msgstr "Journal des requêtes ORCID"
+
+#, fuzzy
+msgid "plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication"
+msgstr ""
+"Envoyer un courriel pour demander l'autorisation ORCID aux auteurs-es de "
+"l'article lors de la publication d'un nouveau numéro"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidScope"
+msgstr "Portée du profil d'accès"
+
+msgid "plugins.generic.orcidProfile.manager.settings.description.globallyconfigured"
+msgstr ""
+"L'API ORCID a été configuré globalement par l'hôte. Les informations "
+"d'identification suivantes ont été enregistrées."
