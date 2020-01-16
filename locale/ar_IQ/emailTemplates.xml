@@ -15,7 +15,7 @@
 <email_texts locale="ar_IQ">
 	<email_text key="ORCID_COLLECT_AUTHOR_ID">
 		<subject>تقديم ORCID</subject>
-		<body>عزيزنا {$authorName}،<br/>
+		<body><![CDATA[>عزيزنا {$authorName}،<br/>
 <br/>
 لقد تم إدراجك بمثابة مؤلف مشارك في عمل مقدم إلى {$contextName}.<br/>
 لتأكيد مصادقتك، لطفاً، أضف رمزك التعريفي في ORCID إلى طلب التقديم هذا عبر زيارة الرابط أدناه.<br/>
