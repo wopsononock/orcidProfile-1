@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE email_texts SYSTEM "../../../../../lib/pkp/dtd/emailTemplateData.dtd">
+
+<!--
+  * @file plugins/generic/orcidProfile/locale/en_US/emailTemplates.xml
+  *
+  * Copyright (c) 2015-2019 University of Pittsburgh
+  * Copyright (c) 2013-2019 Simon Fraser University
+  * Copyright (c) 2003-2019 John Willinsky
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * Localized email templates XML file.
+  -->
+
+<email_texts locale="bg_BG">
+	<email_text key="ORCID_COLLECT_AUTHOR_ID">
+                <subject>Предоставяне на ORCID</subject>
+                <body><![CDATA[Здравейте, {$authorName},<br/>
+<br/>
+Вие сте посочени като автор в ръкопис, предложен за публикуване в {$contextName}.<br/>
+За да потвърдите своето авторство, моля добавете своя ORCID идентификатор чрез отваряне на хипервързката по-долу.<br/>
+<br/>
+<a href="{$authorOrcidUrl}"><img id="orcid-id-logo" src="https://orcid.org/sites/default/files/images/orcid_16x16.png" width='16' height='16' alt="ORCID iD icon" style="display: block; margin: 0 .5em 0 0; padding: 0; float: left;"/>Регистриране или свързване на ORCID идентификатор</a><br/>
+<br/>
+<br>
+<a href="{$orcidAboutUrl}">Още информация за ORCID - в {$contextName}</a><br/>
+<br/>
+Ако имате някакви въпроси, моля, слържете се с мен.<br/>
+<br/>
+{$principalContactSignature}<br/>
+]]></body>
+                <description>Този шаблон за имейл се използва за събиране на ORCID идентификатори от авторите.</description>
+	</email_text>
+	<email_text key="ORCID_REQUEST_AUTHOR_AUTHORIZATION">
+                <subject>Изискване достъп до ORCID запис</subject>
+                <body><![CDATA[Здравейте, {$authorName},<br>
+<br>
+Вие сте посочени като автор в ръкопис, предложен за публикуване "{$articleTitle}" в {$contextName}.
+<br>
+<br>
+Моля, разрешете да добавим вашият ORCID идентификатор към това предложение и да добавим публикацията към Вашия ORCID профил.<br>
+Отворете хипервръзката към официалният сайт за ORCID, влезте в своя профил и удостоверете достъпа, следвайки инструкциите.<br>
+<a href="{$authorOrcidUrl}"><img id="orcid-id-logo" src="https://orcid.org/sites/default/files/images/orcid_16x16.png" width='16' height='16' alt="ORCID iD icon" style="display: block; margin: 0 .5em 0 0; padding: 0; float: left;"/>Регистриране или свързване на ORCID идентификатор</a><br/>
+<br>
+<br>
+<a href="{$orcidAboutUrl}">Още информация за ORCID - в {$contextName}</a><br/>
+<br>
+Ако имате някакви въпроси, моля, слържете се с мен.<br>
+<br>
+{$principalContactSignature}<br>
+]]></body>
+                <description>Този шалон за имейл се използва за искане от авторите на достъп до ORCID записи.</description>
+	</email_text>
+</email_texts>
