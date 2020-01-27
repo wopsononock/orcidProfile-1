@@ -81,9 +81,9 @@ class OrcidProfileSettingsForm extends Form {
 	}
 
 	/**
-	 * Save settings.
+	 * @copydoc Form::execute()
 	 */
-	function execute() {
+	function execute(...$functionArgs) {
 		$plugin =& $this->plugin;
 		$contextId = $this->contextId;
 		foreach (self::CONFIG_VARS as $configVar => $type) {
@@ -94,6 +94,7 @@ class OrcidProfileSettingsForm extends Form {
 				$plugin->updateSetting($contextId, $configVar, $this->getData($configVar), $type);
 			}
 		}
+		parent::execute(...$functionArgs);
 	}
 }
 
