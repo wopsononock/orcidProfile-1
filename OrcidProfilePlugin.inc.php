@@ -69,10 +69,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 			// Send submission meta data upload to ORCID profiles on publication of an issue
 			HookRegistry::register('IssueGridHandler::publishIssue', array($this, 'handlePublishIssue'));
 			HookRegistry::register('issueentrypublicationmetadataform::execute', array($this, 'handleScheduleForPublication'));
-			// Send emails to authors without authorised ORCID access on promoting a submission to copy editing
-			$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
-			if ($this->getSetting($contextId, 'sendMailToAuthorsOnPublication')) {
-				HookRegistry::register('EditorAction::recordDecision', array($this, 'handleEditorAction'));
+
+			// Send emails to authors without authorised ORCID access on promoting a submission to copy editing. Not included in OPS.
+			$application = Application::get();
+			if ($application->getName() != 'pps'){
+				$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
+				if ($this->getSetting($contextId, 'sendMailToAuthorsOnPublication')) {
+					HookRegistry::register('EditorAction::recordDecision', array($this, 'handleEditorAction'));
+				}
 			}
 		}
 		return $success;
@@ -205,6 +209,17 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$script = 'var orcidIconSvg = $('. json_encode($this->getIcon()) .');';
 				$article = $templateMgr->getTemplateVars('article');
 				$authors = $article->getAuthors();
+				foreach ($authors as $author) {
+					if(!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
+						$script .= '$("a[href=\"'.$author->getOrcid().'\"]").prepend(orcidIconSvg);';
+					}
+				}
+				$templateMgr->addJavaScript('orcidIconDisplay', $script, ['inline' => true]);
+				break;
+			case 'frontend/pages/preprint.tpl':
+				$script = 'var orcidIconSvg = $('. json_encode($this->getIcon()) .');';
+				$preprint = $templateMgr->getTemplateVars('preprint');
+				$authors = $preprint->getAuthors();
 				foreach ($authors as $author) {
 					if(!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
 						$script .= '$("a[href=\"'.$author->getOrcid().'\"]").prepend(orcidIconSvg);';
@@ -405,7 +420,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleSubmissionSubmitStep3FormExecute($hookName, $params) {
 		$form = $params[0];
 		// Have to use global Request access because request is not passed to hook
-		$authors = $form->submission->getAuthors();
+		$publication = DAORegistry::getDAO('PublicationDAO')->getById($form->submission->getData('currentPublicationId'));
+		$authors = $publication->getData('authors');
+
 		$request = Application::get()->getRequest();
 		$user = $request->getUser();
 		//error_log("OrcidProfilePlugin: authors[0] = " . var_export($authors[0], true));
@@ -625,8 +642,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$mail = $this->getMailTemplate($mailTemplate, $context);
 		$emailToken = md5(microtime().$author->getEmail());
 		$author->setData('orcidEmailToken', $emailToken);
-		$articleDao = DAORegistry::getDAO('ArticleDAO');
-		$article = $articleDao->getById($author->getSubmissionId());
+		$publication = DAORegistry::getDAO('PublicationDAO')->getById($author->getData('publicationId'));
 		$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'articleId' => $author->getSubmissionId()));
 		$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
 		// Set From to primary journal contact
@@ -638,7 +654,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			'orcidAboutUrl' => $aboutUrl,
 			'authorOrcidUrl' => $oauthUrl,
 			'authorName' => $author->getFullName(),
-			'articleTitle' => $article->getLocalizedTitle(),
+			'articleTitle' => $publication->getLocalizedTitle(),
 		));
 		if ($updateAuthor) {
 			$authorDao = DAORegistry::getDAO('AuthorDAO');
