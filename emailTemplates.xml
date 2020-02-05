@@ -11,6 +11,6 @@
   * Email templates XML file.
   -->
 <emails>
-	<email key="ORCID_COLLECT_AUTHOR_ID" can_edit="1" can_disable="0"/>
-	<email key="ORCID_REQUEST_AUTHOR_AUTHORIZATION" can_edit="1" can_disable="0"/>
+	<email key="ORCID_COLLECT_AUTHOR_ID" can_edit="1" can_disable="0" subject="emails.orcidCollectAuthorId.subject" description="emails.orcidCollectAuthorId.description" body="emails.orcidCollectAuthorId.body"/>
+	<email key="ORCID_REQUEST_AUTHOR_AUTHORIZATION" can_edit="1" can_disable="0" subject="emails.orcidRequestAuthorAuthorization.subject" description="emails.orcidRequestAuthorAuthorization.description" body="emails.orcidRequestAuthorAuthorization.body"/>
 </emails>
