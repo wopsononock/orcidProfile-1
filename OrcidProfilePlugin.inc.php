@@ -72,7 +72,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Send emails to authors without authorised ORCID access on promoting a submission to copy editing. Not included in OPS.
 			$application = Application::get();
-			if ($application->getName() != 'pps'){
+			if ($application->getName() != 'ops'){
 				$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
 				if ($this->getSetting($contextId, 'sendMailToAuthorsOnPublication')) {
 					HookRegistry::register('EditorAction::recordDecision', array($this, 'handleEditorAction'));
