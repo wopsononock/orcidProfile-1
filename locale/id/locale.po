@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2020-02-08 04:14+0000\n"
+"PO-Revision-Date: 2020-02-09 05:35+0000\n"
 "Last-Translator: Ramli Baharuddin <ramli.baharuddin@relawanjurnal.id>\n"
 "Language-Team: Indonesian <http://translate.pkp.sfu.ca/projects/plugins/"
 "orcid-profile-plugin/id/>\n"
@@ -95,3 +95,100 @@ msgstr "Plugin Profil ORCID"
 msgid "plugins.generic.orcidProfile.author.accessTokenStored"
 msgstr ""
 "Akses catatan ORCID diberikan terbatas pada {$orcidAccessScope}, valid hingga"
+
+msgid "plugins.generic.orcidProfile.about.display"
+msgstr ""
+"Untuk disetujui bahwa Anda sudah memiliki iD ORCID dan telah diotentikasi, "
+"kami menampilkan icon iD ORCID <img src=\"https://orcid.org/sites/default/"
+"files/images/orcid_16x16(1).gif\" alt=\"iD icon\" width=\"16\" height=\"16\" "
+"border=\"0\"> di samping nama Anda pada halaman artikel naskah dan pada "
+"profil umum pengguna Anda.<br>\n"
+"\t\tPelajari lebih kanjut di <a href=\"https://orcid.org/blog/2013/02/22/how-"
+"should-orcid-id-be-displayed\">Bagaimana tampilan iD ORCID yang "
+"seharusnya.</a>"
+
+msgid "plugins.generic.orcidProfile.about.display.title"
+msgstr "Di mana iD ORCID ditampilkan?"
+
+msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgstr ""
+"Jurnal ini mengumpulkan iD ORCID Anda sehingga kami bisa {menambahkan tujuan "
+"dan membedakan antara Member API dan Public API].\n"
+"\tBila Anda klik tombol “Beri Otorisasi” pada halaman popup ORCID, kami akan "
+"meminta Anda untuk membagikan iD Anda dengan menggunakan proses otentikasi: "
+"baik dengan <a href=\"https://support.orcid.org/hc/en-us/articles/"
+"360006897454\">mendaftar iD ORCID</a> atau, jika sudah punya, <a href=\""
+"https://support.orcid.org/hc/en-us/categories/360000661673\">login ke akun "
+"ORCID Anda</a>, lalu beri izin kami untuk menngambil iD ORCID Anda. Kami "
+"melakukan ini untuk memastikan bahwa Anda dikenali dengan akurat dan "
+"mengaitkan iD ORCID Anda dengan aman.<br>\n"
+"\tPelajari lebih lanjut <a href=\"https://orcid.org/blog/2017/02/20/whats-so-"
+"special-about-signing\">tentang istimewanya jika sign in.</a>"
+
+msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
+msgstr "Bagaimana dan mengapa kami mengoleksi iD ORCID?"
+
+msgid "plugins.generic.orcidProfile.about.orcidExplanation"
+msgstr ""
+"ORCID adalah organisasi nirlaba independen yang menyediakan pengidentifikasi "
+"tetap - iD ORCID - yang membedakan Anda dari peneliti lain dan mekanisme "
+"untuk menghubungkan hasil dan aktivitas penelitian Anda ke iD Anda. ORCID "
+"terintegrasi dengan banyak sistem yang digunakan oleh penerbit, penyandang "
+"dana, lembaga, dan layanan yang terkait dengan penelitian lainnya. Pelajari "
+"lebih lanjut di <a href=\"https://orcid.org\"> orcid.org </a>."
+
+msgid "plugins.generic.orcidProfile.about.title"
+msgstr "Apa itu ORCID?"
+
+msgid "plugins.generic.orcidProfile.authorise"
+msgstr "Izinkan dan Hubungkan iD ORCID Anda"
+
+msgid "plugins.generic.orcidProfile.connect"
+msgstr "Buat atau hubungkan iD ORCID Anda"
+
+msgid "plugins.generic.orcidProfile.fieldset"
+msgstr "ORCID"
+
+msgid "plugins.generic.orcidProfile.failure.contact"
+msgstr ""
+"Hubungi manajer jurnal menggunakan nama, iD ORCID, dan rincian naskah Anda."
+
+msgid "plugins.generic.orcidProfile.authFailure"
+msgstr "Tautan otorisasi ORCID sudah digunakan atau tidak valid."
+
+msgid "plugins.generic.orcidProfile.verify.denied"
+msgstr "Anda menolak akses ke rekaman ORCID Anda."
+
+msgid "plugins.generic.orcidProfile.verify.duplicateOrcid"
+msgstr "iD ORCID sudah disimpan untuk naskah ini."
+
+msgid "plugins.generic.orcidProfile.verify.failure"
+msgstr "iD ORCID ANda tidak bisa diverifikasi. Tautan tidak valid lagi."
+
+msgid "plugins.generic.orcidProfile.verify.success"
+msgstr ""
+"iD ORCID Anda telah diverifikasi dan berhasil dihubungkan dengan naskah."
+
+msgid "plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.notpublished"
+msgstr "Naskah akan ditambahkan ke dalam rekaman ORCID Anda selama Publikasi."
+
+msgid "plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.failure"
+msgstr "Naskah tidak bisa ditambahkan ke dalam rekaman ORCID Anda."
+
+msgid "plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.success"
+msgstr "Naskah telah dimasukkan ke rekaman ORCID anda."
+
+msgid "plugins.generic.orcidProfile.verify.title"
+msgstr "Otorisasi ORCID"
+
+msgid "plugins.generic.orcidProfile.author.unauthenticated"
+msgstr "iD ORCID tidak diotentikasi! Mintalah otentikasi dari kontributor."
+
+msgid "plugins.generic.orcidProfile.author.orcidEmptyNotice"
+msgstr "Perhatikan di bawah ini untuk meminta id ORCID otentik"
+
+msgid "plugins.generic.orcidProfile.author.deleteORCID"
+msgstr "Hapus iD ORCID dan akses token!"
+
+msgid "plugins.generic.orcidProfile.author.requestAuthorization"
+msgstr "Kirim surel untuk meminta otorisasi ORCID dari kontributor"
