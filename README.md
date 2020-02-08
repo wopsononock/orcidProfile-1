@@ -8,9 +8,9 @@ Plugin for PKP user profiles (for OJS 3.1.2)
 
 Copyright © 2015-2019 University of Pittsburgh
 
-Copyright © 2014-2019 Simon Fraser University
+Copyright © 2014-2020 Simon Fraser University
 
-Copyright © 2003-2019 John Willinsky
+Copyright © 2003-2020 John Willinsky
 
 Licensed under GPL 2 or better.
 
