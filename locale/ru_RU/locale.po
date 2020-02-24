@@ -65,6 +65,9 @@ msgstr "Profile Access Scope"
 msgid "plugins.generic.orcidProfile.manager.settings.mailSectionTitle"
 msgstr "Настройки электронной почты"
 
+msgid "plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication"
+msgstr "Отправлять электронной почтой запрос авторизации ORCID авторам статьи, когда статья будет принята, то есть направлена на литературное редактирование"
+
 msgid "plugins.generic.orcidProfile.manager.settings.logSectionTitle"
 msgstr "Журнал запросов ORCID"
 
