@@ -1,5 +1,5 @@
 {**
- * plugins/generic/orcidProfile/settingsForm.tpl
+ * templates/settingsForm.tpl
  *
  * Copyright (c) 2015-2019 University of Pittsburgh
  * Copyright (c) 2014-2020 Simon Fraser University

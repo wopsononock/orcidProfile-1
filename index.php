@@ -5,7 +5,7 @@
  */
  
 /**
- * @file plugins/generic/orcidProfile/index.php
+ * @file index.php
  *
  * Copyright (c) 2015-2019 University of Pittsburgh
  * Copyright (c) 2014-2020 Simon Fraser University

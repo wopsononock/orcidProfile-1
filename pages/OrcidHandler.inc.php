@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/orcidProfile/OrcidHandler.inc.php
+ * @file pages/OrcidHandler.inc.php
  *
  * Copyright (c) 2015-2019 University of Pittsburgh
  * Copyright (c) 2014-2020 Simon Fraser University

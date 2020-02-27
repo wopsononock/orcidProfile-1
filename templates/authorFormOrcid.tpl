@@ -1,5 +1,5 @@
 {**
- * plugins/generic/orcidProfile/authorFormOrcid.tpl
+ * templates/authorFormOrcid.tpl
  *
  * Copyright (c) 2017-2019 University Library Heidelberg
  *
