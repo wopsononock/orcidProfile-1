@@ -1,18 +1,14 @@
 # ORCID Profile Plugin
 
-**NOTE: Please ensure you're using the correct branch. Use the [master branch](https://github.com/pkp/orcidProfile/tree/master) for OJS 3.0, and the [ojs-dev-2_4 branch](https://github.com/pkp/orcidProfile/tree/ojs-dev-2_4) for OJS 2.4.x.**
+**NOTE: Please ensure you're using the correct branch. See the Releases area for packaged downloads. We recommend using the Plugin Gallery to install the plugin. For OJS 2.x, see the [ojs-dev-2_4 branch](https://github.com/pkp/orcidProfile/tree/ojs-dev-2_4).**
 
-Plugin for adding and verifying ORCID iD in PKP user profiles and author metadata (for OJS 3.1.1).
-
-Plugin for PKP user profiles (for OJS 3.1.2)
+Plugin for adding and verifying ORCID iD in PKP user profiles and author metadata.
 
 Copyright © 2015-2019 University of Pittsburgh
-
 Copyright © 2014-2020 Simon Fraser University
-
 Copyright © 2003-2020 John Willinsky
 
-Licensed under GPL 2 or better.
+Licensed under GPLv3. See LICENSE.txt for details.
 
 ## Features:
 ### New in version 1.1.0
@@ -45,4 +41,4 @@ Licensed under GPL 2 or better.
 
 ### Installation
 
-
+Use the Plugin Gallery from within your PKP application to install the plugin.
