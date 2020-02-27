@@ -647,7 +647,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 			'orcidAboutUrl' => $aboutUrl,
 			'authorOrcidUrl' => $oauthUrl,
 			'authorName' => $author->getFullName(),
-			'articleTitle' => $publication->getLocalizedTitle(),
+			'articleTitle' => $publication->getLocalizedTitle(), // Backwards compatibility only
+			'submissionTitle' => $publication->getLocalizedTitle(),
 		));
 		if ($updateAuthor) {
 			$authorDao = DAORegistry::getDAO('AuthorDAO');
