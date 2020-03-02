@@ -14,7 +14,7 @@
 <locale name="pl_PL" full_name="Język Polski">
 	<message key="plugins.generic.orcidProfile.displayName">Wtyczka ORCID</message>
 	<message key="plugins.generic.orcidProfile.description">Pozwala na pobieranie informacji o profilach użytkowników zarejestrowanych w ORCID</message>
-	<message key="plugins.generic.orcidProfile.instructions">Możesz wstępnie wypełnić ten formularz informacjami z profilu ORCID. Wprowadź adres e-mail lub identyfikator ORCID iD powiązany z profilem ORCID, a następnie kliknij przycisk „Prześlij”. /message>
+	<message key="plugins.generic.orcidProfile.instructions">Możesz wstępnie wypełnić ten formularz informacjami z profilu ORCID. Wprowadź adres e-mail lub identyfikator ORCID iD powiązany z profilem ORCID, a następnie kliknij przycisk „Prześlij”.</message>
 	<message key="plugins.generic.orcidProfile.noData">Nie można znaleźć żadnych danych w ORCID powiązanych z tym numerem</message>
 	<message key="plugins.generic.orcidProfile.emailOrOrcid">Adres email lub ORCID ID:</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.title">Ustawienia ORCID API </message>
