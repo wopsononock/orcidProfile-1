@@ -41,4 +41,4 @@ Licensed under GPLv3. See LICENSE.txt for details.
 
 ### Installation
 
-Use the Plugin Gallery from within your PKP application to install the plugin.
+Use the Plugin Gallery from within your PKP application to install the plugin. For further information refer to [PKP|DOCS](https://docs.pkp.sfu.ca/orcid/en/installation-setup).
