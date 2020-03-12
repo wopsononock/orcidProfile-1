@@ -420,7 +420,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleSubmissionSubmitStep3FormExecute($hookName, $params) {
 		$form = $params[0];
 		// Have to use global Request access because request is not passed to hook
-		$publication = DAORegistry::getDAO('PublicationDAO')->getById($form->submission->getData('currentPublicationId'));
+		$publicationDao = DAORegistry::getDAO('PublicationDAO'); /* @var $publicationDao PublicationDAO */
+		$publication = $publicationDao->getById($form->submission->getData('currentPublicationId'));
 		$authors = $publication->getData('authors');
 
 		$request = Application::get()->getRequest();
@@ -436,7 +437,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$authors[0]->setData('orcidRefreshToken', $user->getData('orcidRefreshToken'));
 			$authors[0]->setData('orcidAccessExpiresOn', $user->getData('orcidAccessExpiresOn'));
 			$authors[0]->setData('orcidSandbox', $user->getData('orcidSandbox'));
-			$authorDao = DAORegistry::getDAO('AuthorDAO');
+			$authorDao = DAORegistry::getDAO('AuthorDAO'); /* @var $authorDao AuthorDAO */
 			$authorDao->updateObject($authors[0]);
 			error_log("OrcidProfilePlugin: author = " . var_export($authors[0], true));
 		}
@@ -635,7 +636,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$mail = $this->getMailTemplate($mailTemplate, $context);
 		$emailToken = md5(microtime().$author->getEmail());
 		$author->setData('orcidEmailToken', $emailToken);
-		$publication = DAORegistry::getDAO('PublicationDAO')->getById($author->getData('publicationId'));
+		$publicationDao = DAORegistry::getDAO('PublicationDAO'); /* @var $publicationDao PublicationDAO */
+		$publication = $publicationDao->getById($author->getData('publicationId'));
 		$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'articleId' => $author->getSubmissionId()));
 		$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
 		// Set From to primary journal contact
