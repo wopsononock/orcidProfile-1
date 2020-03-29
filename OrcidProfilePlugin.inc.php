@@ -46,39 +46,88 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$success = parent::register($category, $path, $mainContextId);
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled($mainContextId)) {
-			// Register callback for Smarty filters; add CSS
-			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
-			// Add "Connect ORCID" button to PublicProfileForm
-			HookRegistry::register('User::PublicProfile::AdditionalItems', array($this, 'handleUserPublicProfileDisplay'));
-			// Display additional ORCID access information and checkbox to send e-mail to authors in the AuthorForm
-			HookRegistry::register('authorform::display', array($this, 'handleFormDisplay'));
-			// Send email to author, if the added checkbox was ticked
-			HookRegistry::register('authorform::execute', array($this, 'handleAuthorFormExecute'));
+			$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
+
 			// Insert the OrcidHandler to handle ORCID redirects
 			HookRegistry::register('LoadHandler', array($this, 'setupCallbackHandler'));
 
+			// Register callback for Smarty filters; add CSS
+			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
+
+			// Add "Connect ORCID" button to PublicProfileForm
+			HookRegistry::register('User::PublicProfile::AdditionalItems', array($this, 'handleUserPublicProfileDisplay'));
+
+			// Display additional ORCID access information and checkbox to send e-mail to authors in the AuthorForm
+			HookRegistry::register('authorform::display', array($this, 'handleFormDisplay'));
+
+			// Send email to author, if the added checkbox was ticked
+			HookRegistry::register('authorform::execute', array($this, 'handleAuthorFormExecute'));
+			
 			// Handle ORCID on user registration
 			HookRegistry::register('registrationform::execute', array($this, 'collectUserOrcidId'));
 
 			// Send emails to authors without ORCID id upon submission
 			HookRegistry::register('submissionsubmitstep3form::execute', array($this, 'handleSubmissionSubmitStep3FormExecute'));
-			// Add more ORCiD fields to author DAO
+
 			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'handleAdditionalFieldNames'));
+
 			// Add more ORCiD fields to UserDAO
 			HookRegistry::register('userdao::getAdditionalFieldNames', array($this, 'handleAdditionalFieldNames'));
-			// Send submission meta data upload to ORCID profiles on publication of an issue
-			HookRegistry::register('IssueGridHandler::publishIssue', array($this, 'handlePublishIssue'));
-			HookRegistry::register('issueentrypublicationmetadataform::execute', array($this, 'handleScheduleForPublication'));
 
 			// Send emails to authors without authorised ORCID access on promoting a submission to copy editing. Not included in OPS.
-			$application = Application::get();
-			if ($application->getName() != 'ops'){
-				$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
-				if ($this->getSetting($contextId, 'sendMailToAuthorsOnPublication')) {
-					HookRegistry::register('EditorAction::recordDecision', array($this, 'handleEditorAction'));
-				}
+			if ($this->getSetting($contextId, 'sendMailToAuthorsOnPublication')) {
+				HookRegistry::register('EditorAction::recordDecision', array($this, 'handleEditorAction'));
 			}
+
+			HookRegistry::register('Publication::publish', array($this, 'handlePublicationStatusChange'));
+			
+			// Add more ORCiD fields to author Schema
+			HookRegistry::register('Schema::get::author', function($hookName, $args) {
+				$schema = $args[0];
+
+				$schema->properties->orcidSandbox = (object) [
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidAccessToken = (object) [
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidAccessScope = (object) [
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidRefreshToken = (object) [
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidAccessExpiresOn = (object) [
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidAccessDenied = (object) [
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidEmailToken = (object) [
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidWorkPutCode = (object) [
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+			});
 		}
+
 		return $success;
 	}
 
@@ -113,8 +162,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return mixed          The setting value, either from the database for this context
 	 *                        or from the global configuration file.
 	 */
-	function getSetting($contextId, $name)
-	{
+	function getSetting($contextId, $name) {
 		switch ($name) {
 			case 'orcidProfileAPIPath':
 				$config_value = Config::getVar('orcid','api_url');
@@ -128,6 +176,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			default:
 				return parent::getSetting($contextId, $name);
 		}
+
 		return $config_value ?: parent::getSetting($contextId, $name);
 	}
 
@@ -163,14 +212,17 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$author = $authorForm->getAuthor();
 				if ($author) {
 					$authenticated = !empty($author->getData('orcidAccessToken'));
-					$templateMgr->assign( array(
-						'orcidAccessToken' => $author->getData('orcidAccessToken'),
-						'orcidAccessScope' => $author->getData('orcidAccessScope'),
-						'orcidAccessExpiresOn' => $author->getData('orcidAccessExpiresOn'),
-						'orcidAccessDenied' => $author->getData('orcidAccessDenied'),
-						'orcidAuthenticated' => $authenticated
-					));
+					$templateMgr->assign(
+						array(
+							'orcidAccessToken' => $author->getData('orcidAccessToken'),
+							'orcidAccessScope' => $author->getData('orcidAccessScope'),
+							'orcidAccessExpiresOn' => $author->getData('orcidAccessExpiresOn'),
+							'orcidAccessDenied' => $author->getData('orcidAccessDenied'),
+							'orcidAuthenticated' => $authenticated
+						)
+					);
 				}
+
 				$templateMgr->registerFilter("output", array($this, 'authorFormFilter'));
 				break;
 		}
@@ -205,27 +257,20 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$templateMgr->registerFilter("output", array($this, 'registrationFilter'));
 				break;
 			case 'frontend/pages/article.tpl':
-				//$templateMgr->assign('orcidIcon', $this->getIcon());
-				$script = 'var orcidIconSvg = $('. json_encode($this->getIcon()) .');';
-				$article = $templateMgr->getTemplateVars('article');
-				$authors = $article->getAuthors();
-				foreach ($authors as $author) {
-					if(!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
-						$script .= '$("a[href=\"'.$author->getOrcid().'\"]").prepend(orcidIconSvg);';
-					}
-				}
-				$templateMgr->addJavaScript('orcidIconDisplay', $script, ['inline' => true]);
-				break;
 			case 'frontend/pages/preprint.tpl':
 				$script = 'var orcidIconSvg = $('. json_encode($this->getIcon()) .');';
-				$preprint = $templateMgr->getTemplateVars('preprint');
-				$authors = $preprint->getAuthors();
+
+				$publication = $templateMgr->getTemplateVars('publication');
+
+				$authors = $publication->getData('authors'); /** @var $authors Author[] */
 				foreach ($authors as $author) {
-					if(!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
+					if (!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
 						$script .= '$("a[href=\"'.$author->getOrcid().'\"]").prepend(orcidIconSvg);';
 					}
 				}
+
 				$templateMgr->addJavaScript('orcidIconDisplay', $script, ['inline' => true]);
+
 				break;
 		}
 		return false;
@@ -271,21 +316,23 @@ class OrcidProfilePlugin extends GenericPlugin {
 		assert($context != null);
 		$contextId = $context->getId();
 
-		if ( $this->isMemberApiEnabled($contextId) ) {
+		if ($this->isMemberApiEnabled($contextId)) {
 			$scope = ORCID_API_SCOPE_MEMBER;
-		}
-		else {
+		} else {
 			$scope = ORCID_API_SCOPE_PUBLIC;
 		}
 		// We need to construct a page url, but the request is using the component router.
 		// Use the Dispatcher to construct the url and set the page router.
 		$redirectUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi',
 			$handlerMethod, null, $redirectParams);
-		return $this->getOauthPath() . 'authorize?' . http_build_query(array(
+
+		return $this->getOauthPath() . 'authorize?' . http_build_query(
+			array(
 				'client_id' => $this->getSetting($contextId, 'orcidClientId'),
 				'response_type' => 'code',
 				'scope' => $scope,
-				'redirect_uri' => $redirectUrl));
+				'redirect_uri' => $redirectUrl)
+			);
 	}
 
 	/**
@@ -336,14 +383,16 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$user = $request->getUser();
 		$contextId = ($context == null) ? 0 : $context->getId();
 		$targetOp = 'profile';
-		$templateMgr->assign(array(
-			'targetOp' => $targetOp,
-			'orcidUrl' => $this->getOrcidUrl(),
-			'orcidOAuthUrl' => $this->buildOAuthUrl('orcidAuthorize', array('targetOp' => $targetOp)),
-			'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
-			'orcidIcon' => $this->getIcon(),
-			'orcidAuthenticated' => !empty($user->getData('orcidAccessToken')),
-		));
+		$templateMgr->assign(
+			array(
+				'targetOp' => $targetOp,
+				'orcidUrl' => $this->getOrcidUrl(),
+				'orcidOAuthUrl' => $this->buildOAuthUrl('orcidAuthorize', array('targetOp' => $targetOp)),
+				'orcidClientId' => $this->getSetting($contextId, 'orcidClientId'),
+				'orcidIcon' => $this->getIcon(),
+				'orcidAuthenticated' => !empty($user->getData('orcidAccessToken')),
+			)
+		);
 
 		$output = $templateMgr->fetch($this->getTemplateResource('orcidProfile.tpl'));
 		return true;
@@ -385,9 +434,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$requestAuthorization = $form->getData('requestOrcidAuthorization');
 		$deleteOrcid = $form->getData('deleteOrcid');
 		$author = $form->getAuthor();
+
 		if ($author && $requestAuthorization) {
 			$this->sendAuthorMail($author);
 		}
+
 		if ($author && $deleteOrcid) {
 			$author->setOrcid(null);
 			$this->removeOrcidAccessToken($author, false);
@@ -437,8 +488,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$authors[0]->setData('orcidRefreshToken', $user->getData('orcidRefreshToken'));
 			$authors[0]->setData('orcidAccessExpiresOn', $user->getData('orcidAccessExpiresOn'));
 			$authors[0]->setData('orcidSandbox', $user->getData('orcidSandbox'));
+
 			$authorDao = DAORegistry::getDAO('AuthorDAO'); /* @var $authorDao AuthorDAO */
 			$authorDao->updateObject($authors[0]);
+
 			error_log("OrcidProfilePlugin: author = " . var_export($authors[0], true));
 		}
 		return false;
@@ -460,12 +513,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$fields[] = 'orcidRefreshToken';
 		$fields[] = 'orcidAccessExpiresOn';
 		$fields[] = 'orcidAccessDenied';
-		if ($hookName === 'authordao::getAdditionalFieldNames')  {
-			// holds a one time hash string generated before sending the ORCID authorization e-mail
-			$fields[] = 'orcidEmailToken';
-			// holds the id of the added work entry in the corresponding ORCID profile for updates
-			$fields[] = 'orcidWorkPutCode';
-		}
+
 		return false;
 	}
 
@@ -620,30 +668,38 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param bool $updateAuthor If true update the author fields in the database.
 	 *    Use this only if not called from a function, which does this anyway.
 	 */
-	public function sendAuthorMail($author, $updateAuthor = false)
-	{
+	public function sendAuthorMail($author, $updateAuthor = false) {
 		$request = PKPApplication::get()->getRequest();
 		$context = $request->getContext();
+
 		// This should only ever happen within a context, never site-wide.
 		assert($context != null);
+
 		$contextId = $context->getId();
-		if ( $this->isMemberApiEnabled($contextId) ) {
+
+		if ($this->isMemberApiEnabled($contextId) ) {
 			$mailTemplate = 'ORCID_REQUEST_AUTHOR_AUTHORIZATION';
-		}
-		else {
+		} else {
 			$mailTemplate = 'ORCID_COLLECT_AUTHOR_ID';
 		}
+
 		$mail = $this->getMailTemplate($mailTemplate, $context);
 		$emailToken = md5(microtime().$author->getEmail());
+
 		$author->setData('orcidEmailToken', $emailToken);
-		$publicationDao = DAORegistry::getDAO('PublicationDAO'); /* @var $publicationDao PublicationDAO */
+
+		$publicationDao = DAORegistry::getDAO('PublicationDAO'); /** @var PublicationDAO $publicationDao */
 		$publication = $publicationDao->getById($author->getData('publicationId'));
-		$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'articleId' => $author->getSubmissionId()));
+
+		$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'publicationId' => $publication->getId()));
 		$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
+
 		// Set From to primary journal contact
 		$mail->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
+
 		// Send to author
 		$mail->setRecipients(array(array('name' => $author->getFullName(), 'email' => $author->getEmail())));
+
 		// Send the mail with parameters
 		$mail->sendWithParams(array(
 			'orcidAboutUrl' => $aboutUrl,
@@ -652,6 +708,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			'articleTitle' => $publication->getLocalizedTitle(), // Backwards compatibility only
 			'submissionTitle' => $publication->getLocalizedTitle(),
 		));
+
 		if ($updateAuthor) {
 			$authorDao = DAORegistry::getDAO('AuthorDAO');
 			$authorDao->updateLocaleFields($author);
@@ -668,53 +725,19 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param $args Issue[] Issue object that will be published
 	 *
 	 **/
-	public function handlePublishIssue($hookName, $args) {
-		$issue =& $args[0];
-		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
-		$authorDao = DAORegistry::getDAO('AuthorDAO');
-		$publishedArticles = $publishedArticleDao->getPublishedArticles($issue->getId());
+	public function handlePublicationStatusChange($hookName, $args) {
+		$newPublication =& $args[0]; /** @var $newPublication Publication */
+		$publication =& $args[1]; /** @var $publication Publication */
+		$submission =& $args[2]; /** @var $submission Submission */
+		
 		$request = PKPApplication::get()->getRequest();
-		$journal = $request->getContext();
 
-		foreach ($publishedArticles as $publishedArticle) {
-			$articleId = $publishedArticle->getId();
-			$this->sendSubmissionToOrcid($articleId, $request, $issue);
-		}
-	}
-
-	/**
-	* handleScheduleForPublication is a hook called during the "Schedule for publication" step
-	* from the production stage of a submission. It registers another hook, because at the time of calling this hook,
-	* the issue
-	*
-	* @param $hookName string The name the hook was registered as.
-	* @param $args array Hook arguments, $form, $request, &$returner
-	*
-	* @see IssueEntryPublicationMetadataForm::execute() The function calling the hook.
-	*/
-	public function handleScheduleForPublication($hookName, $args) {
-		$form = $args[0];
-		$submissionId = $form->getSubmission()->getId();
-		$this->submissionIdToBePublished = $submissionId;
-		HookRegistry::register('ArticleSearchIndex::articleChangesFinished',
-			[$this, 'handleScheduleForPublicationFinished']);
-	}
-
-	/**
-	* handleScheduleForPublicationFinished is a hook registered by handleScheduleForPublication and sends the
-	* submission data to orcid. The hook will be called at the end of IssueEntryPublicationMetadataForm::execute()
-	*
-	* @param $hookName string The name the hook was registered as.
-	* @param $args array Hook arguments
-	*
-	* @see IssueEntryPublicationMetadataForm::execute() The function calling the hook.
-	*/
-	public function handleScheduleForPublicationFinished($hookName, $args) {
-		if ( $this->submissionIdToBePublished ) {
-			$request = PKPApplication::get()->getRequest();
-			$this->sendSubmissionToOrcid($this->submissionIdToBePublished, $request);
-			$this->submissionIdToBePublished = null;
-		}
+		switch ($newPublication->getData('status')) {
+			case STATUS_PUBLISHED:
+			case STATUS_SCHEDULED:
+				$this->sendSubmissionToOrcid($newPublication, $request);
+				break;
+		}	
 	}
 
 	/**
@@ -726,36 +749,26 @@ class OrcidProfilePlugin extends GenericPlugin {
 	* @see EditorAction::recordDecision() The function calling the hook.
 	*/
 	public function handleEditorAction($hookName, $args) {
+		$submission = $args[0]; /** @var Submission $submission */
 		$decision = $args[1];
+
 		if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT) {
-			$submission =& $args[0];
-			$authorDao = DAORegistry::getDAO('AuthorDAO');
-			$authors = $authorDao->getBySubmissionId($submission->getId());
-			foreach ($authors as $author) {
-				$orcidAccessExpiresOn = Carbon\Carbon::parse($author->getData('orcidAccessExpiresOn'));
-				if ( $author->getData('orcidAccessToken') == null || $orcidAccessExpiresOn->isPast()) {
-					$this->sendAuthorMail($author, true);
+			$publication = $submission->getCurrentPublication();
+
+			if (isset($publication)) {
+				$authorDao = DAORegistry::getDAO('AuthorDAO'); /** @var AuthorDAO $authorDao */
+
+				$authors = $authorDao->getByPublicationId($submission->getCurrentPublication()->getId());
+
+				foreach ($authors as $author) {
+					$orcidAccessExpiresOn = Carbon\Carbon::parse($author->getData('orcidAccessExpiresOn'));
+					if ($author->getData('orcidAccessToken') == null || $orcidAccessExpiresOn->isPast()) {
+						$this->sendAuthorMail($author, true);
+					}
 				}
 			}
+			
 		}
-	}
-
-	/**
-	 * Check if the submission with the supplied id is actually published.
-	 * @param  int     $submissionId Id of the submission/article to check.
-	 * @return boolean True, if the article is part of a published issue. False otherwise.
-	 */
-	public function isSubmissionPublished($submissionId) {
-		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
-		$article = $publishedArticleDao->getByArticleId($submissionId);
-		if ( $article === null ) {
-			return false;
-		}
-		$issue = DAORegistry::getDAO('IssueDAO')->getById($article->getIssueId());
-		if ( $issue === null || !$issue->getPublished()) {
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -765,80 +778,81 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @see https://github.com/ORCID/ORCID-Source/tree/master/orcid-model/src/main/resources/record_2.1
 	 * for documentation and examples of the ORCID JSON format.
 	 *
-	 * @param $submissionId integer Id of the article for which the data will be sent to ORCID
-	 * @return void
+	 * @param $publication Publication for which the data will be sent to ORCID
+	 * @param $submission Submission for which the data will be sent to ORCID
+	 * @return bool||bool[]
 	 *
 	 **/
-	public function sendSubmissionToOrcid($submissionId, $request, $issue = null) {
-		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
-		$article = $publishedArticleDao->getByArticleId($submissionId);
-		if ( $article === null ) {
-			$this->logError("No PublishedArticle found for id $submissionId");
-			return false;
-		}
-		if ( $issue === null ) {
-			$issue = DAORegistry::getDAO('IssueDAO')->getById($article->getIssueId());
-		}
-		if ( $issue === null || !$issue->getPublished()) {
-			// Issue not yet published, do not send
-			return false;
-		}
-		$journal = $request->getContext();
-		$this->currentContextId = $journal->getId();
-		if (!$this->isMemberApiEnabled($journal->getId())) {
+	public function sendSubmissionToOrcid($publication, $request) {
+		$context = $request->getContext();
+		$contextId = $this->currentContextId = $context->getId();
+		$publicationId = $publication->getId();
+		$submissionId = $publication->getData('submissionId');
+
+		if (!$this->isMemberApiEnabled($contextId)) {
 			// Sending to ORCID only works with the member API
 			return false;
 		}
-		$authorDao = DAORegistry::getDAO('AuthorDAO');
-		$authors = $authorDao->getBySubmissionId($submissionId);
+
+		$issueId = $publication->getData('issueId');
+		if (isset($issueId)) {
+			$issue = Services::get('issue')->get($issueId);
+		}
+
+		$authorDao = DAORegistry::getDAO('AuthorDAO'); /** @var $authorDao AuthorDAO */
+		$authors = $authorDao->getByPublicationId($publicationId);
+
 		// Collect valid ORCID ids and access tokens from submission contributors
 		$authorsWithOrcid = [];
 		foreach ($authors as $author) {
-			if ($author->getOrcid() && $author->getData('orcidAccessToken') ) {
+			if ($author->getOrcid() && $author->getData('orcidAccessToken')) {
 				$orcidAccessExpiresOn = Carbon\Carbon::parse($author->getData('orcidAccessExpiresOn'));
 				if ($orcidAccessExpiresOn->isFuture()) {
 					# Extract only the ORCID from the stored ORCID uri
 					$orcid = basename(parse_url($author->getOrcid(), PHP_URL_PATH));
 					$authorsWithOrcid[$orcid] = $author;
-				}
-				else {
-					$this->logError("Token expired on $orcidAccessExpiresOn for author ". $author->getId() .
-									", deleting orcidAccessToken!");
+				} else {
+					$this->logError("Token expired on $orcidAccessExpiresOn for author ". $author->getId() . ", deleting orcidAccessToken!");
 					$this->removeOrcidAccessToken($author);
 				}
 			}
 		}
-		if ( empty($authorsWithOrcid) ) {
+
+		if (empty($authorsWithOrcid)) {
 			$this->logInfo('No contributor with ORICD id or valid access token for submission ' . $submissionId);
 			return false;
 		}
-		$orcidWork = $this->buildOrcidWork($article, $journal, $authors, $issue, $request);
+
+		$orcidWork = $this->buildOrcidWork($publication, $context, $authors, $issue, $request);
 		$this::logInfo("Request body (without put-code): " . json_encode($orcidWork));
+
 		$requestsSuccess = [];
 		foreach ($authorsWithOrcid as $orcid => $author) {
-			$url = $this->getSetting($journal->getId(), 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/'
-					. ORCID_WORK_URL;
+			$url = $this->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/' . ORCID_WORK_URL;
 			$method = "POST";
 
-			if ( $putCode = $author->getData('orcidWorkPutCode')) {
+			if ($putCode = $author->getData('orcidWorkPutCode')) {
 				// Submission has already been sent to ORCID. Use PUT to update meta data
 				$url .= '/' . $putCode;
 				$method = "PUT";
 				$orcidWork['put-code'] = $putCode;
-			}
-			else {
+			} else {
 				// Remove put-code from body because the work has not yet been sent
 				unset($orcidWork['put-code']);
 			}
+
 			$orcidWorkJson = json_encode($orcidWork);
+
 			$header = [
 				'Content-Type: application/vnd.orcid+json',
 				'Content-Length: ' . strlen($orcidWorkJson),
 				'Accept: application/json',
 				'Authorization: Bearer ' . $author->getData('orcidAccessToken')
 			];
+
 			$this->logInfo("$method $url");
 			$this->logInfo("Header: " . var_export($header, true));
+
 			$ch = curl_init($url);
 			curl_setopt_array($ch, [
 				CURLOPT_CUSTOMREQUEST => $method,
@@ -854,6 +868,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					curl_setopt($ch, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
 				}
 			}
+
 			$responseHeaders = [];
 			// Needed to correctly process response headers.
 			// This function is called by curl for each received line of the header.
@@ -872,22 +887,27 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$name = strtolower(trim($header[0]));
 					if (!array_key_exists($name, $responseHeaders)) {
 						$responseHeaders[$name] = [trim($header[1])];
-					}
-					else {
+					} else {
 						$responseHeaders[$name][] = trim($header[1]);
 					}
+
 					return $len;
 				}
 			);
+
 			$result = curl_exec($ch);
+
 			if (curl_error($ch)) {
 				$this->logError('Unable to post to ORCID API, curl error: ' . curl_error($ch));
 				curl_close($ch);
 				return false;
 			}
+
 			$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			curl_close($ch);
+
 			$this->logInfo("Response status: $httpstatus");
+
 			switch ($httpstatus) {
 				case 200:
 					// Work updated
@@ -934,10 +954,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$requestsSuccess[$orcid] = false;
 			}
 		}
-		if (array_product($requestsSuccess) ) {
+		if (array_product($requestsSuccess)) {
 			return true;
-		}
-		else {
+		} else {
 			return $requestsSuccess;
 		}
 	}
@@ -947,49 +966,60 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @see https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/write_sample/bulk-work-2.1.json
 	 *  Example of valid ORCID JSON for adding works to an ORCID record.
-	 * @param  Article $article  extract data from this Article
-	 * @param  Journal $journal  Journal (context) object the Article is part of
-	 * @param  Author[] $authors Array of Author objects, the contributors of the article
+	 * @param  Submission $submission  the submission we want to extract data from.
+	 * @param  Publication $publication  extract data from this Article
+	 * @param  Journal $context  Context object the Submission is part of
+	 * @param  Author[] $authors Array of Author objects, the contributors of the publication
 	 * @param  Issue $issue      Issue the Article is part of
 	 * @param  Request $request  the current request
 	 * @return array             an associative array with article meta data corresponding to ORCID work JSON structure
 	 */
-	public function buildOrcidWork($article, $journal, $authors, $issue, $request) {
-		$articleLocale = $article->getLocale();
-		$titles = $article->getTitle($articleLocale);
-		$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin');
-		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $article, 'bibtex')));
-		$articleUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'article', 'view', $article->getBestArticleId());
+	public function buildOrcidWork($publication, $context, $authors, $request, $issue = null) {
+		$submission = Services::get('submission')->get($publication->getData('submissionId'));
+
+		$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin'); /** @var CitationStyleLanguagePlugin $citationPlugin */
+		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $submission, 'bibtex', $issue, $publication)));
+
+		$publicationLocale = $publication->getData('locale');
+		$titles = $publication->getData('title', $publicationLocale);
+		$publicationUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'article', 'view', $publication->getBestArticleId());
+
 		$orcidWork = [
 			'title' => [
 				'title' => [
-					'value' => $article->getLocalizedTitle($articleLocale)
+					'value' => $publication->getLocalizedData('title', $publicationLocale)
 				],
 				'subtitle' => [
-					'value' => $article->getSubtitle($articleLocale)
+					'value' => $publication->getLocalizedData('subtitle', $publicationLocale)
 				]
 			],
 			'journal-title' => [
-				'value' => $journal->getName('en_US')
+				'value' => $context->getName('en_US')
 			],
-			'short-description' => trim(strip_tags($article->getAbstract('en_US'))),
+			'short-description' => trim(strip_tags($publication->getLocalizedData('abstract', $publicationLocale))),
 			'type' => 'JOURNAL_ARTICLE',
-			'external-ids' => [ 'external-id' => $this->buildOrcidExternalIds($article, $journal, $issue, $articleUrl)],
-			'publication-date' => $this->buildOrcidPublicationDate($issue),
-			'url' => $articleUrl,
+			'external-ids' => [ 
+				'external-id' => $this->buildOrcidExternalIds($submission, $publication, $context, $issue, $publicationUrl)
+			],
+			'publication-date' => $this->buildOrcidPublicationDate($publication, $issue),
+			'url' => $publicationUrl,
 			'citation' => [
 				'citation-type' => 'BIBTEX',
 				'citation-value' => $bibtexCitation
 			],
-			'language-code' => substr($articleLocale, 0, 2),
-			'contributors' => [ 'contributor' => $this->buildOrcidContributors($authors, $journal->getId()) ]
+			'language-code' => substr($publicationLocale, 0, 2),
+			'contributors' => [ 
+				'contributor' => $this->buildOrcidContributors($authors, $context->getId()) 
+			]
 		];
-		if ($articleLocale !== 'en_US') {
+
+		if ($publicationLocale !== 'en_US') {
 			$orcidWork['title']['translated-title'] = [
-				'value' => $article->getTitle('en_US'),
+				'value' => $publication->getLocalizedData('en_US'),
 				'language-code' => 'en'
 			];
 		}
+
 		return $orcidWork;
 	}
 
@@ -1000,12 +1030,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @return array Associative array with year, month and day or only year
 	 */
-	private function buildOrcidPublicationDate($issue) {
-		$issuePublicationDate = Carbon\Carbon::parse($issue->getDatePublished());
+	private function buildOrcidPublicationDate($publication, $issue = null) {
+		$publicationPublishDate = Carbon\Carbon::parse($publication->getData('datePublished'));
+		
 		return [
-			'year' => [ 'value' => $issuePublicationDate->format("Y")],
-			'month' => [ 'value' => $issuePublicationDate->format("m")],
-			'day' => [ 'value' => $issuePublicationDate->format("d")]
+			'year' => [ 'value' => $publicationPublishDate->format("Y")],
+			'month' => [ 'value' => $publicationPublishDate->format("m")],
+			'day' => [ 'value' => $publicationPublishDate->format("d")]
 		];
 	}
 
@@ -1014,14 +1045,17 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @see  https://pub.orcid.org/v2.0/identifiers Table of valid ORCID identifier types.
 	 *
-	 * @param  Article $article The Article object for which the external identifiers should be build.
-	 * @param  Journal $journal Journal the Article is part of.
+	 * @param  Submission $submission The Article object for which the external identifiers should be build.
+	 * @param  Publication $publication The Article object for which the external identifiers should be build.
+	 * @param  Journal $context Context the Submission is part of.
 	 * @param  Issue   $issue   The Issue object the Article object belongs to.
 	 * @return array            An associative array corresponding to ORCID external-id JSON.
 	 */
-	private function buildOrcidExternalIds($article, $journal, $issue, $articleUrl) {
+	private function buildOrcidExternalIds($submission, $publication, $context, $issue, $articleUrl) {
+		$contextId = $context->getId();
+		
 		$externalIds = array();
-		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true, $article->getContextId());
+		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true, $contextId);
 		// Add doi, urn, etc. for article
 		$articleHasStoredPubId = false;
 		if (is_array($pubIdPlugins)) {
@@ -1029,34 +1063,43 @@ class OrcidProfilePlugin extends GenericPlugin {
 				if (!$plugin->getEnabled()) {
 					continue;
 				}
+
 				$pubIdType = $plugin->getPubIdType();
+
 				# Add article ids
-				$pubId = $article->getStoredPubId($pubIdType);
+				$pubId = $publication->getData($pubIdType);
+
 				if ($pubId)	{
 					$externalIds[] = [
 						'external-id-type' => self::PUBID_TO_ORCID_EXT_ID[$pubIdType],
 						'external-id-value' => $pubId,
-						'external-id-url' => [ 'value' => $plugin->getResolvingURL($article->getContextId(), $pubId) ],
+						'external-id-url' => [
+							'value' => $plugin->getResolvingURL($contextId, $pubId)
+						],
 						'external-id-relationship' => 'SELF'
 					];
+
 					$articleHasStoredPubId = true;
 				}
+
 				# Add issue ids if they exist
 				$pubId = $issue->getStoredPubId($pubIdType);
 				if ($pubId) {
 					$externalIds[] = [
-					'external-id-type' => self::PUBID_TO_ORCID_EXT_ID[$pubIdType],
-					'external-id-value' => $pubId,
-					'external-id-url' => [ 'value' => $plugin->getResolvingURL($article->getContextId(), $pubId) ],
-					'external-id-relationship' => 'PART_OF'
+						'external-id-type' => self::PUBID_TO_ORCID_EXT_ID[$pubIdType],
+						'external-id-value' => $pubId,
+						'external-id-url' => [ 
+							'value' => $plugin->getResolvingURL($contextId, $pubId) 
+						],
+						'external-id-relationship' => 'PART_OF'
 					];
 				}
 			}
-		}
-		else {
+		} else {
 			error_log("OrcidProfilePlugin::buildOrcidExternalIds: No pubId plugins could be loaded");
 		}
-		if ( !$articleHasStoredPubId ) {
+
+		if (!$articleHasStoredPubId) {
 			// No pubidplugins available or article does not have any stored pubid
 			// Use URL as an external-id
 			$externalIds[] = [
@@ -1065,12 +1108,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'external-id-relationship' => 'SELF'
 			];
 		}
+
 		// Add journal online ISSN
 		// TODO What about print ISSN?
-		if ($journal->getData('onlineIssn')) {
+		if ($context->getData('onlineIssn')) {
 			$externalIds[] = [
 				'external-id-type' => 'issn',
-				'external-id-value' => $journal->getData('onlineIssn'),
+				'external-id-value' => $context->getData('onlineIssn'),
 				'external-id-relationship' => 'PART_OF'
 			];
 		}
@@ -1089,6 +1133,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	private function buildOrcidContributors($authors, $contextId) {
 		$contributors = [];
+
 		$first = true;
 		foreach ($authors as $author) {
 			// TODO Check if e-mail address should be added
@@ -1098,29 +1143,36 @@ class OrcidProfilePlugin extends GenericPlugin {
 					'contributor-sequence' => $first ? 'FIRST' : 'ADDITIONAL'
 				]
 			];
+
 			$role = self::USERGROUP_TO_ORCID_ROLE[$author->getUserGroup()->getName('en_US')];
+
 			if ($role) {
 				$contributor['contributor-attributes']['contributor-role'] = $role;
 			}
+
 			if ($author->getOrcid()) {
 				$orcid = basename(parse_url($author->getOrcid(), PHP_URL_PATH));
-				if( $author->getData('orcidSandbox') ) {
+
+				if ($author->getData('orcidSandbox')) {
 					$uri = 'https://sandbox.orcid.org/' . $orcid;
 					$host = 'sandbox.orcid.org';
-				}
-				else {
+				} else {
 					$uri = $author->getOrcid();
 					$host = 'orcid.org';
 				}
+
 				$contributor['contributor-orcid'] = [
 					'uri' => $uri,
 					'path' => $orcid,
 					'host' => $host
 				];
 			}
+
 			$first = false;
+
 			$contributors[] = $contributor;
 		}
+
 		return $contributors;
 	}
 
@@ -1137,7 +1189,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$author->setData('orcidRefreshToken', null);
 		$author->setData('orcidAccessExpiresOn', null);
 		$author->setData('orcidSandbox', null);
-		if ($save) {
+
+		if ($saveAuthor) {
 			$authorDao = DAORegistry::getDAO('AuthorDAO');
 			$authorDao->updateLocaleFields($author);
 		}
@@ -1169,8 +1222,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	public function logInfo($message) {
 		if ($this->getSetting($this->currentContextId, 'logLevel') === 'ERROR') {
 			return;
-		}
-		else {
+		} else {
 			self::writeLog($message, 'INFO');
 		}
 	}
@@ -1201,10 +1253,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	public function isMemberApiEnabled($contextId) {
 		$apiUrl = $this->getSetting($contextId, 'orcidProfileAPIPath');
-		if ( $apiUrl === ORCID_API_URL_MEMBER || $apiUrl === ORCID_API_URL_MEMBER_SANDBOX ) {
+		if ($apiUrl === ORCID_API_URL_MEMBER || $apiUrl === ORCID_API_URL_MEMBER_SANDBOX) {
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
