@@ -22,9 +22,11 @@ class OrcidProfileSettingsForm extends Form {
 	const CONFIG_VARS = array(
 		'orcidProfileAPIPath' => 'string',
 		'orcidClientId' => 'string',
-		'orcidClientSecret' => 'string',		
+		'orcidClientSecret' => 'string',
 		'sendMailToAuthorsOnPublication' => 'bool',
-		'logLevel' => 'string');
+		'logLevel' => 'string',
+		'isSandBox' => 'bool'
+	);
 	/** @var $contextId int */
 	var $contextId;
 
@@ -94,6 +96,10 @@ class OrcidProfileSettingsForm extends Form {
 				$plugin->updateSetting($contextId, $configVar, $this->getData($configVar), $type);
 			}
 		}
+		if (strpos($this->getData("orcidProfileAPIPath"), "sandbox.orcid.org") == true) {
+			$plugin->updateSetting($contextId, "isSandBox", true, "bool");
+		}
+
 	}
 }
 
