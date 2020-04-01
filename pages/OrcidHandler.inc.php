@@ -88,7 +88,7 @@ class OrcidHandler extends Handler {
 			$response = json_decode($result, true);
 			$orcid = $response['orcid'];
 			$accessToken = $response['access_token'];
-			$orcidUri = 'https://orcid.org/' . $orcid;
+			$orcidUri = ($plugin->getSetting($contextId, "isSandBox") == true ? ORCID_URL_SANDBOX : ORCID_URL) . $orcid;
 		}
 
 		switch ($request->getUserVar('targetOp')) {
@@ -151,7 +151,7 @@ class OrcidHandler extends Handler {
 				$this->_setOrcidData($user, $orcidUri, $response);
 				$userDao = DAORegistry::getDAO('UserDAO');
 				$userDao->updateLocaleFields($user);
-				
+
 				// Reload the public profile tab (incl. form)
 				echo '
 					<html><body><script type="text/javascript">
@@ -178,14 +178,14 @@ class OrcidHandler extends Handler {
 
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$templatePath = $plugin->getTemplateResource(self::TEMPLATE);
-		
-		
+
+
 		$publicationId = $request->getUserVar('publicationId');
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$authors = $authorDao->getByPublicationId($publicationId);
 
 		$publication = Services::get('publication')->get($publicationId);
-		
+
 		$authorToVerify = null;
 		// Find the author entry, for which the ORCID verification was requested
 		if ($request->getUserVar('token')) {
@@ -213,7 +213,7 @@ class OrcidHandler extends Handler {
 			$templateMgr->assign('verifySuccess', false);
 			$templateMgr->display($templatePath);
 			return;
-		}	
+		}
 
 		if ($request->getUserVar('error') === 'access_denied') {
 			// User denied access
@@ -278,7 +278,7 @@ class OrcidHandler extends Handler {
 		$plugin->logInfo('Response body: ' . $result);
 		$response = json_decode($result, true);
 		if (isset($response['error']) && $response['error'] === 'invalid_grant') {
-			$plugin->logError("Response status: $httpstatus . Authroization code invalid, maybe already used");			
+			$plugin->logError("Response status: $httpstatus . Authroization code invalid, maybe already used");
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($templatePath);
 			return;
@@ -288,12 +288,12 @@ class OrcidHandler extends Handler {
 			$templateMgr->display($templatePath);
 		}
 		// Set the orcid id using the full https uri
-		$orcidUri = 'https://orcid.org/' . $response['orcid'];
+		$orcidUri = ($plugin->getSetting($contextId, "isSandBox") == true ? ORCID_URL_SANDBOX : ORCID_URL) . $response['orcid'];
 		if (!empty($authorToVerify->getOrcid()) && $orcidUri != $authorToVerify->getOrcid()) {
 			// another ORCID id is stored for the author
 			$templateMgr->assign('duplicateOrcid', true);
 			$templateMgr->display($templatePath);
-			return;	
+			return;
 		}
 		$authorToVerify->setOrcid($orcidUri);
 		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
@@ -304,7 +304,7 @@ class OrcidHandler extends Handler {
 		} else {
 			$templateMgr->assign('orcid', $orcidUri);
 		}
-		
+
 		// remove the email token
 		$authorToVerify->setData('orcidEmailToken', null);
 		$this->_setOrcidData($authorToVerify, $orcidUri, $response);
