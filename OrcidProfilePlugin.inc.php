@@ -711,7 +711,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		if ($updateAuthor) {
 			$authorDao = DAORegistry::getDAO('AuthorDAO');
-			$authorDao->updateLocaleFields($author);
+			$authorDao->updateObject($author);
 		}
 	}
 
@@ -920,7 +920,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$putCode = intval(basename(parse_url($location, PHP_URL_PATH)));
 					$this->logInfo("Work added to profile, putCode: $putCode");
 					$author->setData('orcidWorkPutCode', $putCode);
-					$authorDao->updateLocaleFields($author);
+					$authorDao->updateObject($author);
 					$requestsSuccess[$orcid] = true;
 					break;
 				case 401:
@@ -937,7 +937,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					if ($method === 'PUT') {
 						$this->logError("Work deleted from ORCID record, deleting putCode form author");
 						$author->setData('orcidWorkPutCode', null);
-						$authorDao->updateLocaleFields($author);
+						$authorDao->updateObject($author);
 						$requestsSuccess[$orcid] = false;
 					}
 					else {
@@ -1192,7 +1192,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		if ($saveAuthor) {
 			$authorDao = DAORegistry::getDAO('AuthorDAO');
-			$authorDao->updateLocaleFields($author);
+			$authorDao->updateObject($author);
 		}
 	}
 
