@@ -62,7 +62,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			// Send email to author, if the added checkbox was ticked
 			HookRegistry::register('authorform::execute', array($this, 'handleAuthorFormExecute'));
-			
+
 			// Handle ORCID on user registration
 			HookRegistry::register('registrationform::execute', array($this, 'collectUserOrcidId'));
 
@@ -80,7 +80,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			}
 
 			HookRegistry::register('Publication::publish', array($this, 'handlePublicationStatusChange'));
-			
+
 			// Add more ORCiD fields to author Schema
 			HookRegistry::register('Schema::get::author', function($hookName, $args) {
 				$schema = $args[0];
@@ -482,7 +482,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if($authors[0]->getOrcid() === $user->getOrcid()) {
 			// if the author and user share the same ORCID id
 			// copy the access token from the user
-			error_log("OrcidProfilePlugin: user->orcidAccessToken = " . $user->getData('orcidAccessToken'));
+			//error_log("OrcidProfilePlugin: user->orcidAccessToken = " . $user->getData('orcidAccessToken'));
 			$authors[0]->setData('orcidAccessToken', $user->getData('orcidAccessToken'));
 			$authors[0]->setData('orcidAccessScope', $user->getData('orcidAccessScope'));
 			$authors[0]->setData('orcidRefreshToken', $user->getData('orcidRefreshToken'));
@@ -492,7 +492,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$authorDao = DAORegistry::getDAO('AuthorDAO'); /* @var $authorDao AuthorDAO */
 			$authorDao->updateObject($authors[0]);
 
-			error_log("OrcidProfilePlugin: author = " . var_export($authors[0], true));
+			//error_log("OrcidProfilePlugin: author = " . var_export($authors[0], true));
 		}
 		return false;
 	}
@@ -729,7 +729,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$newPublication =& $args[0]; /** @var $newPublication Publication */
 		$publication =& $args[1]; /** @var $publication Publication */
 		$submission =& $args[2]; /** @var $submission Submission */
-		
+
 		$request = PKPApplication::get()->getRequest();
 
 		switch ($newPublication->getData('status')) {
@@ -737,7 +737,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			case STATUS_SCHEDULED:
 				$this->sendSubmissionToOrcid($newPublication, $request);
 				break;
-		}	
+		}
 	}
 
 	/**
@@ -767,7 +767,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					}
 				}
 			}
-			
+
 		}
 	}
 
@@ -998,7 +998,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			],
 			'short-description' => trim(strip_tags($publication->getLocalizedData('abstract', $publicationLocale))),
 			'type' => 'JOURNAL_ARTICLE',
-			'external-ids' => [ 
+			'external-ids' => [
 				'external-id' => $this->buildOrcidExternalIds($submission, $publication, $context, $issue, $publicationUrl)
 			],
 			'publication-date' => $this->buildOrcidPublicationDate($publication, $issue),
@@ -1008,8 +1008,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'citation-value' => $bibtexCitation
 			],
 			'language-code' => substr($publicationLocale, 0, 2),
-			'contributors' => [ 
-				'contributor' => $this->buildOrcidContributors($authors, $context->getId()) 
+			'contributors' => [
+				'contributor' => $this->buildOrcidContributors($authors, $context->getId())
 			]
 		];
 
@@ -1032,7 +1032,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	private function buildOrcidPublicationDate($publication, $issue = null) {
 		$publicationPublishDate = Carbon\Carbon::parse($publication->getData('datePublished'));
-		
+
 		return [
 			'year' => [ 'value' => $publicationPublishDate->format("Y")],
 			'month' => [ 'value' => $publicationPublishDate->format("m")],
@@ -1053,7 +1053,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	private function buildOrcidExternalIds($submission, $publication, $context, $issue, $articleUrl) {
 		$contextId = $context->getId();
-		
+
 		$externalIds = array();
 		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true, $contextId);
 		// Add doi, urn, etc. for article
@@ -1088,8 +1088,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$externalIds[] = [
 						'external-id-type' => self::PUBID_TO_ORCID_EXT_ID[$pubIdType],
 						'external-id-value' => $pubId,
-						'external-id-url' => [ 
-							'value' => $plugin->getResolvingURL($contextId, $pubId) 
+						'external-id-url' => [
+							'value' => $plugin->getResolvingURL($contextId, $pubId)
 						],
 						'external-id-relationship' => 'PART_OF'
 					];
