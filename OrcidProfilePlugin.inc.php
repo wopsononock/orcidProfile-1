@@ -948,8 +948,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 	public function buildOrcidWork($article, $journal, $authors, $issue, $request) {
 		$articleLocale = $article->getLocale();
 		$titles = $article->getTitle($articleLocale);
+		PluginRegistry::loadCategory('generic');
 		$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin');
-		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $article, 'bibtex')));
+		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $article, 'bibtex', $issue)));
 		$articleUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'article', 'view', $article->getBestArticleId());
 		$orcidWork = [
 			'title' => [
