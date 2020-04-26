@@ -482,7 +482,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if($authors[0]->getOrcid() === $user->getOrcid()) {
 			// if the author and user share the same ORCID id
 			// copy the access token from the user
-			error_log("OrcidProfilePlugin: user->orcidAccessToken = " . $user->getData('orcidAccessToken'));
+			//error_log("OrcidProfilePlugin: user->orcidAccessToken = " . $user->getData('orcidAccessToken'));
 			$authors[0]->setData('orcidAccessToken', $user->getData('orcidAccessToken'));
 			$authors[0]->setData('orcidAccessScope', $user->getData('orcidAccessScope'));
 			$authors[0]->setData('orcidRefreshToken', $user->getData('orcidRefreshToken'));
@@ -492,7 +492,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$authorDao = DAORegistry::getDAO('AuthorDAO'); /* @var $authorDao AuthorDAO */
 			$authorDao->updateObject($authors[0]);
 
-			error_log("OrcidProfilePlugin: author = " . var_export($authors[0], true));
+			//error_log("OrcidProfilePlugin: author = " . var_export($authors[0], true));
 		}
 		return false;
 	}
