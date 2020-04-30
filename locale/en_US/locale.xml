@@ -32,7 +32,7 @@
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret">Client Secret</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.orcidScope">Profile Access Scope</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.mailSectionTitle">E-Mail Settings</message>
-	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Send e-mail to request ORCID authorization from article authors on publication of a new issue</message>
+	<message key="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication">Send e-mail to request ORCID authorization from authors when an article is accepted ie. sent to copy editing</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logSectionTitle">ORCID request log</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.help">Select the amount of logging output written by the plugin</message>
 	<message key="plugins.generic.orcidProfile.manager.settings.logLevel.error">Errors</message>
