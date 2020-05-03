@@ -300,7 +300,7 @@ class OrcidHandler extends Handler {
 			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_PUBLIC_SANDBOX) {
 			// Set a flag to mark that the stored orcid id and access token came form the sandbox api
 			$authorToVerify->setData('orcidSandbox', true);
-			$templateMgr->assign('orcid', 'https://sandbox.orcid.org/' . $response['orcid']);
+			$templateMgr->assign('orcid', ORCID_URL_SANDBOX . $response['orcid']);
 		} else {
 			$templateMgr->assign('orcid', $orcidUri);
 		}

@@ -982,7 +982,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $submission, 'bibtex', $issue, $publication)));
 
 		$publicationLocale = $publication->getData('locale');
-		$titles = $publication->getData('title', $publicationLocale);
+
 		$publicationUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'article', 'view', $publication->getId());
 
 		$orcidWork = [
@@ -991,7 +991,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					'value' => $publication->getLocalizedData('title', $publicationLocale)
 				],
 				'subtitle' => [
-					'value' => $publication->getLocalizedData('subtitle', $publicationLocale)
+					'value' => $publication->getLocalizedData('subtitle', $publicationLocale) ?? ''
 				]
 			],
 			'journal-title' => [
@@ -1155,7 +1155,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				$orcid = basename(parse_url($author->getOrcid(), PHP_URL_PATH));
 
 				if ($author->getData('orcidSandbox')) {
-					$uri = 'https://sandbox.orcid.org/' . $orcid;
+					$uri = ORCID_URL_SANDBOX . $orcid;
 					$host = 'sandbox.orcid.org';
 				} else {
 					$uri = $author->getOrcid();
