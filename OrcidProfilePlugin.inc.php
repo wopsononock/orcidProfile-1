@@ -978,26 +978,28 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$submission = Services::get('submission')->get($publication->getData('submissionId'));
 
 		PluginRegistry::loadCategory('generic');
-		$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin'); /** @var CitationStyleLanguagePlugin $citationPlugin */
+		$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin');
+		/** @var CitationStyleLanguagePlugin $citationPlugin */
 		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $submission, 'bibtex', $issue, $publication)));
 
 		$publicationLocale = $publication->getData('locale');
+		$supportedSubmissionLocales = $context->getSupportedSubmissionLocales();
 
 		$publicationUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'article', 'view', $publication->getId());
 
 		$orcidWork = [
 			'title' => [
 				'title' => [
-					'value' => $publication->getLocalizedData('title', $publicationLocale)
+					'value' => $publication->getLocalizedData('title', $publicationLocale) ?? ''
 				],
 				'subtitle' => [
 					'value' => $publication->getLocalizedData('subtitle', $publicationLocale) ?? ''
 				]
 			],
 			'journal-title' => [
-				'value' => $context->getName('en_US')
+				'value' => $context->getName($publicationLocale)
 			],
-			'short-description' => trim(strip_tags($publication->getLocalizedData('abstract', $publicationLocale))),
+			'short-description' => trim(strip_tags($publication->getLocalizedData('abstract', $publicationLocale))) ?? '',
 			'type' => 'JOURNAL_ARTICLE',
 			'external-ids' => [
 				'external-id' => $this->buildOrcidExternalIds($submission, $publication, $context, $issue, $publicationUrl)
@@ -1013,12 +1015,16 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'contributor' => $this->buildOrcidContributors($authors, $context->getId())
 			]
 		];
-
-		if ($publicationLocale !== 'en_US') {
-			$orcidWork['title']['translated-title'] = [
-				'value' => $publication->getLocalizedData('en_US'),
-				'language-code' => 'en'
-			];
+		foreach ($supportedSubmissionLocales as $defaultLanguage) {
+			if ($defaultLanguage !== $publicationLocale) {
+				$iso2LanguageCode = substr($defaultLanguage, 0, 2);
+				$translatedTitleAvialable = false;
+				$defaultTitle = $publication->getLocalizedData($iso2LanguageCode);
+				if (strlen($defaultTitle) > 0 && $translatedTitleAvialable) {
+					$orcidWork['title']['translated-title'] = ['value' => $defaultTitle, 'language-code' => $iso2LanguageCode];
+					$translatedTitleAvialable = true;
+				}
+			}
 		}
 
 		return $orcidWork;
