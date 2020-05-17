@@ -1020,7 +1020,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			if ($defaultLanguage !== $publicationLocale) {
 				$iso2LanguageCode = substr($defaultLanguage, 0, 2);
 				$defaultTitle = $publication->getLocalizedData($iso2LanguageCode);
-				if (strlen($defaultTitle) > 0 && $translatedTitleAvialable) {
+				if (strlen($defaultTitle) > 0 && !$translatedTitleAvialable) {
 					$orcidWork['title']['translated-title'] = ['value' => $defaultTitle, 'language-code' => $iso2LanguageCode];
 					$translatedTitleAvialable = true;
 				}
