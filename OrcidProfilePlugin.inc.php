@@ -1015,10 +1015,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'contributor' => $this->buildOrcidContributors($authors, $context->getId())
 			]
 		];
+		$translatedTitleAvialable = false;
 		foreach ($supportedSubmissionLocales as $defaultLanguage) {
 			if ($defaultLanguage !== $publicationLocale) {
 				$iso2LanguageCode = substr($defaultLanguage, 0, 2);
-				$translatedTitleAvialable = false;
 				$defaultTitle = $publication->getLocalizedData($iso2LanguageCode);
 				if (strlen($defaultTitle) > 0 && $translatedTitleAvialable) {
 					$orcidWork['title']['translated-title'] = ['value' => $defaultTitle, 'language-code' => $iso2LanguageCode];
