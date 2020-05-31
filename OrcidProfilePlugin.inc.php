@@ -34,7 +34,7 @@ define('ORCID_WORK_URL', 'work');
 
 class OrcidProfilePlugin extends GenericPlugin {
 	const PUBID_TO_ORCID_EXT_ID = ["doi" => "doi", "other::urn" => "urn"];
-	const USER_GROUP_TO_ORCID_ROLE = ["Author" => "AUTHOR", "Translator" => "CHAIR_OR_TRANSLATOR","Journal manager"=>"MANAGER"];
+	const USER_GROUP_TO_ORCID_ROLE = ["Author" => "AUTHOR", "Translator" => "CHAIR_OR_TRANSLATOR","Journal manager"=>"AUTHOR"];
 
 	private $submissionIdToBePublished;
 	private $currentContextId;
@@ -977,7 +977,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			if ($defaultLanguage !== $publicationLocale) {
 				$iso2LanguageCode = substr($defaultLanguage, 0, 2);
 				$defaultTitle = $publication->getTitle($publicationLocale);
-				if (strlen($defaultTitle) > 0 && !$translatedTitleAvialable) {
+				if (strlen($defaultTitle) > 0 && !$translatedTitleAvailable) {
 					$orcidWork['title']['translated-title'] = ['value' => $defaultTitle, 'language-code' => $iso2LanguageCode];
 					$translatedTitleAvailable = true;
 				}
@@ -1082,15 +1082,24 @@ class OrcidProfilePlugin extends GenericPlugin {
 	private function buildOrcidContributors($authors, $contextId) {
 		$contributors = [];
 		$first = true;
+
 		foreach ($authors as $author) {
 			// TODO Check if e-mail address should be added
+			$fullName = $author->getLocalizedGivenName() . " " . $author->getLocalizedFamilyName();
+
+			if (strlen($fullName) == 0) {
+				$this->logError("Contributor Name not defined" . $author->getAllData());
+			}
 			$contributor = [
-				'credit-name' => $author->getFullName(),
+				'credit-name' => $fullName,
 				'contributor-attributes' => [
 					'contributor-sequence' => $first ? 'FIRST' : 'ADDITIONAL'
 				]
 			];
-			$role = self::USER_GROUP_TO_ORCID_ROLE[$author->getUserGroup()->getName('en_US')];
+
+			$userGroup = $author->getUserGroup();
+			$role = self::USER_GROUP_TO_ORCID_ROLE[$userGroup->getName('en_US')];
+
 			if ($role) {
 				$contributor['contributor-attributes']['contributor-role'] = $role;
 			}
