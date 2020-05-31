@@ -1,3 +1,13 @@
+Table of Contents
+=================
+
+   * [ORCID Profile Plugin](#orcid-profile-plugin)
+      * [User Documentation](#user-documentation)
+      * [Features:](#features)
+         * [Extra functionalities for ORCID Member organizations](#extra-functionalities-for-orcid-member-organizations)
+      * [Technical Workflow  description](#technical-workflow--description)
+      * [Installation](#installation)
+
 # ORCID Profile Plugin
 
 **NOTE: Please ensure you're using the correct branch. See the Releases area for packaged downloads. We recommend using the Plugin Gallery to install the plugin. For OJS 2.x, see the [ojs-dev-2_4 branch](https://github.com/pkp/orcidProfile/tree/ojs-dev-2_4).**
@@ -9,9 +19,11 @@ Copyright © 2014-2020 Simon Fraser University
 Copyright © 2003-2020 John Willinsky
 
 Licensed under GPLv3. See LICENSE.txt for details.
+## User Documentation
+* [ORCID Plugin Guide](https://docs.pkp.sfu.ca/orcid/en/)
 
 ## Features:
-### New in version 1.1.0
+
 * Enable site-wide configuration of ORCID API settings using config.inc.php 
 * Support ORCID API Version 2.1  (store only https ORCID Ids)
 * Allow journal managers to send e-mails requesting authors for ORCID authorization on submission or later.
@@ -21,7 +33,7 @@ Licensed under GPLv3. See LICENSE.txt for details.
 * Extra configurable (in plugin settings) ORCID log file in `OJS_FILES_DIR/orcid.log` for API communication. 
  *NOTE: Make sure that the files folder is not publicly accessible*
  
-#### Extra functionalities for ORCID Member organizations
+### Extra functionalities for ORCID Member organizations
   
   * Extra e-mail template `ORCID_REQUEST_AUTHOR_AUTHORIZATION`  for requesting API access tokens.
   * Updated template text, e-mail templates for English and German locales. 
@@ -32,13 +44,16 @@ Licensed under GPLv3. See LICENSE.txt for details.
     * Author grants permission after the publication of the issue  
    
 
-### Technical Workflow  description
+## Technical Workflow  description
   The included authorization link will have the access scope `/activities/update`. 
   An author can authorize access to his/her ORCID record to allow the adding of the submission to the record.  
   See https://members.orcid.org/api/oauth/orcid-scopes for more information.
 
-  
 
-### Installation
+
+## Installation
 
 Use the Plugin Gallery from within your PKP application to install the plugin. For further information refer to [PKP|DOCS](https://docs.pkp.sfu.ca/orcid/en/installation-setup).
+
+
+
