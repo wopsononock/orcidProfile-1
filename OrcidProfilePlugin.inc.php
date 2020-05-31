@@ -993,7 +993,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$publicationLocale = ($publication->getData('locale')) ? $publication->getData('locale') : 'en_US';
 		$supportedSubmissionLocales = $context->getSupportedSubmissionLocales();
 
-		$publicationUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'article', 'view', $publication->getId());
+		$publicationUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'article', 'view', $submission->getId());
 
 		$orcidWork = [
 			'title' => [
@@ -1151,7 +1151,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$first = true;
 
 		foreach ($authors as $author) {
-
+			// TODO Check if e-mail address should be added
 			$fullName = $author->getLocalizedGivenName() . " " . $author->getLocalizedFamilyName();
 
 			if (strlen($fullName) == 0) {
