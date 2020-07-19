@@ -411,12 +411,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 		// Have to use global Request access because request is not passed to hook
 		$authors = $form->submission->getAuthors();
 		$user = Request::getUser();
-		//error_log("OrcidProfilePlugin: authors[0] = " . var_export($authors[0], true));
-		//error_log("OrcidProfilePlugin: user = " . var_export($user, true));
 		if ($authors[0]->getOrcid() === $user->getOrcid()) {
 			// if the author and user share the same ORCID id
 			// copy the access token from the user
-			//error_log("OrcidProfilePlugin: user->orcidAccessToken = " . $user->getData('orcidAccessToken'));
 			$authors[0]->setData('orcidAccessToken', $user->getData('orcidAccessToken'));
 			$authors[0]->setData('orcidAccessScope', $user->getData('orcidAccessScope'));
 			$authors[0]->setData('orcidRefreshToken', $user->getData('orcidRefreshToken'));
@@ -424,7 +421,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$authors[0]->setData('orcidSandbox', $user->getData('orcidSandbox'));
 			$authorDao = DAORegistry::getDAO('AuthorDAO');
 			$authorDao->updateObject($authors[0]);
-			//error_log("OrcidProfilePlugin: author = " . var_export($authors[0], true));
 		}
 		return false;
 	}

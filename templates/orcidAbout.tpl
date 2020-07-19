@@ -19,9 +19,13 @@
 		{translate key="plugins.generic.orcidProfile.about.orcidExplanation"}
 	</div>
 	<h3>{translate key="plugins.generic.orcidProfile.about.howAndWhy.title"}</h3>
-	<div class="description">
-		{translate key="plugins.generic.orcidProfile.about.howAndWhy"}
-	</div>
+	{if $isMemberApi}
+		<div class="description">
+			{translate key="plugins.generic.orcidProfile.about.howAndWhy"}
+		</div>
+	{else}
+	{/if}
+
 	<h3>{translate key="plugins.generic.orcidProfile.about.display.title"}</h3>
 	<div class="description">
 		{translate key="plugins.generic.orcidProfile.about.display"}
