@@ -1,2 +1,94 @@
 msgid ""
-msgstr "X-Generator: Weblate\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit"
+msgstr ""
+"PO-Revision-Date: 2020-08-15 00:48+0000\n"
+"Last-Translator: Paul Heckler <paul.d.heckler@gmail.com>\n"
+"Language-Team: French <http://translate.pkp.sfu.ca/projects/"
+"orcid-profile-plugin/orcid-profile-plugin/fr/>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 3.9.1\n"
+
+msgid "plugins.generic.orcidProfile.manager.settings.logLevel.all"
+msgstr "Tout"
+
+msgid "plugins.generic.orcidProfile.manager.settings.logLevel.error"
+msgstr "Erreurs"
+
+msgid "plugins.generic.orcidProfile.manager.settings.logLevel.help"
+msgstr ""
+"Choisissez la quantité de données de journalisation écrites par le module"
+
+msgid "plugins.generic.orcidProfile.manager.settings.logSectionTitle"
+msgstr "Journal des requêtes ORCID"
+
+msgid "plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication"
+msgstr ""
+"Envoyer un courriel pour demander l'autorisation ORCID aux auteurs et "
+"autrices lorsqu'un article est accepté, c'est-à-dire envoyé en révision"
+
+msgid "plugins.generic.orcidProfile.manager.settings.mailSectionTitle"
+msgstr "Paramètres des courriels"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidScope"
+msgstr "Portée de l'accès au profil"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidClientSecret"
+msgstr "Clé secrète du client"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidClientId"
+msgstr "Identifiant ORCID du client"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox"
+msgstr "Bac à sable des membres"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member"
+msgstr "Membre"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox"
+msgstr "Bac à sable public"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public"
+msgstr "Public"
+
+msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath"
+msgstr "API ORCID"
+
+msgid "plugins.generic.orcidProfile.manager.settings.description.globallyconfigured"
+msgstr ""
+"L'API ORCID a été configurée globalement par l'hôte. Les informations "
+"d'identification suivantes ont été enregistrées."
+
+msgid "plugins.generic.orcidProfile.manager.settings.description"
+msgstr ""
+"Veuillez configurer l'accès à l'API ORCID afin d'ajouter les renseignements "
+"de profil ORCID dans les profils d'utilisateurs, utilisatrices, auteurs ou "
+"autrices ainsi que pour mettre à jour les informations ORCID associées aux "
+"nouvelles publications (uniquement pour les membres ORCID)."
+
+msgid "plugins.generic.orcidProfile.manager.settings.hidden"
+msgstr "Caché"
+
+msgid "plugins.generic.orcidProfile.manager.settings.title"
+msgstr "Paramètres de l'API ORCID"
+
+msgid "plugins.generic.orcidProfile.instructions"
+msgstr ""
+"Vous pouvez pré-remplir ce formulaire avec les informations provenant d'un "
+"profil ORCID. Entrez l'adresse électronique ou l'identifiant ORCID associé "
+"au profil ORCID, puis cliquez sur « Envoyer »."
+
+msgid "plugins.generic.orcidProfile.emailOrOrcid"
+msgstr "Adresse électronique ou identifiant ORCID :"
+
+msgid "plugins.generic.orcidProfile.noData"
+msgstr "Aucune donnée n'a été trouvée sur ORCID."
+
+msgid "plugins.generic.orcidProfile.description"
+msgstr ""
+"Permet l'importation du profil d'utilisateur ou d'utilisatrice depuis ORCID."
+
+msgid "plugins.generic.orcidProfile.displayName"
+msgstr "Module de profile ORCID"
