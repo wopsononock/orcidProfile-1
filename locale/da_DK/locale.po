@@ -90,7 +90,7 @@ msgstr ""
 msgid "plugins.generic.orcidProfile.about.display.title"
 msgstr "Hvor vises ORCID iD'er?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Dette tidsskrift indsamler dit ORCID iD, så vi kan [tilføje formål og skelne "
 "mellem Member API og Public API].\n"

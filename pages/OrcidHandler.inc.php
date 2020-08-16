@@ -349,9 +349,12 @@ class OrcidHandler extends Handler {
 	 */
 
 	function about($args, $request) {
+		$context = $request->getContext();
+		$contextId = ($context == null) ? CONTEXT_ID_NONE : $context->getId();
 		$templateMgr = TemplateManager::getManager($request);
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$templateMgr->assign('orcidIcon', $plugin->getIcon());
+		$templateMgr->assign('isMemberApi', $plugin->isMemberApiEnabled($contextId));
 		$templateMgr->display($plugin->getTemplateResource('orcidAbout.tpl'));
 	}
 }

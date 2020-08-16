@@ -141,7 +141,7 @@ msgstr "Avtoriziraj in poveži vaš ORCID iD"
 msgid "plugins.generic.orcidProfile.about.title"
 msgstr "Kaj je ORCID?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Revija zbira vaš ORCID iD, da lahko povežemo prispevke in članke z vašimi ORCID podatki.\n"
 "\n"

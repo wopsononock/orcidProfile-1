@@ -143,7 +143,7 @@ msgstr "Το ORCID είναι ένας ανεξάρτητος μη κερδοσ�
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "Πώς και γιατί γίνεται η συλλογή ORCID iD;"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Το περιοδικό συλλέγει το ORCID iD προκειμένου να [συμπληρώστε τον σκοπό και διακρίνετε μεταξύ των Member API και Public API].\n"
 "\tΠατώντας το κουμπί “Authorize” στο αναδυόμενο παράθυρο του ORCID, θα σας ζητηθεί να κοινοποιήσετε το ORCID id σας μέσω πιστοποιημένων διαδικασιών: είτε <a href=\"https://support.orcid.org/hc/en-us/articles/360006897454\">κάνοντας εγγραφή στο ORCID</a> ή -εάν έχετε ήδη ORCID id- <a href=\"https://support.orcid.org/hc/en-us/categories/360000661673\">μπαίνοντας στον λογαριασμό σας</a>, και δίνοντας άδεια πρόσβασης στο ORCID iD. Οι διαδικασίες αυτές διασφαλίζουν την ορθή ταυτοποίηση και διασύνδεση του ORCID iD.<br>\n"

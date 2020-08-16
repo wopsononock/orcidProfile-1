@@ -150,7 +150,7 @@ msgstr ""
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "Wie und warum werden ORCID iDs gesammelt?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Dieses Journal sammelt Ihre ORCID iD, so dass [füge Grund hinzu und "
 "unterscheide dabei nach Mitglieder API und Öffentlicher API].\n"

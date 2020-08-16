@@ -98,7 +98,7 @@ msgstr "gizli"
 msgid "plugins.generic.orcidProfile.manager.settings.title"
 msgstr "ORCID API Ayarları"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Bu dergi ORCID iD'nizi toplar. Böylece [Üye API'sı ve Herkese Açık API "
 "arasında amaç ekleyebilir ve ayırt edebiliriz].\n"

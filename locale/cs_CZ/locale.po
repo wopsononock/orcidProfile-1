@@ -93,7 +93,7 @@ msgstr ""
 msgid "plugins.generic.orcidProfile.about.display.title"
 msgstr "Kde jsou zobrazeny ORCID iD?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Tento časopis shromažďuje vaše ORCID iD.\n"
 "Když v rozbalovací nabídce ORCID kliknete na tlačítko „Autorizovat“, "

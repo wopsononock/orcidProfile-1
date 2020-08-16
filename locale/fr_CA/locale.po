@@ -146,7 +146,7 @@ msgstr ""
 msgid "plugins.generic.orcidProfile.about.display.title"
 msgstr "Où sont affichés les identifiants ORCID ?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Cette revue collecte votre identifiant ORCID afin que nous puissions "
 "intégrer vos renseignements ORCID à votre profil utilisateur ou à votre "
