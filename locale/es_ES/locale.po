@@ -183,7 +183,7 @@ msgstr ""
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "¿Cómo y por qué recolectamos iD ORCID?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Esta revista recopila su iD ORCID para que podamos [agregar propósito y "
 "distinguir entre API de Miembros y API Pública].\n"

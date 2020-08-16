@@ -35,7 +35,7 @@ msgstr "Az ORCID egy non-profit független szervezet, amely egy olyan azonosít�
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "Hogy és miért kérünk be ORCID azonosítókat?  "
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr "A folyóirat abból a célból kéri be az Ön ORCID azonosítóját, hogy ezáltal [írjuk le az okát, és tegyünk különbséget a Member API és Nyilvános API között]. Amikor az ORCID felugró ablakban rákattint az ’Authorize’ gombra, a hitelesítési folyamatban bekérjük azonosítóját: egyik módja, hogy <a href=\"https://support.orcid.org/hc/en-us/articles/360006897454\">regisztrál egy ORCID azonosítót</a> , vagy amennyiben már rendelkezik vele, az <a href=\"https://support.orcid.org/hc/en-us/categories/360000661673\">ORCID fiókba történő bejelentkezéssel</a> és így hozzáférést biztosítva számunkra az ORCID azonosítójához. Mindezt az egyértelmű azonosítás és ORCID azonosító biztonságos csatolása érdekében tesszük. A bejelentkezésről további részletek az alábbiakban olvashatók: <a href=\"https://orcid.org/blog/2017/02/20/whats-so-special-about-signing\">What’s so special about signing in.</a>"
 
 msgid "plugins.generic.orcidProfile.about.display.title"

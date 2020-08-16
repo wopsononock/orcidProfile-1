@@ -24,7 +24,7 @@ msgstr ""
 msgid "plugins.generic.orcidProfile.about.display.title"
 msgstr "Các ORCID iD được hiển thị ở đâu?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Tạp chí này đang thu thập ORCID iD của bạn để chúng tôi có thể [thêm mục "
 "đích và phân biệt giữa API thành viên và API công khai].\n"

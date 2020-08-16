@@ -161,7 +161,7 @@ msgstr "ORCID é uma organização não lucrativa independente que fornece um id
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "Como e porquê recolhemos os iDs ORCID?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Esta revista está a recolher o seu ORCID iD para que possamos [adicionar finalidade e distinguir entre Membro da API e API pública].\n"
 "\tQuando clica em “Autorizo” no popup do ORCID, iremos pedir-lhe que partilhe o seu iD usando um processo autenticado: ou para <a href=\"https://support.orcid.org/hc/en-us/articles/360006897454\">obter um ORCID iD</a> ou, se já tiver, <a href=\"https://support.orcid.org/hc/en-us/categories/360000661673\">entrar na sua conta ORCID</a>, dando-nos assim acesso ao seu ORCID iD. Fazemos isto para assegurarmo-nos que se encontra corretamente identificado e conectado de forma segura ao seu ORCID iD.<br>\n"

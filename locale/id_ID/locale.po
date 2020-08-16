@@ -110,7 +110,7 @@ msgstr ""
 msgid "plugins.generic.orcidProfile.about.display.title"
 msgstr "Di mana iD ORCID ditampilkan?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Jurnal ini mengumpulkan iD ORCID Anda sehingga kami bisa {menambahkan tujuan "
 "dan membedakan antara Member API dan Public API].\n"

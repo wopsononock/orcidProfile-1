@@ -146,7 +146,7 @@ msgstr "ORCID е независима, нетърговска организац
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "Защо и как ние събираме ORCID идентификатори?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Това списание събира Вашите ORCID идентификатори за да можем [добавете цел и направете разлика между API за членове и обществен API].\n"
 "\tКогато кликнете бутон “Упълномощаване” в изскачащия прозорец за ORCID, ще Ви помолим да споделите своя идентификатор чрез процес на упълномощаване извършван чрез: <a href=\"https://support.orcid.org/hc/en-us/articles/360006897454\">регистриране за ORCID идентификатор</a> или, ако Вие имате такъв, чрез <a href=\"https://support.orcid.org/hc/en-us/categories/360000661673\">влизане във Вашия ORCID профил</a>, а след това предоставяне на нас разрешение да получим Вашия ORCID идентификатор. Ние правим това за да подсигурим, че коректно сте идентифицирани и сигурно сме свързали Вашия ORCID идентификатор.<br>\n"

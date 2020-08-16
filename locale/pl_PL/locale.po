@@ -160,7 +160,7 @@ msgstr "ORCID to niezależna organizacja non-profit która przydziela stały ide
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "Jak i dlaczego używamy ORCID ID?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Niniejsze czasopismo zbiera numery ORCID aby można było zidentyfikować Twoje prace w tym czasopiśmie i dodać je do Twojego dorobku spisanego w ORCID ID za pomoca publicznego i kolienckiego API .\n"
 "\tKiedy klikasz przycisk \"Autoryzuj\" w oknie popup, zostaniesz zapytany o zgodę na użycie Twojego ORCID ID poprzez: <a href=\"https://support.orcid.org/hc/en-us/articles/360006897454\">registering for an ORCID iD</a> lub jeśli już go posiadasz, <a href=\"https://support.orcid.org/hc/en-us/categories/360000661673\"> zalogujesz się do swojego konta</a>, dajac nam zezwolenie na pobranie Twojego ORCI ID.  Robimy to w celu uzyskania pełnej zgodności Twoich prac ze stanem faktycznym.<br>\n"

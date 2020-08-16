@@ -87,7 +87,7 @@ msgstr ""
 msgid "plugins.generic.orcidProfile.about.display.title"
 msgstr "Dove vengono visualizzati gli ORCID ID?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Questa testata registra il tuo ORCID ID con il fine [aggiungere lo scopo e "
 "la definizione tra Member API e Public API]. \n"

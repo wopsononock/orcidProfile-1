@@ -18,7 +18,7 @@ msgid "plugins.generic.orcidProfile.description"
 msgstr "Helpottaa ORCID-tunnisteiden käyttöä OJS-järjestelmässä."
 
 msgid "plugins.generic.orcidProfile.instructions"
-msgstr "Voit esitäyttää lomakkeen ORCID-tilisi tiedoilla. Anna ORCID-tunniste tai siihen liitetty sähköpostiosoite ja paina "Lähetä"."
+msgstr "Voit esitäyttää lomakkeen ORCID-tilisi tiedoilla. Anna ORCID-tunniste tai siihen liitetty sähköpostiosoite ja paina \"Lähetä\"."
 
 msgid "plugins.generic.orcidProfile.noData"
 msgstr "Tietoja ei löytynyt."
@@ -158,7 +158,7 @@ msgstr "ORCID on itsenäinen ja voittoa tavoittelematon organisaatio, joka yllä
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "Miten ja miksi keräämme ORCID-tunnisteita?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Kun painat Vahvista-nappia ORCID-ikkunassa, pyydämme sinua antamaan ORCID-tunnisteesi joko <a href=\"https://support.orcid.org/hc/en-us/articles/360006897454\">rekisteröimällä uuden ORCID-tunnisteen</a> tai, mikäli sinulla jo tunniste, <a href=\"https://support.orcid.org/hc/en-us/categories/360000661673\">kirjautumalla ORCID-tilillesi</a> ja antamalla meille luvan hakea ORCID-tunnisteesi. Teemme tämän varmistaaksemme, että tallennettu ORCID-tunniste on vahvistettu ja oikean henkilön tunniste. Lue lisää <a href=\"https://orcid.org/blog/2017/02/20/whats-so-special-about-signing\">miksi tämä on niin tärkeää.</a>"
 
@@ -167,8 +167,8 @@ msgstr "Missä ORCID-tunnisteet näkyvät?"
 
 msgid "plugins.generic.orcidProfile.about.display"
 msgstr ""
-"Vahvistettujen ORCID-tunnisteiden yhteydessä näkyy ORCID-logo <img src=\"https://orcid.org/sites/default/files/images/orcid_16x16(1).gif\" alt=\"iD icon\" width=\"16\" height=\"16\" border=\"0\">tekijän nimen vieressä ja julkisessa käyttäjäprofiilissa.
-Lue lisää siitä <a href=\"https://orcid.org/blog/2013/02/22/how-should-orcid-id-be-displayed\">miten ORCID-tunniste tulisi esittää.</a>"
+"Vahvistettujen ORCID-tunnisteiden yhteydessä näkyy ORCID-logo <img src=\"https://orcid.org/sites/default/files/images/orcid_16x16(1).gif\" alt=\"iD icon\" width=\"16\" height=\"16\" border=\"0\">tekijän nimen vieressä ja julkisessa käyttäjäprofiilissa."
+"Lue lisää siitä <a href=\"https://orcid.org/blog/2013/02/22/how-should-orcid-id-be-displayed\">miten ORCID-tunniste tulisi esittää.</a>"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidScope"
 msgstr "Profiilin pääsyoikeuden laajuus"

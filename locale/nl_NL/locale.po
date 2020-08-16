@@ -143,7 +143,7 @@ msgstr "ORCID is een onafhankelijke niet-commerciële organisatie die een vaste 
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "Hoe en waarom verzamelen we ORCID ID's?"
 
-msgid "plugins.generic.orcidProfile.about.howAndWhy"
+msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Dit tijdschrift verzamelt uw ORCID ID om te kunnen [add purpose and distinguish between Member API and Public API]. Als u op de \"Authoriseren\" knop klikt in het ORCID popupvenster, zullen we u vragen om uw ID te delen via een geauthenticeerd proces: ofwel door te <a href=\"https://support.orcid.org/hc/en-us/articles/360006897454\">registreren voor een ORCID ID</a> of als u er al een heeft, door <a href=\"https://support.orcid.org/hc/en-us/categories/360000661673\">aan te melden voor uw ORCID profiel</a>, en ons dan toestemming te verlenen tot uw ORCID ID. We doen dit om te verzekeren dat u correct geïdentificeerd bent en om uw ORCID ID veilig te koppelen.<br/>\n"
 "\tMeer informatie op <a href=\"https://orcid.org/blog/2017/02/20/whats-so-special-about-signing\">What’s so special about signing in.</a>"
