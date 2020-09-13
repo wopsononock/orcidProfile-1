@@ -6,18 +6,29 @@
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  */
 
-describe("Test Orcid Plugin", function () {
+// eslint-disable-next-line no-undef
+describe("Authorization Redirect: "+Cypress.env('orcid')['url'], function () {
 
 	var redirectUrl = "http://localhost/ojs/index.php/publicknowledge/orcidapi/orcidAuthorize?targetOp=profile";
-	var orcidUrl = Cypress.env('orcid')['url'] + "/signin?oauth&client_id=" + Cypress.env('orcid')['clientId'] + "&response_type=code&scope=/activities/update&redirect_uri=" + redirectUrl;
+	// eslint-disable-next-line no-undef
+	var orcidUrl = Cypress.env('orcid')['url'] + "/signin?oauth&client_id=" + Cypress.env('orcid')['clientId']
+		+ "&response_type=code&scope=/activities/update&redirect_uri=" + redirectUrl;
 
-	it('Authorize user', function () {
+
+	// eslint-disable-next-line no-undef
+	it('Check '+ Cypress.env('orcid')['url'], () => {
+		// eslint-disable-next-line no-undef
+		cy.request(orcidUrl)
+			.should((response) => {
+				expect(response.status).to.eq(200)
+			})
+	});
+
+	it('Authoritazation:  User Credentials',  ()=> {
 		cy.visit(orcidUrl)
 		cy.get('input[id="userId"]').clear().type(Cypress.env('orcid')['email']);
 		cy.get('input[id="password"]').clear().type(Cypress.env('orcid')['emailPassword']);
 		cy.get('button[id="form-sign-in-button"]').click()
-		cy.wait(3000)
-		cy.login('admin', 'admin', 'publicknowledge');
 
 	});
 
