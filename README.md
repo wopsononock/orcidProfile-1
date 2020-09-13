@@ -60,7 +60,7 @@ Use the Plugin Gallery from within your PKP application to install the plugin. F
 
 ### Settings
 
-* Navigat to OJS installation folder.
+* Navigate to OJS Folder.
 * if a file called `cypress.env.json` does not exist, create one.
 * Add the following variables to the root JSON element, according to your server setting
 
@@ -68,7 +68,7 @@ Use the Plugin Gallery from within your PKP application to install the plugin. F
 "orcid": {
 	"url": "https://sandbox.orcid.org",
 	"apiPath": "https://api.sandbox.orcid.org",
-    "api Type": "Member Sandbox"
+ 	"api Type": "Member Sandbox"
 	"clientId": "APP-T0XXXXXXXXXXX",
 	"clientSecret": "288455445-a3e4-454-9783-454545555",
 	"email": "coauthor@mailinator.com",
@@ -77,13 +77,24 @@ Use the Plugin Gallery from within your PKP application to install the plugin. F
 ```
 
 ### Run  all tests
-* ` npx cypress open --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/functional`
+
+ Navigate to `OJS folder`
+* ` npx cypress run --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/functional`
 
 ### Run Plugin setup
+* `npx cypress run --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/functional/ --spec plugins/generic/orcidProfile/cypress/tests/functional/01-Orcid-Setup.spec.js`
+
+### Run Authorization
+* `npx cypress run --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/functional/ --spec plugins/generic/orcidProfile/cypress/tests/functional/02-Orcid-API.spec.js`
 
 
 
-###
+### Debug
+
+* Navigate to `OJS Folder`
+* Navigate to `cypress` folder
+* check `logs` and `screenshots` for errors
+
 
 
 

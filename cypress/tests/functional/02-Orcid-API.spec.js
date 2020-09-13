@@ -6,18 +6,14 @@
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  */
 
-// eslint-disable-next-line no-undef
 describe("Authorization Redirect: "+Cypress.env('orcid')['url'], function () {
 
 	var redirectUrl = "http://localhost/ojs/index.php/publicknowledge/orcidapi/orcidAuthorize?targetOp=profile";
-	// eslint-disable-next-line no-undef
 	var orcidUrl = Cypress.env('orcid')['url'] + "/signin?oauth&client_id=" + Cypress.env('orcid')['clientId']
 		+ "&response_type=code&scope=/activities/update&redirect_uri=" + redirectUrl;
 
 
-	// eslint-disable-next-line no-undef
 	it('Check '+ Cypress.env('orcid')['url'], () => {
-		// eslint-disable-next-line no-undef
 		cy.request(orcidUrl)
 			.should((response) => {
 				expect(response.status).to.eq(200)
