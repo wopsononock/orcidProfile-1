@@ -7,7 +7,7 @@ Table of Contents
          * [Extra functionalities for ORCID Member organizations](#extra-functionalities-for-orcid-member-organizations)
       * [Technical Workflow  description](#technical-workflow--description)
       * [Installation](#installation)
-      * [Testing](#testing)
+      * [Debugging / Testing](#debuggingtesting)
 
 # ORCID Profile Plugin
 
@@ -56,7 +56,7 @@ Licensed under GPLv3. See LICENSE.txt for details.
 
 Use the Plugin Gallery from within your PKP application to install the plugin. For further information refer to [PKP|DOCS](https://docs.pkp.sfu.ca/orcid/en/installation-setup).
 
-## Debuggiong/Testing
+## Debugging/Testing
 
 ### Settings
 
