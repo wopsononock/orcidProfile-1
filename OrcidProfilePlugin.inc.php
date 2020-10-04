@@ -48,6 +48,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 		if ($success && $this->getEnabled($mainContextId)) {
 			$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
 
+			HookRegistry::register('ArticleHandler::view', array(&$this, 'submissionView'));
+			HookRegistry::register('PreprintHandler::view', array(&$this, 'submissionView'));
+
 			// Insert the OrcidHandler to handle ORCID redirects
 			HookRegistry::register('LoadHandler', array($this, 'setupCallbackHandler'));
 
@@ -255,23 +258,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 		switch ($template) {
 			case 'frontend/pages/userRegister.tpl':
 				$templateMgr->registerFilter("output", array($this, 'registrationFilter'));
-				break;
-			case 'frontend/pages/article.tpl':
-			case 'frontend/pages/preprint.tpl':
-				$script = 'var orcidIconSvg = ' . json_encode($this->getIcon()) . ';';
-
-				$publication = $templateMgr->getTemplateVars('publication');
-
-				$authors = $publication->getData('authors');
-				/** @var $authors Author[] */
-				foreach ($authors as $author) {
-					if (!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
-						$script .= '$("a[href=\"' . $author->getOrcid() . '\"]").prepend(orcidIconSvg);';
-					}
-				}
-
-				$templateMgr->addJavaScript('orcidIconDisplay', $script, ['inline' => true]);
-
 				break;
 		}
 		return false;
@@ -559,6 +545,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 			unset($params['id']);
 		}
 		return $smarty->smartyUrl($params, $smarty);
+	}
+
+	function submissionView($hookName, $args) {
+		$request = $args[0];
+		$templateMgr = TemplateManager::getManager($request);
+		$templateMgr->assign(array("orcidIcon" => $this->getIcon()));
 	}
 
 	/**
