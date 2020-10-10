@@ -16,8 +16,6 @@ php:
 env:
   - APPLICATION=ojs BRANCH=master TEST=mysql
   - APPLICATION=ojs BRANCH=master TEST=pgsql
-  - APPLICATION=omp BRANCH=master TEST=mysql
-  - APPLICATION=omp BRANCH=master TEST=pgsql
   - APPLICATION=ops BRANCH=master TEST=mysql
   - APPLICATION=ops BRANCH=master TEST=pgsql
 
@@ -34,7 +32,7 @@ install:
   # Make sure we're using the current checkout of this repo rather than the built-in OJS/OMP version
   - rm -rf ~/${APPLICATION}/plugins/generic/orcidProfile
   - ln -s ${TRAVIS_BUILD_DIR} ~/${APPLICATION}/plugins/generic/orcidProfile
-  # Install OJS/OMP & prep data environment
+  # Install OJS/OPS & prep data environment
   - $(npm bin)/cypress run --spec "cypress/tests/data/10-Installation.spec.js,cypress/tests/data/20-CreateContext.spec.js"
 script:
-  - $(npm bin)/cypress run --config integrationFolder=plugins/generic/orcidProfile/cypress/tests
+  - $(npm bin)/cypress run --env orcid_url="https://sandbox.orcid.org",orcid_apiPath="https://api.sandbox.orcid.org",orcid_apiType="Member Sandbox",orcid_clientId=clientid,     orcid_clientSecret=secret,orcid_email=coauthor@mailinator.com,orcid_emailPassword=email, --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/
