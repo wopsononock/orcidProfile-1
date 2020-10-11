@@ -20,13 +20,13 @@ describe("Authorization Redirect: "+Cypress.env('orcid_url'), function () {
 			})
 	});
 
-	it('Authoritazation:  User Credentials',  ()=> {
-		cy.visit(orcidUrl)
-		cy.get('input[id="userId"]').clear().type(Cypress.env('orcid_email'));
-		cy.get('input[id="password"]').clear().type(Cypress.env('orcid_emailPassword'));
-		cy.get('button[id="form-sign-in-button"]').click()
-
-	});
+	// it('Authoritazation:  User Credentials',  ()=> {
+	// 	cy.visit(orcidUrl)
+	// 	cy.get('input[id="userId"]').clear().type(Cypress.env('orcid_email'));
+	// 	cy.get('input[id="password"]').clear().type(Cypress.env('orcid_emailPassword'));
+	// 	cy.get('button[id="form-sign-in-button"]').click()
+	//
+	// });
 
 })
 
