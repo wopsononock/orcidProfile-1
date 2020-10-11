@@ -9,7 +9,7 @@
 
 describe("Test Orcid Plugin", function () {
 	it('Configure Plugin', function () {
-		cy.login('admin', 'admin', 'publicknowledge');
+		/*cy.login('admin', 'admin', 'publicknowledge');
 		cy.get('li a:contains("Settings")').click();
 		cy.get('li a:contains("Website")').click();
 		cy.get('button[id="plugins-button"]').click();
@@ -23,7 +23,7 @@ describe("Test Orcid Plugin", function () {
 		cy.get('input[id^="orcidClientSecret-"]').clear().type(Cypress.env('orcid_clientSecret'));
 		cy.get('#sendMailToAuthorsOnPublication').check('on');
 		cy.get('#orcidProfileSettingsForm > #orcidProfileSettings > .section > div > #logLevel').select('ALL');
-		cy.get('.content > #orcidProfileSettingsForm > #orcidProfileSettings > .section ').find('button').contains('OK').click();
+		cy.get('.content > #orcidProfileSettingsForm > #orcidProfileSettings > .section ').find('button').contains('OK').click();*/
 
 	});
 
