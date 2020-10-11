@@ -18,6 +18,13 @@ env:
   - APPLICATION=ojs BRANCH=master TEST=pgsql
   - APPLICATION=ops BRANCH=master TEST=mysql
   - APPLICATION=ops BRANCH=master TEST=pgsql
+  - ORCID_URL=https://sandbox.orcid.org
+  - ORCID_APIPATH=https://api.sandbox.orcid.org
+  - ORCID_APITYPE="Member Sandbox"
+  - ORCID_CLIENTID=APP-app
+  - ORCID_SECRET=secret
+  - ORCID_EMAIL=coauthor@mailinator.com
+  - ORCID_EMAILPASSWORD=pass
 
 install:
   # Prepare OJS/OMP environment
@@ -35,4 +42,4 @@ install:
   # Install OJS/OPS & prep data environment
   - $(npm bin)/cypress run --spec "cypress/tests/data/10-Installation.spec.js,cypress/tests/data/20-CreateContext.spec.js"
 script:
-  - $(npm bin)/cypress run  --env orcid_url="https://sandbox.orcid.org",orcid_apiPath="https://api.sandbox.orcid.org",orcid_apiType="Member Sandbox",orcid_clientId=APP-app,orcid_clientSecret=secret,orcid_email=coauthor@mailinator.com,orcid_emailPassword=pass --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/
+  - $(npm bin)/cypress run  --env orcid_url=[ORCID_URL] orcid_apiPath=[ORCID_APIPATH],orcid_apiType=[ORCID_APITYPE],orcid_clientId=[ORCID_CLIENTID],orcid_clientSecret=[ORCID_SECRET],orcid_email=[ORCID_EMAIL],orcid_emailPassword=[ORCID_EMAILPASSWORD] --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/
