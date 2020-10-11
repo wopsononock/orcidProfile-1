@@ -1,38 +1,37 @@
-# @file
-# .travis.yml - PKP Plugins Integration
-
 language: php
-
 addons:
   apt:
     update: true
-
 sudo: required
-
 php:
-  - 7.2
-  - 7.3
-  - 7.4
+- 7.2
+- 7.3
+- 7.4
 env:
-  - APPLICATION=ojs BRANCH=master TEST=mysql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com ORCID_EMAILPASSWORD=pass
-  - APPLICATION=ojs BRANCH=master TEST=pgsql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com ORCID_EMAILPASSWORD=pass
-  - APPLICATION=ops BRANCH=master TEST=mysql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com ORCID_EMAILPASSWORD=pass
-  - APPLICATION=ops BRANCH=master TEST=pgsql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com ORCID_EMAILPASSWORD=pass
-
+  matrix:
+  - APPLICATION=ojs BRANCH=master TEST=mysql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org
+    ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com
+    ORCID_EMAILPASSWORD=pass
+  - APPLICATION=ojs BRANCH=master TEST=pgsql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org
+    ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com
+    ORCID_EMAILPASSWORD=pass
+  - APPLICATION=ops BRANCH=master TEST=mysql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org
+    ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com
+    ORCID_EMAILPASSWORD=pass
+  - APPLICATION=ops BRANCH=master TEST=pgsql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org
+    ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com
+    ORCID_EMAILPASSWORD=pass
 install:
-  # Prepare OJS/OMP environment
-  - git clone -b ${BRANCH} https://github.com/pkp/${APPLICATION} ~/${APPLICATION}
-  - cd ~/${APPLICATION}
-  - git submodule update --init --recursive
-  - source lib/pkp/tools/travis/prepare-tests.sh
-  - lib/pkp/tools/travis/prepare-webserver.sh
-  # Build/install dependencies
-  - lib/pkp/tools/travis/install-composer-dependencies.sh
-  - npm i g -npm && npm install && npm run build
-  # Make sure we're using the current checkout of this repo rather than the built-in OJS/OMP version
-  - rm -rf ~/${APPLICATION}/plugins/generic/orcidProfile
-  - ln -s ${TRAVIS_BUILD_DIR} ~/${APPLICATION}/plugins/generic/orcidProfile
-  # Install OJS/OPS & prep data environment
-  - $(npm bin)/cypress run --spec "cypress/tests/data/10-Installation.spec.js,cypress/tests/data/20-CreateContext.spec.js"
+- git clone -b ${BRANCH} https://github.com/pkp/${APPLICATION} ~/${APPLICATION}
+- cd ~/${APPLICATION}
+- git submodule update --init --recursive
+- source lib/pkp/tools/travis/prepare-tests.sh
+- lib/pkp/tools/travis/prepare-webserver.sh
+- lib/pkp/tools/travis/install-composer-dependencies.sh
+- npm i g -npm && npm install && npm run build
+- rm -rf ~/${APPLICATION}/plugins/generic/orcidProfile
+- ln -s ${TRAVIS_BUILD_DIR} ~/${APPLICATION}/plugins/generic/orcidProfile
+- $(npm bin)/cypress run --spec "cypress/tests/data/10-Installation.spec.js,cypress/tests/data/20-CreateContext.spec.js"
 script:
-  - $(npm bin)/cypress run  --env orcid_url=$ORCID_URL orcid_apiPath=$ORCID_APIPATH,orcid_apiType=$ORCID_APITYPE,orcid_clientId=$ORCID_CLIENTID,orcid_clientSecret=$ORCID_SECRET,orcid_email=$ORCID_EMAIL,orcid_emailPassword=$ORCID_EMAILPASSWORD --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/
+- "$(npm bin)/cypress run  --env orcid_url=$ORCID_URL orcid_apiPath=$ORCID_APIPATH,orcid_apiType=$ORCID_APITYPE,orcid_clientId=$ORCID_CLIENTID,orcid_clientSecret=$ORCID_SECRET,orcid_email=$ORCID_EMAIL,orcid_emailPassword=$ORCID_EMAILPASSWORD
+  --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/"
