@@ -14,17 +14,10 @@ php:
   - 7.3
   - 7.4
 env:
-  - APPLICATION=ojs BRANCH=master TEST=mysql
-  - APPLICATION=ojs BRANCH=master TEST=pgsql
-  - APPLICATION=ops BRANCH=master TEST=mysql
-  - APPLICATION=ops BRANCH=master TEST=pgsql
-  - ORCID_URL=https://sandbox.orcid.org
-  - ORCID_APIPATH=https://api.sandbox.orcid.org
-  - ORCID_APITYPE="Member Sandbox"
-  - ORCID_CLIENTID=APP-app
-  - ORCID_SECRET=secret
-  - ORCID_EMAIL=coauthor@mailinator.com
-  - ORCID_EMAILPASSWORD=pass
+  - APPLICATION=ojs BRANCH=master TEST=mysql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com ORCID_EMAILPASSWORD=pass
+  - APPLICATION=ojs BRANCH=master TEST=pgsql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com ORCID_EMAILPASSWORD=pass
+  - APPLICATION=ops BRANCH=master TEST=mysql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com ORCID_EMAILPASSWORD=pass
+  - APPLICATION=ops BRANCH=master TEST=pgsql ORCID_URL=https://sandbox.orcid.org ORCID_APIPATH=https://api.sandbox.orcid.org ORCID_APITYPE="Member Sandbox" ORCID_CLIENTID=APP-app ORCID_SECRET=secret ORCID_EMAIL=coauthor@mailinator.com ORCID_EMAILPASSWORD=pass
 
 install:
   # Prepare OJS/OMP environment
