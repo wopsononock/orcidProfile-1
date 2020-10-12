@@ -9,10 +9,11 @@
 
 describe("Test Orcid Plugin", function () {
 	it('Configure Plugin', function () {
-		/*cy.login('admin', 'admin', 'publicknowledge');
+		cy.login('admin', 'admin', 'publicknowledge');
 		cy.get('li a:contains("Settings")').click();
 		cy.get('li a:contains("Website")').click();
 		cy.get('button[id="plugins-button"]').click();
+		/*
 		cy.get('input[id^="select-cell-orcidprofileplugin-enabled"]').check();
 		cy.get('#component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin > .first_column > .show_extras').click();
 		cy.waitJQuery();
