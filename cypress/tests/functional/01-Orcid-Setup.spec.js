@@ -11,7 +11,7 @@ describe("Test Orcid Plugin", function () {
 	it('Configure Plugin', function () {
 		cy.login('admin', 'admin', 'publicknowledge');
 		//cy.get('li a:contains("Settings")').click();
-		cy.get('li a:contains("Website")').click();
+		cy.get('li a:contains("Website")').click({force:true});
 		cy.get('button[id="plugins-button"]').click();
 
 		cy.get('input[id^="select-cell-orcidprofileplugin-enabled"]').check();
