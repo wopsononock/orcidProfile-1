@@ -10,7 +10,7 @@
 describe("Test Orcid Plugin", function () {
 	it('Configure Plugin', function () {
 		cy.login('admin', 'admin', 'publicknowledge');
-		cy.get('li a:contains("Settings")').click();
+		//cy.get('li a:contains("Settings")').click();
 		cy.get('li a:contains("Website")').click();
 		cy.get('button[id="plugins-button"]').click();
 		/*
