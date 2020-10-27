@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/orcidProfile/OrcidProfilePlugin.inc.php
+ * @file OrcidProfilePlugin.inc.php
  *
  * Copyright (c) 2015-2019 University of Pittsburgh
  * Copyright (c) 2014-2020 Simon Fraser University
@@ -46,6 +46,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$success = parent::register($category, $path, $mainContextId);
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled($mainContextId)) {
+			$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
+
+			HookRegistry::register('ArticleHandler::view', array(&$this, 'submissionView'));
+			HookRegistry::register('PreprintHandler::view', array(&$this, 'submissionView'));
+
+			// Insert the OrcidHandler to handle ORCID redirects
+			HookRegistry::register('LoadHandler', array($this, 'setupCallbackHandler'));
+
 			// Register callback for Smarty filters; add CSS
 			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
 			// Add "Connect ORCID" button to PublicProfileForm
@@ -54,15 +62,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 			HookRegistry::register('authorform::display', array($this, 'handleFormDisplay'));
 			// Send email to author, if the added checkbox was ticked
 			HookRegistry::register('authorform::execute', array($this, 'handleAuthorFormExecute'));
-			// Insert the OrcidHandler to handle ORCID redirects
-			HookRegistry::register('LoadHandler', array($this, 'setupCallbackHandler'));
-
 			// Handle ORCID on user registration
 			HookRegistry::register('registrationform::execute', array($this, 'collectUserOrcidId'));
 
 			// Send emails to authors without ORCID id upon submission
 			HookRegistry::register('submissionsubmitstep3form::execute', array($this, 'handleSubmissionSubmitStep3FormExecute'));
-			// Add more ORCiD fields to author DAO
+
 			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'handleAdditionalFieldNames'));
 			// Add more ORCiD fields to UserDAO
 			HookRegistry::register('userdao::getAdditionalFieldNames', array($this, 'handleAdditionalFieldNames'));
@@ -198,17 +203,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 		switch ($template) {
 			case 'frontend/pages/userRegister.tpl':
 				$templateMgr->registerFilter("output", array($this, 'registrationFilter'));
-				break;
-			case 'frontend/pages/article.tpl':
-				$script = 'var orcidIconSvg = ' . json_encode($this->getIcon()) . ';';
-				$article = $templateMgr->getTemplateVars('article');
-				$authors = $article->getAuthors();
-				foreach ($authors as $author) {
-					if (!empty($author->getOrcid()) && !empty($author->getData('orcidAccessToken'))) {
-						$script .= '$("a[href=\"' . $author->getOrcid() . '\"]").prepend(orcidIconSvg);';
-					}
-				}
-				$templateMgr->addJavaScript('orcidIconDisplay', $script, ['inline' => true]);
 				break;
 		}
 		return false;
@@ -411,12 +405,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 		// Have to use global Request access because request is not passed to hook
 		$authors = $form->submission->getAuthors();
 		$user = Request::getUser();
-		//error_log("OrcidProfilePlugin: authors[0] = " . var_export($authors[0], true));
-		//error_log("OrcidProfilePlugin: user = " . var_export($user, true));
 		if ($authors[0]->getOrcid() === $user->getOrcid()) {
 			// if the author and user share the same ORCID id
 			// copy the access token from the user
-			//error_log("OrcidProfilePlugin: user->orcidAccessToken = " . $user->getData('orcidAccessToken'));
 			$authors[0]->setData('orcidAccessToken', $user->getData('orcidAccessToken'));
 			$authors[0]->setData('orcidAccessScope', $user->getData('orcidAccessScope'));
 			$authors[0]->setData('orcidRefreshToken', $user->getData('orcidRefreshToken'));
@@ -424,7 +415,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$authors[0]->setData('orcidSandbox', $user->getData('orcidSandbox'));
 			$authorDao = DAORegistry::getDAO('AuthorDAO');
 			$authorDao->updateObject($authors[0]);
-			//error_log("OrcidProfilePlugin: author = " . var_export($authors[0], true));
 		}
 		return false;
 	}
@@ -500,6 +490,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 			unset($params['id']);
 		}
 		return $smarty->smartyUrl($params, $smarty);
+	}
+
+	function submissionView($hookName, $args) {
+		$request = $args[0];
+		$templateMgr = TemplateManager::getManager($request);
+		$templateMgr->assign(array("orcidIcon" => $this->getIcon()));
 	}
 
 	/**
@@ -660,10 +656,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	public function handlePublishIssue($hookName, $args) {
 		$issue =& $args[0];
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
-		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$publishedArticles = $publishedArticleDao->getPublishedArticles($issue->getId());
 		$request = PKPApplication::getRequest();
-		$journal = $request->getContext();
 
 		foreach ($publishedArticles as $publishedArticle) {
 			$articleId = $publishedArticle->getId();
