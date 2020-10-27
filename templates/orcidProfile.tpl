@@ -1,10 +1,10 @@
 {**
- * plugins/generic/orcidProfile/orcidProfile.tpl
+ * templates/orcidProfile.tpl
  *
  * Copyright (c) 2015-2019 University of Pittsburgh
- * Copyright (c) 2014-2019 Simon Fraser University
- * Copyright (c) 2003-2019 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2020 Simon Fraser University
+ * Copyright (c) 2003-2020 John Willinsky
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * ORCID Profile authorization form
  *
@@ -50,7 +50,7 @@
 		return false;
 	{rdelim}
 {if $targetOp eq 'profile'}
-	$(document).ready(function() {ldelim}        
+	$(document).ready(function() {ldelim}
 		var orcidInput = $('input[name=orcid]');
         orcidInput.attr('type', 'hidden');
         var orcidLinkOrButton = $(
@@ -58,8 +58,8 @@
         		{$orcidLink|json_encode}
         	{else}
         		{$orcidButton|json_encode}
-        	{/if});       
-        orcidLinkOrButton.insertAfter(orcidInput);		
+        	{/if});
+        orcidLinkOrButton.insertAfter(orcidInput);
 	{rdelim});
 {/if}
 </script>
