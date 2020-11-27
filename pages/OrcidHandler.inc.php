@@ -56,27 +56,36 @@ class OrcidHandler extends Handler {
 		$op = $request->getRequestedOp();
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$contextId = ($context == null) ? CONTEXT_ID_NONE : $context->getId();
-		$httpClient = Application::get()->getHttpClient();
+
+		// Set up common CURL request details
+		$curl = curl_init();
+		// Use proxy if configured
+		if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
+			curl_setopt($curl, CURLOPT_PROXY, $httpProxyHost);
+			curl_setopt($curl, CURLOPT_PROXYPORT, Config::getVar('proxy', 'http_port', '80'));
+			if ($username = Config::getVar('proxy', 'username')) {
+				curl_setopt($curl, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
+			}
+		}
 
 		// API request: Get an OAuth token and ORCID.
-		$response = $httpClient->request(
-			'POST',
-			$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . OAUTH_TOKEN_URL,
-			[
-				'form_params' => [
-					'code' => $request->getUserVar('code'),
-					'grant_type' => 'authorization_code',
-					'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
-					'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
-				],
-				'headers' => ['Accept' => 'application/json'],
-			]
-		);
-		if ($response->getStatusCode() != 200) {
-			error_log('ORCID token URL error: ' . $response->getStatusCode() . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+		curl_setopt_array($curl, array(
+			CURLOPT_URL => $plugin->getSetting($contextId, 'orcidProfileAPIPath') . OAUTH_TOKEN_URL,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_HTTPHEADER => array('Accept: application/json'),
+			CURLOPT_POST => true,
+			CURLOPT_POSTFIELDS => http_build_query(array(
+				'code' => $request->getUserVar('code'),
+				'grant_type' => 'authorization_code',
+				'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
+				'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
+			))
+		));
+		if (!($result = curl_exec($curl))) {
+			error_log('ORCID CURL error: ' . curl_error($curl) . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 			$orcidUri = $orcid = $accessToken = null;
 		} else {
-			$response = json_decode($response->getBody(),true);
+			$response = json_decode($result, true);
 			$orcid = $response['orcid'];
 			$accessToken = $response['access_token'];
 			$orcidUri = ($plugin->getSetting($contextId, "isSandBox") == true ? ORCID_URL_SANDBOX : ORCID_URL) . $orcid;
@@ -85,36 +94,42 @@ class OrcidHandler extends Handler {
 		switch ($request->getUserVar('targetOp')) {
 			case 'register':
 				// API request: get user profile (for names; email; etc)
-				$response = $httpClient->request(
-					'GET',
-					$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($orcid) . '/' . ORCID_PROFILE_URL,
-					[
-						'headers' => [
-							'Accept' => 'application/json',
-							'Authorization' => 'Bearer ' . $accessToken,
-						],
-					]
-				);
-				if ($response->getStatusCode() != 200) {
-					error_log('ORCID profile URL error: ' . $response->getStatusCode() . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+				curl_setopt_array($curl, array(
+					CURLOPT_RETURNTRANSFER => 1,
+					CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($orcid) . '/' . ORCID_PROFILE_URL,
+					CURLOPT_POST => false,
+					CURLOPT_HTTPHEADER => array(
+						'Accept: application/json',
+						'Authorization: Bearer ' . $accessToken,
+					),
+				));
+				if (!($result = curl_exec($curl))) error_log('ORCID CURL error: ' . curl_error($curl) . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+				$info = curl_getinfo($curl);
+				if ($info['http_code'] == 200) {
+					$profileJson = json_decode($result, true);
+				} else {
+					error_log('Unexpected ORCID API response: ' . $info['http_code'] . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 					$profileJson = null;
-				} else $profileJson = json_decode($response->getBody(),true);
+				}
 
 				// API request: get employments (for affiliation field)
-				$httpClient->request(
-					'GET',
-					$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($orcid) . '/' . ORCID_EMPLOYMENTS_URL,
-					[
-						'headers' => [
-							'Accept' => 'application/json',
-							'Authorization' => 'Bearer ' . $accessToken,
-						],
-					]
-				);
-				if ($response->getStatusCode() != 200) {
-					error_log('ORCID employments URL error: ' . $response->getStatusCode() . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+				curl_setopt_array($curl, array(
+					CURLOPT_RETURNTRANSFER => 1,
+					CURLOPT_URL =>	$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . urlencode($orcid) . '/' . ORCID_EMPLOYMENTS_URL,
+					CURLOPT_POST => false,
+					CURLOPT_HTTPHEADER => array(
+						'Accept: application/json',
+						'Authorization: Bearer ' . $accessToken,
+					),
+				));
+				if (!($result = curl_exec($curl))) error_log('ORCID CURL error: ' . curl_error($curl) . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
+				$info = curl_getinfo($curl);
+				if ($info['http_code'] == 200) {
+					$employmentJson = json_decode($result, true);
+				} else {
+					error_log('Unexpected ORCID API response: ' . $info['http_code'] . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 					$employmentJson = null;
-				} else $employmentJson = json_decode($response->getBody(),true);
+				}
 
 				// Suppress errors for nonexistent array indexes
 				echo '
@@ -147,6 +162,8 @@ class OrcidHandler extends Handler {
 				break;
 			default: assert(false);
 		}
+
+		curl_close($curl);
 	}
 
 	/**
@@ -218,43 +235,55 @@ class OrcidHandler extends Handler {
 		// fetch the access token
 		$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL;
 
-		$httpClient = Application::get()->getHttpClient();
-		$header = ['Accept' => 'application/json'];
-		$postData = [
+		$ch = curl_init($url);
+
+		$header = array('Accept: application/json');
+		$postData = http_build_query(array(
 			'code' => $request->getUserVar('code'),
 			'grant_type' => 'authorization_code',
 			'client_id' => $plugin->getSetting($contextId, 'orcidClientId'),
 			'client_secret' => $plugin->getSetting($contextId, 'orcidClientSecret')
-		];
+		));
 
 		$plugin->logInfo('POST ' . $url);
 		$plugin->logInfo('Request header: ' . var_export($header, true));
-		$plugin->logInfo('Request body: ' . http_build_query($postData));
+		$plugin->logInfo('Request body: ' . $postData);
 
-		$response = $httpClient->request(
-			'POST',
-			$url,
-			[
-				'headers' => $header,
-				'form_params' => $postData,
-			]
-		);
-		if ($response->getStatusCode() != 200) {
-			$plugin->logError('OrcidHandler::orcidverify - unexpected response: ' . $response->getStatusCode());
+		// Use proxy if configured
+		if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
+			curl_setopt($ch, CURLOPT_PROXY, $httpProxyHost);
+			curl_setopt($ch, CURLOPT_PROXYPORT, Config::getVar('proxy', 'http_port', '80'));
+			if ($username = Config::getVar('proxy', 'username')) {
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
+			}
+		}
+
+		curl_setopt_array($ch, array(
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_HTTPHEADER => $header,
+			CURLOPT_POST => true,
+			CURLOPT_POSTFIELDS => $postData
+		));
+
+		if (!($result = curl_exec($ch))) {
+			$plugin->logError('OrcidHandler::orcidverify - CURL error: ' . curl_error($ch));
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($templatePath);
 			return;
 		}
-		$response = json_decode($response->getBody(),true);
 
-		$plugin->logInfo('Response body: ' . print_r($response,true));
+		$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+
+		$plugin->logInfo('Response body: ' . $result);
+		$response = json_decode($result, true);
 		if (isset($response['error']) && $response['error'] === 'invalid_grant') {
-			$plugin->logError("Authorization code invalid, maybe already used");
+			$plugin->logError("Response status: $httpstatus . Authroization code invalid, maybe already used");
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($templatePath);
 			return;
 		} elseif (isset($response['error'])) {
-			$plugin->logError("Invalid ORCID response: $result");
+			$plugin->logError("Response status: $httpstatus . Invalid ORCID response: $result");
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($templatePath);
 		}
@@ -315,11 +344,10 @@ class OrcidHandler extends Handler {
 		$userOrAuthor->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 	}
 
-	/**
+	/*
 	 * Show explanation and information about ORCID
-	 * @param $args array
-	 * @param $request PKPRequest
 	 */
+
 	function about($args, $request) {
 		$context = $request->getContext();
 		$contextId = ($context == null) ? CONTEXT_ID_NONE : $context->getId();

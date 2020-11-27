@@ -855,18 +855,59 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$this->logInfo("$method $url");
 			$this->logInfo("Header: " . var_export($header, true));
 
-			$httpClient = Application::get()->getHttpClient();
-			$response = $httpClient->request(
-				$method,
-				$url,
-				[
-					'headers' => $header,
-					'json' => $orcidWork,
-				]
+			$ch = curl_init($url);
+			curl_setopt_array($ch, [
+				CURLOPT_CUSTOMREQUEST => $method,
+				CURLOPT_POSTFIELDS => $orcidWorkJson,
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_HTTPHEADER => $header
+			]);
+			// Use proxy if configured
+			if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
+				curl_setopt($ch, CURLOPT_PROXY, $httpProxyHost);
+				curl_setopt($ch, CURLOPT_PROXYPORT, Config::getVar('proxy', 'http_port', '80'));
+				if ($username = Config::getVar('proxy', 'username')) {
+					curl_setopt($ch, CURLOPT_PROXYUSERPWD, $username . ':' . Config::getVar('proxy', 'password'));
+				}
+			}
+
+			$responseHeaders = [];
+			// Needed to correctly process response headers.
+			// This function is called by curl for each received line of the header.
+			// Code from StackOverflow answer here: https://stackoverflow.com/a/41135574/8938233
+			// Thanks to StackOverflow user Geoffrey.
+			curl_setopt($ch, CURLOPT_HEADERFUNCTION,
+				function ($curl, $header) use (&$responseHeaders) {
+					$len = strlen($header);
+					$header = explode(':', $header, 2);
+					if (count($header) < 2) {
+						// ignore invalid headers
+						return $len;
+					}
+
+					$name = strtolower(trim($header[0]));
+					if (!array_key_exists($name, $responseHeaders)) {
+						$responseHeaders[$name] = [trim($header[1])];
+					} else {
+						$responseHeaders[$name][] = trim($header[1]);
+					}
+
+					return $len;
+				}
 			);
-			$httpstatus = $response->getStatusCode();
+
+			$result = curl_exec($ch);
+
+			if (curl_error($ch)) {
+				$this->logError('Unable to post to ORCID API, curl error: ' . curl_error($ch));
+				curl_close($ch);
+				return false;
+			}
+
+			$httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			curl_close($ch);
+
 			$this->logInfo("Response status: $httpstatus");
-			$responseHeaders = $response->getHeaders();
 
 			switch ($httpstatus) {
 				case 200:
@@ -885,9 +926,9 @@ class OrcidProfilePlugin extends GenericPlugin {
 					break;
 				case 401:
 					// invalid access token, token was revoked
-					$error = json_decode($response->getBody(),true);
-					if ($error['error'] === 'invalid_token') {
-						$this->logError($error['error_description'] . ', deleting orcidAccessToken from author');
+					$error = json_decode($result);
+					if ($error->error === 'invalid_token') {
+						$this->logError("$error->error_description, deleting orcidAccessToken from author");
 						$this->removeOrcidAccessToken($author);
 					}
 					$requestsSuccess[$orcid] = false;
@@ -900,16 +941,16 @@ class OrcidProfilePlugin extends GenericPlugin {
 						$authorDao->updateObject($author);
 						$requestsSuccess[$orcid] = false;
 					} else {
-						$this->logError("Unexpected status $httpstatus response, body: " . $response->getBody());
+						$this->logError("Unexpected status $httpstatus response, body: $result");
 						$requestsSuccess[$orcid] = false;
 					}
 					break;
 				case 409:
-					$this->logError('Work already added to profile, response body: ' . $response->getBody());
+					$this->logError('Work already added to profile, response body: ' . $result);
 					$requestsSuccess[$orcid] = false;
 					break;
 				default:
-					$this->logError("Unexpected status $httpstatus response, body: " . $response->getBody());
+					$this->logError("Unexpected status $httpstatus response, body: $result");
 					$requestsSuccess[$orcid] = false;
 			}
 		}
