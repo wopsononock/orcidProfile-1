@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2020-10-27 11:50+0000\n"
-"Last-Translator: Jordi LC <jordi.lacruz@uab.cat>\n"
+"PO-Revision-Date: 2021-01-21 15:53+0000\n"
+"Last-Translator: Amanda Stevens <astevens@publicknowledgeproject.org>\n"
 "Language-Team: Catalan <http://translate.pkp.sfu.ca/projects/"
 "orcid-profile-plugin/orcid-profile-plugin/ca_ES/>\n"
 "Language: ca_ES\n"
@@ -125,7 +125,7 @@ msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member"
 msgstr "Membre"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox"
-msgstr "Espai de proves públic"
+msgstr "Sandbox públic"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public"
 msgstr "Públic"
