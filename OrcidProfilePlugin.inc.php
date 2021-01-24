@@ -733,6 +733,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		switch ($newPublication->getData('status')) {
 			case STATUS_PUBLISHED:
+				$this->sendSubmissionToOrcid($newPublication, $request);
+				break;
 			case STATUS_SCHEDULED:
 				$this->sendSubmissionToOrcid($newPublication, $request);
 				break;
@@ -856,14 +858,20 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$this->logInfo("Header: " . var_export($header, true));
 
 			$httpClient = Application::get()->getHttpClient();
-			$response = $httpClient->request(
-				$method,
-				$url,
-				[
-					'headers' => $header,
-					'json' => $orcidWork,
-				]
-			);
+			try {
+				$response = $httpClient->request(
+					$method,
+					$url,
+					[
+						'headers' => $header,
+						'json' => $orcidWork,
+					]
+				);
+			} catch (\GuzzleHttp\Exception\ClientException $exception) {
+				$reason = $exception->getResponse()->getBody(false);
+				$this->logInfo("Publication fail: $reason");
+				return new JSONMessage(false);
+			}
 			$httpstatus = $response->getStatusCode();
 			$this->logInfo("Response status: $httpstatus");
 			$responseHeaders = $response->getHeaders();
@@ -890,6 +898,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 						$this->logError($error['error_description'] . ', deleting orcidAccessToken from author');
 						$this->removeOrcidAccessToken($author);
 					}
+					$requestsSuccess[$orcid] = false;
+					break;
+				case 403:
+					$this->logError('Work update forbidden: ' . $response->getBody());
 					$requestsSuccess[$orcid] = false;
 					break;
 				case 404:
