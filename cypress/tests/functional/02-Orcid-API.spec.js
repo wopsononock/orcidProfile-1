@@ -20,12 +20,12 @@ describe("Authorization Redirect: " + Cypress.env('orcid_url'), function () {
 			})
 	});
 
-	it('Authoritazation:  User Credentials', () => {
+	/*it('Authoritazation:  User Credentials', () => {
 		cy.visit(orcidUrl);
 		cy.get('.mat-form-field > .mat-form-field-wrapper > .mat-form-field-flex > .mat-form-field-infix > #mat-input-0').clear().type(Cypress.env('orcid_email'));
 		cy.get('.mat-form-field > .mat-form-field-wrapper > .mat-form-field-flex > .mat-form-field-infix > #mat-input-1').clear().type(Cypress.env('orcid_emailPassword'));
 		cy.get('.mat-card > .mat-card-content > .ng-star-inserted > .ng-valid > .mat-focus-indicator').click();
 
-	})
+	})*/
 });
 
