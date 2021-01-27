@@ -832,12 +832,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		$requestsSuccess = [];
 		foreach ($authorsWithOrcid as $orcid => $author) {
-			$url = $this->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/' . ORCID_WORK_URL;
+			$uri = $this->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/' . ORCID_WORK_URL;
 			$method = "POST";
 
 			if ($putCode = $author->getData('orcidWorkPutCode')) {
 				// Submission has already been sent to ORCID. Use PUT to update meta data
-				$url .= '/' . $putCode;
+				$uri .= '/' . $putCode;
 				$method = "PUT";
 				$orcidWork['put-code'] = $putCode;
 			} else {
@@ -847,23 +847,22 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			$orcidWorkJson = json_encode($orcidWork);
 
-			$header = [
-				'Content-Type: application/vnd.orcid+json',
-				'Content-Length: ' . strlen($orcidWorkJson),
-				'Accept: application/json',
-				'Authorization: Bearer ' . $author->getData('orcidAccessToken')
+			$headers = [
+				'Content-type: application/vnd.orcid+json',
+				'Accept' => 'application/json',
+				'Authorization' => 'Bearer ' . $author->getData('orcidAccessToken')
 			];
 
-			$this->logInfo("$method $url");
-			$this->logInfo("Header: " . var_export($header, true));
+			$this->logInfo("$method $uri");
+			$this->logInfo("Header: " . var_export($headers, true));
 
 			$httpClient = Application::get()->getHttpClient();
 			try {
 				$response = $httpClient->request(
 					$method,
-					$url,
+					$uri,
 					[
-						'headers' => $header,
+						'headers' => $headers,
 						'json' => $orcidWork,
 					]
 				);
@@ -948,10 +947,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	public function buildOrcidWork($publication, $context, $authors, $request, $issue = null) {
 		$submission = Services::get('submission')->get($publication->getData('submissionId'));
 
-		PluginRegistry::loadCategory('generic');
-		$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin');
-		/** @var CitationStyleLanguagePlugin $citationPlugin */
-		$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $submission, 'bibtex', $issue, $publication)));
+		$applicationName = Application::get()->getName();
+		$bibtexCitation= '';
 
 		$publicationLocale = ($publication->getData('locale')) ? $publication->getData('locale') : 'en_US';
 		$supportedSubmissionLocales = $context->getSupportedSubmissionLocales();
@@ -977,15 +974,25 @@ class OrcidProfilePlugin extends GenericPlugin {
 			],
 			'publication-date' => $this->buildOrcidPublicationDate($publication, $issue),
 			'url' => $publicationUrl,
-			'citation' => [
-				'citation-type' => 'BIBTEX',
-				'citation-value' => $bibtexCitation
-			],
 			'language-code' => substr($publicationLocale, 0, 2),
 			'contributors' => [
 				'contributor' => $this->buildOrcidContributors($authors, $context, $publication)
 			]
 		];
+
+		if ($applicationName == 'ojs2') {
+			PluginRegistry::loadCategory('generic');
+			$citationPlugin = PluginRegistry::getPlugin('generic', 'citationstylelanguageplugin');
+			/** @var CitationStyleLanguagePlugin $citationPlugin */
+			$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $submission, 'bibtex', $issue, $publication)));
+			$orcidWork['citation'] = [
+				'citation-type' => 'BIBTEX',
+				'citation-value' => $bibtexCitation
+			];
+
+		}
+
+
 		$translatedTitleAvailable = false;
 		foreach ($supportedSubmissionLocales as $defaultLanguage) {
 			if ($defaultLanguage !== $publicationLocale) {
