@@ -53,13 +53,13 @@ msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public"
 msgstr "Public"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox"
-msgstr "Bac à sable public"
+msgstr "Sandbox public"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member"
 msgstr "Membre"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox"
-msgstr "Bac à sable réservé aux membres"
+msgstr "Sandbox réservé aux membres"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidClientId"
 msgstr "Identifiant ORCID du client"
