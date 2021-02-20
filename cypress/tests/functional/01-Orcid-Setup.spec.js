@@ -11,6 +11,7 @@ describe("Test Orcid Plugin", function () {
 	it('Configure Plugin', function () {
 
 		cy.login('admin', 'admin', 'publicknowledge');
+		cy.get('li a:contains("Settings")').click();
 		cy.get('li a:contains("Website")').click();
 		cy.get('button[id="plugins-button"]').click();
 		cy.get('input[id^="select-cell-orcidprofileplugin-enabled"]').check();
@@ -18,9 +19,9 @@ describe("Test Orcid Plugin", function () {
 		cy.waitJQuery();
 		cy.get('a[id^="component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin-settings-button-"]').click();
 		cy.waitJQuery();
-		cy.get('#orcidProfileAPIPath').select(Cypress.env('orcid')['apiType']);
-		cy.get('input[id^="orcidClientId-"]').clear().type(Cypress.env('orcid')['clientId']);
-		cy.get('input[id^="orcidClientSecret-"]').clear().type(Cypress.env('orcid')['clientSecret']);
+		cy.get('#orcidProfileAPIPath').select(Cypress.env('orcid_apiType'));
+		cy.get('input[id^="orcidClientId-"]').clear().type(Cypress.env('orcid_clientId'));
+		cy.get('input[id^="orcidClientSecret-"]').clear().type(Cypress.env('orcid_clientSecret'));
 		cy.get('#sendMailToAuthorsOnPublication').check('on');
 		cy.get('#orcidProfileSettingsForm > #orcidProfileSettings > .section > div > #logLevel').select('ALL');
 		cy.get('.content > #orcidProfileSettingsForm > #orcidProfileSettings > .section ').find('button').contains('OK').click();
