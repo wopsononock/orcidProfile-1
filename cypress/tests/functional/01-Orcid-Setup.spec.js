@@ -29,6 +29,6 @@ describe("Test Orcid Plugin", function () {
 		cy.get('#orcidProfileSettingsForm > #orcidProfileSettings > .section > div > #logLevel').select('ALL');
 		cy.get('.content > #orcidProfileSettingsForm > #orcidProfileSettings > .section ').find('button').contains('OK').click();
 
-	})
+	});
 
 })
