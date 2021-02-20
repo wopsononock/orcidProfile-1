@@ -612,34 +612,35 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$request = PKPApplication::getRequest();
 		$context = $request->getContext();
 		// This should only ever happen within a context, never site-wide.
-		assert($context != null);
-		$contextId = $context->getId();
-		if ($this->isMemberApiEnabled($contextId)) {
-			$mailTemplate = 'ORCID_REQUEST_AUTHOR_AUTHORIZATION';
-		} else {
-			$mailTemplate = 'ORCID_COLLECT_AUTHOR_ID';
-		}
-		$mail = $this->getMailTemplate($mailTemplate, $context);
-		$emailToken = md5(microtime() . $author->getEmail());
-		$author->setData('orcidEmailToken', $emailToken);
-		$articleDao = DAORegistry::getDAO('ArticleDAO');
-		$article = $articleDao->getById($author->getSubmissionId());
-		$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'articleId' => $author->getSubmissionId()));
-		$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
-		// Set From to primary journal contact
-		$mail->setFrom($context->getSetting('contactEmail'), $context->getSetting('contactName'));
-		// Send to author
-		$mail->setRecipients(array(array('name' => $author->getFullName(), 'email' => $author->getEmail())));
-		// Send the mail with parameters
-		$mail->sendWithParams(array(
-			'orcidAboutUrl' => $aboutUrl,
-			'authorOrcidUrl' => $oauthUrl,
-			'authorName' => $author->getFullName(),
-			'articleTitle' => $article->getLocalizedTitle(),
-		));
-		if ($updateAuthor) {
-			$authorDao = DAORegistry::getDAO('AuthorDAO');
-			$authorDao->updateLocaleFields($author);
+		if ($context != null) {
+			$contextId = $context->getId();
+			if ($this->isMemberApiEnabled($contextId)) {
+				$mailTemplate = 'ORCID_REQUEST_AUTHOR_AUTHORIZATION';
+			} else {
+				$mailTemplate = 'ORCID_COLLECT_AUTHOR_ID';
+			}
+			$mail = $this->getMailTemplate($mailTemplate, $context);
+			$emailToken = md5(microtime() . $author->getEmail());
+			$author->setData('orcidEmailToken', $emailToken);
+			$articleDao = DAORegistry::getDAO('ArticleDAO');
+			$article = $articleDao->getById($author->getSubmissionId());
+			$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'articleId' => $author->getSubmissionId()));
+			$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
+			// Set From to primary journal contact
+			$mail->setFrom($context->getSetting('contactEmail'), $context->getSetting('contactName'));
+			// Send to author
+			$mail->setRecipients(array(array('name' => $author->getFullName(), 'email' => $author->getEmail())));
+			// Send the mail with parameters
+			$mail->sendWithParams(array(
+				'orcidAboutUrl' => $aboutUrl,
+				'authorOrcidUrl' => $oauthUrl,
+				'authorName' => $author->getFullName(),
+				'articleTitle' => $article->getLocalizedTitle(),
+			));
+			if ($updateAuthor) {
+				$authorDao = DAORegistry::getDAO('AuthorDAO');
+				$authorDao->updateLocaleFields($author);
+			}
 		}
 	}
 
