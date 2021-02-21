@@ -12,7 +12,7 @@ describe("Test Orcid Plugin", function () {
 
 		cy.login('admin', 'admin', 'publicknowledge');
 
-		// Enable plugin
+
 		cy.get('ul[id="navigationPrimary"] a:contains("Settings")').click();
 		cy.get('ul[id="navigationPrimary"] a:contains("Website")').click();
 		cy.get('button[id="plugins-button"]').click();
@@ -27,8 +27,7 @@ describe("Test Orcid Plugin", function () {
 		cy.get('input[id^="orcidClientSecret-"]').clear().type(Cypress.env('orcid_clientSecret'));
 		cy.get('#sendMailToAuthorsOnPublication').check('on');
 		cy.get('#orcidProfileSettingsForm > #orcidProfileSettings > .section > div > #logLevel').select('ALL');
-		cy.get('.content > #orcidProfileSettingsForm > #orcidProfileSettings > .section  > button').get('button[id^="submitFormButton"]').contains('OK').click();
-
+		cy.get('.content > #orcidProfileSettingsForm > #orcidProfileSettings > .section ').find('button').contains('OK').click();
 
 	});
 
