@@ -13,21 +13,7 @@ describe("Test Orcid Plugin", function () {
 		cy.login('admin', 'admin', 'publicknowledge');
 
 
-		cy.get('ul[id="navigationPrimary"] a:contains("Settings")').click();
-		cy.get('ul[id="navigationPrimary"] a:contains("Website")').click();
-		cy.get('button[id="plugins-button"]').click();
 
-		cy.get('input[id^="select-cell-orcidprofileplugin-enabled"]').check();
-		cy.get('#component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin > .first_column > .show_extras').click();
-		cy.waitJQuery();
-		cy.get('a[id^="component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin-settings-button-"]').click();
-		cy.waitJQuery();
-		cy.get('#orcidProfileAPIPath').select(Cypress.env('orcid_apiType'));
-		cy.get('input[id^="orcidClientId-"]').clear().type(Cypress.env('orcid_clientId'));
-		cy.get('input[id^="orcidClientSecret-"]').clear().type(Cypress.env('orcid_clientSecret'));
-		cy.get('#sendMailToAuthorsOnPublication').check();
-		cy.get('#orcidProfileSettingsForm > #orcidProfileSettings > .section > div > #logLevel').select('ALL');
-		cy.get('.content > #orcidProfileSettingsForm > #orcidProfileSettings > .section ').find('button').contains('OK').click();
 
 	});
 
