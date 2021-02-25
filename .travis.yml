@@ -25,6 +25,7 @@ install:
 - lib/pkp/tools/travis/prepare-webserver.sh
 - lib/pkp/tools/travis/install-composer-dependencies.sh
 - npm i g -npm && npm install && npm run build
+- npm install -g core-js
 - rm -rf ~/${APPLICATION}/plugins/generic/orcidProfile
 - ln -s ${TRAVIS_BUILD_DIR} ~/${APPLICATION}/plugins/generic/orcidProfile
 - $(npm bin)/cypress run --spec "cypress/tests/data/*.spec.js,cypress/tests/data/60-content/VkarbasizaedSubmission.spec.js"
