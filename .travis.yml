@@ -27,8 +27,7 @@ install:
 - npm i g -npm && npm install && npm run build
 - rm -rf ~/${APPLICATION}/plugins/generic/orcidProfile
 - ln -s ${TRAVIS_BUILD_DIR} ~/${APPLICATION}/plugins/generic/orcidProfile
-- $(npm bin)/cypress run --spec "cypress/tests/data/10-Installation.spec.js,cypress/tests/data/20-CreateContext.spec.js"
-
+- $(npm bin)/cypress run --spec "cypress/tests/data/*.spec.js,cypress/tests/data/60-content/VkarbasizaedSubmission.spec.js"
 
 
 script:
