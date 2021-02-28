@@ -21,9 +21,9 @@ describe("Test Orcid Plugin", function () {
 		cy.get('#component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin > .first_column > .show_extras').click();
 
 		cy.waitJQuery();
-
-		//cy.get('a[id^="component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin-settings-button-"]').click();
 		/**
+		cy.get('a[id^="component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin-settings-button-"]').click();
+
 		cy.get('#orcidProfileAPIPath').select(Cypress.env('orcid_apiType'));
 		cy.get('input[id^="orcidClientId-"]').clear().type(Cypress.env('orcid_clientId'));
 		cy.get('input[id^="orcidClientSecret-"]').clear().type(Cypress.env('orcid_clientSecret'));
