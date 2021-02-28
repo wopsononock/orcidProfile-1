@@ -19,9 +19,11 @@ describe("Test Orcid Plugin", function () {
 
 		cy.get('input[id^="select-cell-orcidprofileplugin-enabled"]').check();
 		cy.get('#component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin > .first_column > .show_extras').click();
+		cy.waitJQuery();
 
+		cy.get('#component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin > .first_column > .show_extras').click()
+		cy.get('a[id^="component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin-settings-button"]').click()
 
-		cy.get('a[id^="component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin-settings-button"]').click();
 		/**
 		cy.get('#orcidProfileAPIPath').select(Cypress.env('orcid_apiType'));
 		cy.get('input[id^="orcidClientId-"]').clear().type(Cypress.env('orcid_clientId'));
@@ -29,7 +31,6 @@ describe("Test Orcid Plugin", function () {
 		cy.get('#sendMailToAuthorsOnPublication').check();
 		cy.get('#orcidProfileSettingsForm > #orcidProfileSettings > .section > div > #logLevel').select('ALL');
 		cy.get('.content > #orcidProfileSettingsForm > #orcidProfileSettings > .section ').find('button').contains('OK').click();*/
-		cy.waitJQuery();
 
 	});
 
