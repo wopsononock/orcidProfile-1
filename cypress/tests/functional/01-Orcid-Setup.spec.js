@@ -22,7 +22,7 @@ describe("Test Orcid Plugin", function () {
 
 		cy.waitJQuery();
 
-		cy.get('a[id^="component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin-settings-button-"]').click();
+		//cy.get('a[id^="component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin-settings-button-"]').click();
 		/**
 		cy.get('#orcidProfileAPIPath').select(Cypress.env('orcid_apiType'));
 		cy.get('input[id^="orcidClientId-"]').clear().type(Cypress.env('orcid_clientId'));
