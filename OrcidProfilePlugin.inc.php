@@ -668,46 +668,47 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$context = $request->getContext();
 
 		// This should only ever happen within a context, never site-wide.
-		assert($context != null);
+		if ($context != null) {
 
-		$contextId = $context->getId();
+			$contextId = $context->getId();
 
-		if ($this->isMemberApiEnabled($contextId)) {
-			$mailTemplate = 'ORCID_REQUEST_AUTHOR_AUTHORIZATION';
-		} else {
-			$mailTemplate = 'ORCID_COLLECT_AUTHOR_ID';
-		}
+			if ($this->isMemberApiEnabled($contextId)) {
+				$mailTemplate = 'ORCID_REQUEST_AUTHOR_AUTHORIZATION';
+			} else {
+				$mailTemplate = 'ORCID_COLLECT_AUTHOR_ID';
+			}
 
-		$mail = $this->getMailTemplate($mailTemplate, $context);
-		$emailToken = md5(microtime() . $author->getEmail());
+			$mail = $this->getMailTemplate($mailTemplate, $context);
+			$emailToken = md5(microtime() . $author->getEmail());
 
-		$author->setData('orcidEmailToken', $emailToken);
+			$author->setData('orcidEmailToken', $emailToken);
 
-		$publicationDao = DAORegistry::getDAO('PublicationDAO');
-		/** @var PublicationDAO $publicationDao */
-		$publication = $publicationDao->getById($author->getData('publicationId'));
+			$publicationDao = DAORegistry::getDAO('PublicationDAO');
+			/** @var PublicationDAO $publicationDao */
+			$publication = $publicationDao->getById($author->getData('publicationId'));
 
-		$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'publicationId' => $publication->getId()));
-		$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
+			$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'publicationId' => $publication->getId()));
+			$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
 
-		// Set From to primary journal contact
-		$mail->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
+			// Set From to primary journal contact
+			$mail->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
 
-		// Send to author
-		$mail->setRecipients(array(array('name' => $author->getFullName(), 'email' => $author->getEmail())));
+			// Send to author
+			$mail->setRecipients(array(array('name' => $author->getFullName(), 'email' => $author->getEmail())));
 
-		// Send the mail with parameters
-		$mail->sendWithParams(array(
-			'orcidAboutUrl' => $aboutUrl,
-			'authorOrcidUrl' => $oauthUrl,
-			'authorName' => $author->getFullName(),
-			'articleTitle' => $publication->getLocalizedTitle(), // Backwards compatibility only
-			'submissionTitle' => $publication->getLocalizedTitle(),
-		));
+			// Send the mail with parameters
+			$mail->sendWithParams(array(
+				'orcidAboutUrl' => $aboutUrl,
+				'authorOrcidUrl' => $oauthUrl,
+				'authorName' => $author->getFullName(),
+				'articleTitle' => $publication->getLocalizedTitle(), // Backwards compatibility only
+				'submissionTitle' => $publication->getLocalizedTitle(),
+			));
 
-		if ($updateAuthor) {
-			$authorDao = DAORegistry::getDAO('AuthorDAO');
-			$authorDao->updateObject($author);
+			if ($updateAuthor) {
+				$authorDao = DAORegistry::getDAO('AuthorDAO');
+				$authorDao->updateObject($author);
+			}
 		}
 	}
 

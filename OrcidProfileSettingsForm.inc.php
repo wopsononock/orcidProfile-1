@@ -44,12 +44,32 @@ class OrcidProfileSettingsForm extends Form {
 
 		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
-		if(!$this->plugin->isGloballyConfigured()) {
+		if (!$this->plugin->isGloballyConfigured()) {
 			$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required',
 				'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
 		}
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
+		$this->addCheck(new FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientId.error', function ($clientId) {
+			if (preg_match('/^APP-[\da-zA-Z]{16}|(\d{4}-){3,}\d{3}[\dX]/', $clientId) == 1) {
+				$this->plugin->setEnabled(true);
+				return true;
+			} else {
+				$this->plugin->setEnabled(false);
+			}
+
+		}));
+		$this->addCheck(new FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error', function ($clientSecret) {
+			if (preg_match('/^(\d|-|[a-f]){36,64}/', $clientSecret) == 1) {
+				$this->plugin->setEnabled(true);
+				return true;
+			} else {
+				$this->plugin->setEnabled(false);
+			}
+
+		}));
+
+
 	}
 
 	/**
@@ -91,8 +111,7 @@ class OrcidProfileSettingsForm extends Form {
 		foreach (self::CONFIG_VARS as $configVar => $type) {
 			if ($configVar === 'orcidProfileAPIPath') {
 				$plugin->updateSetting($contextId, $configVar, trim($this->getData($configVar), "\"\';"), $type);
-			}
-			else {
+			} else {
 				$plugin->updateSetting($contextId, $configVar, $this->getData($configVar), $type);
 			}
 		}
