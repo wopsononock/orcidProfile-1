@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T11:05:16+00:00\n"
-"PO-Revision-Date: 2021-01-21 15:53+0000\n"
-"Last-Translator: Heike Riegler <heike.riegler@julius-kuehn.de>\n"
+"PO-Revision-Date: 2021-03-23 10:55+0000\n"
+"Last-Translator: Sebastian Wolf <bibliothekswelt@htmlwolf.de>\n"
 "Language-Team: German <http://translate.pkp.sfu.ca/projects/"
 "orcid-profile-plugin/orcid-profile-plugin/de_DE/>\n"
 "Language: de_DE\n"
@@ -86,8 +86,9 @@ msgstr "ORCID Zugriff abgelehnt"
 msgid "plugins.generic.orcidProfile.author.accessTokenStored"
 msgstr "ORCID Zugriff genehmigt mit Berechtigung {$orcidAccessScope}, gültig bis"
 
+#, fuzzy
 msgid "plugins.generic.orcidProfile.author.requestAuthorization"
-msgstr "Sende E-Mail an Beiträger/in um ORCID Authorisierung anzufragen"
+msgstr "Sende E-Mail an Beiträger/in um ORCID-Autorisierung anzufragen"
 
 msgid "plugins.generic.orcidProfile.author.deleteORCID"
 msgstr "Lösche ORCID iD und Zugriffsberechtigung!"
@@ -95,11 +96,13 @@ msgstr "Lösche ORCID iD und Zugriffsberechtigung!"
 msgid "plugins.generic.orcidProfile.author.orcidEmptyNotice"
 msgstr "Siehe unten zur Authentifizierung der ORCID iD"
 
+#, fuzzy
 msgid "plugins.generic.orcidProfile.author.unauthenticated"
-msgstr "ORCID iD nicht authentifiziert! Bitte Authorisierung anfragen."
+msgstr "ORCID iD nicht authentifiziert! Bitte Autorisierung anfragen."
 
+#, fuzzy
 msgid "plugins.generic.orcidProfile.verify.title"
-msgstr "ORCID Authorisierung"
+msgstr "ORCID-Autorisierung"
 
 msgid "plugins.generic.orcidProfile.verify.sendSubmissionToOrcid.success"
 msgstr "Die Einreichung wurde zu Ihrem ORCID-Datensatz hinzugefügt."
@@ -205,3 +208,11 @@ msgstr ""
 "vertrauenswürdigen Informationen aktuell zu halten. Lesen Sie mehr dazu "
 "unter <a href=\"https://orcid.org/blog/2017/08/10/six-ways-make-your-orcid-"
 "id-work-you\">Six ways to make your ORCID iD work for you!</a>\n"
+
+#, fuzzy
+msgid "plugins.generic.orcidProfile.manager.settings.orcidClientId.error"
+msgstr "Ungültige Client-ID"
+
+#, fuzzy
+msgid "plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error"
+msgstr "Ungültiges Client Secret"
