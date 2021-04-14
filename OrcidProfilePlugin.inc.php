@@ -310,7 +310,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		// We need to construct a page url, but the request is using the component router.
 		// Use the Dispatcher to construct the url and set the page router.
-		$redirectUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi',
+		$redirectUrl = $request->getDispatcher()->url($request, PKPApplication::ROUTE_PAGE, null, 'orcidapi',
 			$handlerMethod, null, $redirectParams);
 
 		return $this->getOauthPath() . 'authorize?' . http_build_query(
@@ -688,7 +688,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$publication = $publicationDao->getById($author->getData('publicationId'));
 
 			$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'publicationId' => $publication->getId()));
-			$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
+			$aboutUrl = $request->getDispatcher()->url($request, PKPApplication::ROUTE_PAGE, null, 'orcidapi', 'about', null);
 
 			// Set From to primary journal contact
 			$mail->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
@@ -954,7 +954,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$publicationLocale = ($publication->getData('locale')) ? $publication->getData('locale') : 'en_US';
 		$supportedSubmissionLocales = $context->getSupportedSubmissionLocales();
 
-		$publicationUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'article', 'view', $submission->getId());
+		$publicationUrl = $request->getDispatcher()->url($request, PKPApplication::ROUTE_PAGE, null, 'article', 'view', $submission->getId());
 
 		$orcidWork = [
 			'title' => [

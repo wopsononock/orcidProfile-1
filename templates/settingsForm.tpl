@@ -18,7 +18,7 @@
 	{rdelim});
 </script>
 
-<form class="pkp_form" id="orcidProfileSettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
+<form class="pkp_form" id="orcidProfileSettingsForm" method="post" action="{url router=PKPApplication::ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
 	<div id="orcidProfileSettings">
 
 		<p id="description">
