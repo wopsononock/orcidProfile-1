@@ -68,7 +68,7 @@ Use the Plugin Gallery from within your PKP application to install the plugin. F
 "orcid": {
 	"url": "https://sandbox.orcid.org",
 	"apiPath": "https://api.sandbox.orcid.org",
- 	"api Type": "Member Sandbox"
+ 	"api Type": "Member Sandbox",
 	"clientId": "APP-T0XXXXXXXXXXX",
 	"clientSecret": "288455445-a3e4-454-9783-454545555",
 	"email": "coauthor@mailinator.com",
