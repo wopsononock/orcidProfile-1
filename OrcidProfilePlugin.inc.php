@@ -33,6 +33,7 @@ define('ORCID_EMAIL_URL', 'email');
 define('ORCID_WORK_URL', 'work');
 
 use \PKP\core\JSONMessage;
+use \PKP\mail\MailTemplate;
 
 class OrcidProfilePlugin extends GenericPlugin {
 	const PUBID_TO_ORCID_EXT_ID = ["doi" => "doi", "other::urn" => "urn"];
@@ -654,7 +655,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return MailTemplate
 	 */
 	function getMailTemplate($emailKey, $context = null) {
-		import('lib.pkp.classes.mail.MailTemplate');
 		return new MailTemplate($emailKey, null, $context, false);
 	}
 
