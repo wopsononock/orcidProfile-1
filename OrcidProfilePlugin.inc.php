@@ -34,6 +34,7 @@ define('ORCID_WORK_URL', 'work');
 
 use \PKP\core\JSONMessage;
 use \PKP\mail\MailTemplate;
+use \PKP\submission\PKPSubmission;
 
 class OrcidProfilePlugin extends GenericPlugin {
 	const PUBID_TO_ORCID_EXT_ID = ["doi" => "doi", "other::urn" => "urn"];
@@ -735,10 +736,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$request = PKPApplication::get()->getRequest();
 
 		switch ($newPublication->getData('status')) {
-			case STATUS_PUBLISHED:
+			case PKPSubmission::STATUS_PUBLISHED:
 				$this->sendSubmissionToOrcid($newPublication, $request);
 				break;
-			case STATUS_SCHEDULED:
+			case PKPSubmission::STATUS_SCHEDULED:
 				$this->sendSubmissionToOrcid($newPublication, $request);
 				break;
 		}

@@ -14,7 +14,9 @@
  * @brief Pass off internal ORCID API requests to ORCID
  */
 
-import('classes.handler.Handler');
+use \PKP\submission\PKPSubmission;
+
+use \APP\handler\Handler;
 
 class OrcidHandler extends Handler {
 	const TEMPLATE = 'orcidVerify.tpl';
@@ -281,7 +283,7 @@ class OrcidHandler extends Handler {
 		$this->_setOrcidData($authorToVerify, $orcidUri, $response);
 		$authorDao->updateObject($authorToVerify);
 		if($plugin->isMemberApiEnabled($contextId) ) {
-			if ($publication->getData('status') == STATUS_PUBLISHED) {
+			if ($publication->getData('status') == PKPSubmission::STATUS_PUBLISHED) {
 				$templateMgr->assign('sendSubmission', true);
 				$sendResult = $plugin->sendSubmissionToOrcid($publication, $request);
 				if ($sendResult === true || (is_array($sendResult) && $sendResult[$response['orcid']])) {
