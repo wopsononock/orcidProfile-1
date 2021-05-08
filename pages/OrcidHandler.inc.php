@@ -15,6 +15,7 @@
  */
 
 use \PKP\submission\PKPSubmission;
+use PKP\security\authorization\PKPSiteAccessPolicy;
 
 use \APP\handler\Handler;
 
@@ -25,12 +26,11 @@ class OrcidHandler extends Handler {
 	 * @copydoc PKPHandler::authorize()
 	 */
 	function authorize($request, &$args, $roleAssignments) {
-		// Authorize all requets
-		import('lib.pkp.classes.security.authorization.PKPSiteAccessPolicy');
+		// Authorize all requests
 		$this->addPolicy(new PKPSiteAccessPolicy(
 			$request,
 			array('orcidVerify', 'orcidAuthorize', 'about'),
-			SITE_ACCESS_ALL_ROLES
+			PKPSiteAccessPolicy::SITE_ACCESS_ALL_ROLES
 		));
 
 		$op = $request->getRequestedOp();

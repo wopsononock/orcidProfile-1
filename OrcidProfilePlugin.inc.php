@@ -14,8 +14,6 @@
  * @brief ORCID Profile plugin class
  */
 
-import('lib.pkp.classes.plugins.GenericPlugin');
-
 define('ORCID_URL', 'https://orcid.org/');
 define('ORCID_URL_SANDBOX', 'https://sandbox.orcid.org/');
 define('ORCID_API_URL_PUBLIC', 'https://pub.orcid.org/');
@@ -32,9 +30,14 @@ define('ORCID_PROFILE_URL', 'person');
 define('ORCID_EMAIL_URL', 'email');
 define('ORCID_WORK_URL', 'work');
 
-use \PKP\core\JSONMessage;
-use \PKP\mail\MailTemplate;
-use \PKP\submission\PKPSubmission;
+use PKP\plugins\GenericPlugin;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\AjaxModal;
+use PKP\core\JSONMessage;
+use PKP\mail\MailTemplate;
+use PKP\submission\PKPSubmission;
+
+use APP\workflow\EditorDecisionActionsManager;
 
 class OrcidProfilePlugin extends GenericPlugin {
 	const PUBID_TO_ORCID_EXT_ID = ["doi" => "doi", "other::urn" => "urn"];
@@ -562,7 +565,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function getActions($request, $actionArgs) {
 		$router = $request->getRouter();
-		import('lib.pkp.classes.linkAction.request.AjaxModal');
 		return array_merge(
 			$this->getEnabled() ? array(
 				new LinkAction(
@@ -758,7 +760,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		/** @var Submission $submission */
 		$decision = $args[1];
 
-		if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT) {
+		if ($decision['decision'] == EditorDecisionActionsManager::SUBMISSION_EDITOR_DECISION_ACCEPT) {
 			$publication = $submission->getCurrentPublication();
 
 			if (isset($publication)) {
