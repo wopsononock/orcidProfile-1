@@ -20,7 +20,7 @@ define('ORCID_API_URL_PUBLIC', 'https://pub.orcid.org/');
 define('ORCID_API_URL_PUBLIC_SANDBOX', 'https://pub.sandbox.orcid.org/');
 define('ORCID_API_URL_MEMBER', 'https://api.orcid.org/');
 define('ORCID_API_URL_MEMBER_SANDBOX', 'https://api.sandbox.orcid.org/');
-define('ORCID_API_VERSION_URL', 'v2.1/');
+define('ORCID_API_VERSION_URL', 'v3.0/');
 define('ORCID_API_SCOPE_PUBLIC', '/authenticate');
 define('ORCID_API_SCOPE_MEMBER', '/activities/update');
 
@@ -851,7 +851,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 				unset($orcidWork['put-code']);
 			}
 
-			$orcidWorkJson = json_encode($orcidWork);
 
 			$headers = [
 				'Content-type: application/vnd.orcid+json',
@@ -888,7 +887,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$requestsSuccess[$orcid] = true;
 					break;
 				case 201:
-					$location = $responseHeaders['location'][0];
+					$location = $responseHeaders['Location'][0];
 					// Extract the ORCID work put code for updates/deletion.
 					$putCode = intval(basename(parse_url($location, PHP_URL_PATH)));
 					$this->logInfo("Work added to profile, putCode: $putCode");
@@ -974,7 +973,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'value' => $context->getName($publicationLocale) ?? ''
 			],
 			'short-description' => trim(strip_tags($publication->getLocalizedData('abstract', $publicationLocale))) ?? '',
-			'type' => 'JOURNAL_ARTICLE',
+			'type' => 'annotation',
 			'external-ids' => [
 				'external-id' => $this->buildOrcidExternalIds($submission, $publication, $context, $issue, $publicationUrl)
 			],
@@ -992,7 +991,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			/** @var CitationStyleLanguagePlugin $citationPlugin */
 			$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $submission, 'bibtex', $issue, $publication)));
 			$orcidWork['citation'] = [
-				'citation-type' => 'BIBTEX',
+				'citation-type' => 'bibtex',
 				'citation-value' => $bibtexCitation
 			];
 
@@ -1067,7 +1066,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 						'external-id-url' => [
 							'value' => $plugin->getResolvingURL($contextId, $pubId)
 						],
-						'external-id-relationship' => 'SELF'
+						'external-id-relationship' => 'self'
 					];
 
 					$articleHasStoredPubId = true;
@@ -1082,7 +1081,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 						'external-id-url' => [
 							'value' => $plugin->getResolvingURL($contextId, $pubId)
 						],
-						'external-id-relationship' => 'PART_OF'
+						'external-id-relationship' => 'part-of'
 					];
 				}
 			}
@@ -1096,7 +1095,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$externalIds[] = [
 				'external-id-type' => 'uri',
 				'external-id-value' => $articleUrl,
-				'external-id-relationship' => 'SELF'
+				'external-id-relationship' => 'self'
 			];
 		}
 
@@ -1106,7 +1105,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$externalIds[] = [
 				'external-id-type' => 'issn',
 				'external-id-value' => $context->getData('onlineIssn'),
-				'external-id-relationship' => 'PART_OF'
+				'external-id-relationship' => 'part-of'
 			];
 		}
 
@@ -1136,7 +1135,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$contributor = [
 				'credit-name' => $fullName,
 				'contributor-attributes' => [
-					'contributor-sequence' => $first ? 'FIRST' : 'ADDITIONAL'
+					'contributor-sequence' => $first ? 'first' : 'additional'
 				]
 			];
 
