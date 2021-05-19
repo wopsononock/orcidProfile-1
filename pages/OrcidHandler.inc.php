@@ -57,7 +57,7 @@ class OrcidHandler extends Handler {
 		$context = $request->getContext();
 		$op = $request->getRequestedOp();
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
-		$contextId = ($context == null) ? CONTEXT_ID_NONE : $context->getId();
+		$contextId = ($context == null) ? \PKP\core\PKPApplication::CONTEXT_ID_NONE : $context->getId();
 		$httpClient = Application::get()->getHttpClient();
 
 		// API request: Get an OAuth token and ORCID.
@@ -159,7 +159,7 @@ class OrcidHandler extends Handler {
 	function orcidVerify($args, $request) {
 		$templateMgr = TemplateManager::getManager($request);
 		$context = $request->getContext();
-		$contextId = ($context == null) ? CONTEXT_ID_NONE : $context->getId();
+		$contextId = ($context == null) ? \PKP\core\PKPApplication::CONTEXT_ID_NONE : $context->getId();
 
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$templatePath = $plugin->getTemplateResource(self::TEMPLATE);
@@ -324,7 +324,7 @@ class OrcidHandler extends Handler {
 	 */
 	function about($args, $request) {
 		$context = $request->getContext();
-		$contextId = ($context == null) ? CONTEXT_ID_NONE : $context->getId();
+		$contextId = ($context == null) ? \PKP\core\PKPApplication::CONTEXT_ID_NONE : $context->getId();
 		$templateMgr = TemplateManager::getManager($request);
 		$plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		$templateMgr->assign('orcidIcon', $plugin->getIcon());
