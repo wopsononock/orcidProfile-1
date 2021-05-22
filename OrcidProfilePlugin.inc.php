@@ -22,7 +22,7 @@ define('ORCID_API_URL_PUBLIC', 'https://pub.orcid.org/');
 define('ORCID_API_URL_PUBLIC_SANDBOX', 'https://pub.sandbox.orcid.org/');
 define('ORCID_API_URL_MEMBER', 'https://api.orcid.org/');
 define('ORCID_API_URL_MEMBER_SANDBOX', 'https://api.sandbox.orcid.org/');
-define('ORCID_API_VERSION_URL', 'v2.1/');
+define('ORCID_API_VERSION_URL', 'v3.0/');
 define('ORCID_API_SCOPE_PUBLIC', '/authenticate');
 define('ORCID_API_SCOPE_MEMBER', '/activities/update');
 
@@ -831,12 +831,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 		$requestsSuccess = [];
 		foreach ($authorsWithOrcid as $orcid => $author) {
-			$url = $this->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/' . ORCID_WORK_URL;
+			$uri = $this->getSetting($contextId, 'orcidProfileAPIPath') . ORCID_API_VERSION_URL . $orcid . '/' . ORCID_WORK_URL;
 			$method = "POST";
 
 			if ($putCode = $author->getData('orcidWorkPutCode')) {
 				// Submission has already been sent to ORCID. Use PUT to update meta data
-				$url .= '/' . $putCode;
+				$uri .= '/' . $putCode;
 				$method = "PUT";
 				$orcidWork['put-code'] = $putCode;
 			} else {
@@ -846,22 +846,22 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			$orcidWorkJson = json_encode($orcidWork);
 
-			$header = [
-				'Content-Type: application/vnd.orcid+json',
+			$headers = [
+				'Content-type: application/vnd.orcid+json',
 				'Content-Length: ' . strlen($orcidWorkJson),
 				'Accept: application/json',
 				'Authorization: Bearer ' . $author->getData('orcidAccessToken')
 			];
 
-			$this->logInfo("$method $url");
-			$this->logInfo("Header: " . var_export($header, true));
+			$this->logInfo("$method $uri");
+			$this->logInfo("Header: " . var_export($headers, true));
 
-			$ch = curl_init($url);
+			$ch = curl_init($uri);
 			curl_setopt_array($ch, [
 				CURLOPT_CUSTOMREQUEST => $method,
 				CURLOPT_POSTFIELDS => $orcidWorkJson,
 				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_HTTPHEADER => $header
+				CURLOPT_HTTPHEADER => $headers
 			]);
 			// Use proxy if configured
 			if ($httpProxyHost = Config::getVar('proxy', 'http_host')) {
@@ -1001,14 +1001,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 				'value' => $context->getName($publicationLocale) ?? ''
 			],
 			'short-description' => trim(strip_tags($publication->getLocalizedData('abstract', $publicationLocale))) ?? '',
-			'type' => 'JOURNAL_ARTICLE',
+			'type' => 'annotation',
 			'external-ids' => [
 				'external-id' => $this->buildOrcidExternalIds($submission, $publication, $context, $issue, $publicationUrl)
 			],
 			'publication-date' => $this->buildOrcidPublicationDate($publication, $issue),
 			'url' => $publicationUrl,
 			'citation' => [
-				'citation-type' => 'BIBTEX',
+				'citation-type' => 'bibtex',
 				'citation-value' => $bibtexCitation
 			],
 			'language-code' => substr($publicationLocale, 0, 2),
@@ -1084,7 +1084,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 						'external-id-url' => [
 							'value' => $plugin->getResolvingURL($contextId, $pubId)
 						],
-						'external-id-relationship' => 'SELF'
+						'external-id-relationship' => 'self'
 					];
 
 					$articleHasStoredPubId = true;
@@ -1099,7 +1099,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 						'external-id-url' => [
 							'value' => $plugin->getResolvingURL($contextId, $pubId)
 						],
-						'external-id-relationship' => 'PART_OF'
+						'external-id-relationship' => 'part-of'
 					];
 				}
 			}
@@ -1113,7 +1113,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$externalIds[] = [
 				'external-id-type' => 'uri',
 				'external-id-value' => $articleUrl,
-				'external-id-relationship' => 'SELF'
+				'external-id-relationship' => 'self'
 			];
 		}
 
@@ -1123,7 +1123,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$externalIds[] = [
 				'external-id-type' => 'issn',
 				'external-id-value' => $context->getData('onlineIssn'),
-				'external-id-relationship' => 'PART_OF'
+				'external-id-relationship' => 'part-of'
 			];
 		}
 
@@ -1153,7 +1153,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$contributor = [
 				'credit-name' => $fullName,
 				'contributor-attributes' => [
-					'contributor-sequence' => $first ? 'FIRST' : 'ADDITIONAL'
+					'contributor-sequence' => $first ? 'first' : 'additional'
 				]
 			];
 
