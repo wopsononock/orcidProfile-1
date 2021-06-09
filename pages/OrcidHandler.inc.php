@@ -18,6 +18,7 @@ use \PKP\submission\PKPSubmission;
 use PKP\security\authorization\PKPSiteAccessPolicy;
 
 use \APP\handler\Handler;
+use APP\facades\Repo;
 
 class OrcidHandler extends Handler {
 	const TEMPLATE = 'orcidVerify.tpl';
@@ -169,7 +170,7 @@ class OrcidHandler extends Handler {
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$authors = $authorDao->getByPublicationId($publicationId);
 
-		$publication = Services::get('publication')->get($publicationId);
+		$publication = Repo::publication()->get($publicationId);
 
 		$authorToVerify = null;
 		// Find the author entry, for which the ORCID verification was requested
