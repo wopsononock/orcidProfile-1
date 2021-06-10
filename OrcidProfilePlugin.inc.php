@@ -38,6 +38,7 @@ use PKP\mail\MailTemplate;
 use PKP\submission\PKPSubmission;
 
 use APP\workflow\EditorDecisionActionsManager;
+use APP\facades\Repo;
 
 class OrcidProfilePlugin extends GenericPlugin {
 	const PUBID_TO_ORCID_EXT_ID = ["doi" => "doi", "other::urn" => "urn"];
@@ -465,9 +466,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleSubmissionSubmitStep3FormExecute($hookName, $params) {
 		$form = $params[0];
 		// Have to use global Request access because request is not passed to hook
-		$publicationDao = DAORegistry::getDAO('PublicationDAO');
-		/* @var $publicationDao PublicationDAO */
-		$publication = $publicationDao->getById($form->submission->getData('currentPublicationId'));
+		$publication = Repo::publication()->get($form->submission->getData('currentPublicationId'));
 		$authors = $publication->getData('authors');
 
 		$request = Application::get()->getRequest();
@@ -688,9 +687,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			$author->setData('orcidEmailToken', $emailToken);
 
-			$publicationDao = DAORegistry::getDAO('PublicationDAO');
-			/** @var PublicationDAO $publicationDao */
-			$publication = $publicationDao->getById($author->getData('publicationId'));
+			$publication = Repo::publication()->get($author->getData('publicationId'));
 
 			$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'publicationId' => $publication->getId()));
 			$aboutUrl = $request->getDispatcher()->url($request, PKPApplication::ROUTE_PAGE, null, 'orcidapi', 'about', null);
@@ -950,7 +947,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @return array             an associative array with article meta data corresponding to ORCID work JSON structure
 	 */
 	public function buildOrcidWork($publication, $context, $authors, $request, $issue = null) {
-		$submission = Services::get('submission')->get($publication->getData('submissionId'));
+		$submission = Repo::submission()->get($publication->getData('submissionId'));
 
 		$applicationName = Application::get()->getName();
 		$bibtexCitation= '';
