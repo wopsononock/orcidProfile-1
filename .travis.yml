@@ -4,7 +4,6 @@ addons:
     update: true
 sudo: required
 php:
-- 7.3
 - 7.4
 env:
   matrix:
