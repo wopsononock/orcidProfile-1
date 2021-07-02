@@ -683,9 +683,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			$author->setData('orcidEmailToken', $emailToken);
 
-			$publicationDao = DAORegistry::getDAO('PublicationDAO');
-			/** @var PublicationDAO $publicationDao */
-			$publication = $publicationDao->getById($author->getData('publicationId'));
+			$publicationService = Services::get('publication');
+			$publication = $publicationService->get($author->getData('publicationId'));
 
 			$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'publicationId' => $publication->getId()));
 			$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
