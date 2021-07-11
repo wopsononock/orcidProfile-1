@@ -563,21 +563,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$this->getEnabled() ? array(
 				new LinkAction(
 					'settings',
-					new AjaxModal(
-						$router->url(
-							$request,
-							null,
-							null,
-							'manage',
-							null,
-							array(
-								'verb' => 'settings',
-								'plugin' => $this->getName(),
-								'category' => 'generic'
-							)
-						),
-						$this->getDisplayName()
-					),
+					new AjaxModal($router->url($request, null, null, 'manage', null, array('verb' => 'settings', 'plugin' => $this->getName(), 'category' => 'generic')), $this->getDisplayName()),
 					__('manager.plugins.settings'),
 					null
 				),
