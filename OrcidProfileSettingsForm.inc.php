@@ -99,6 +99,7 @@ class OrcidProfileSettingsForm extends Form {
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign('globallyConfigured', $this->plugin->isGloballyConfigured());
 		$templateMgr->assign('pluginName', $this->plugin->getName());
+		$templateMgr->assign('prerequisitesMissing', $this->_checkPrerequisites());
 		return parent::fetch($request, $template, $display);
 	}
 
@@ -120,6 +121,14 @@ class OrcidProfileSettingsForm extends Form {
 		}
 
 		parent::execute(...$functionArgs);
+	}
+	public function _checkPrerequisites() {
+		$messages = array();
+
+		if (!@include_once('Archive/Tar.php')) {
+			$messages[] = __('plugins.generic.orcidProfile.manager.settings.pluginDisabled');
+		}
+		return $messages;
 	}
 }
 

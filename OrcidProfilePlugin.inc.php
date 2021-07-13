@@ -606,8 +606,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$form->initData();
 				}
 				return new JSONMessage(true, $form->fetch($request));
+			case 'enable':
+				if(!@include_once('Archive/Tar.php')) {
+					$message = NOTIFICATION_TYPE_ERROR;
+					$messageParams = array('contents' => __('plugins.generic.orcidProfile.manager.settings.pluginDisabled'));
+					break;
+				}
 		}
-		return parent::manage($args, $request);
+		return parent::manage($args, $message, $messageParams);
 	}
 
 	/**
