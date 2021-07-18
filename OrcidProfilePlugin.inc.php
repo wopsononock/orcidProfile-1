@@ -577,7 +577,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function getEnabled($contextId = null) {
 
-		return false;
+		return parent::getEnabled($contextId);
 	}
 
 	function manage($args, $request) {
