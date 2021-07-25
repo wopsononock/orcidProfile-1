@@ -4,8 +4,8 @@
  * @file OrcidProfileSettingsForm.inc.php
  *
  * Copyright (c) 2015-2019 University of Pittsburgh
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
+ * Copyright (c) 2014-2021 Simon Fraser University
+ * Copyright (c) 2003-2021 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class OrcidProfileSettingsForm
@@ -41,9 +41,9 @@ class OrcidProfileSettingsForm extends Form {
 	 * @param $plugin object
 	 * @param $contextId int
 	 */
-	function __construct(&$plugin, $contextId) {
+	function __construct($plugin, $contextId) {
 		$this->contextId = $contextId;
-		$this->plugin =& $plugin;
+		$this->plugin = $plugin;
 		$orcidValidator = new OrcidValidator($plugin);
 		$this->validator = $orcidValidator;
 		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
@@ -92,7 +92,6 @@ class OrcidProfileSettingsForm extends Form {
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign('globallyConfigured', $this->plugin->isGloballyConfigured());
 		$templateMgr->assign('pluginName', $this->plugin->getName());
-		$templateMgr->assign('prerequisitesMissing', $this->_checkPrerequisites());
 		return parent::fetch($request, $template, $display);
 	}
 
@@ -118,9 +117,16 @@ class OrcidProfileSettingsForm extends Form {
 	public function _checkPrerequisites() {
 		$messages = array();
 
-		$clientId = $this->plugin->getSetting($this->_contextId, 'orcidClientId');
+		$clientId = $this->getData('orcidClientId');
 		if (!$this->validator->validateClientId($clientId)) {
 			$messages[] = __('plugins.generic.orcidProfile.manager.settings.orcidClientId.error');
+		}
+		$clientSecret = $this->getData('orcidClientSecret');
+		if (!$this->validator->validateClientSecret($clientSecret)) {
+			$messages[] = __('plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error');
+		}
+		if(strlen($clientId) ==0 or strlen($clientSecret)==0) {
+			$this->plugin->setEnabled(false);
 		}
 		return $messages;
 	}

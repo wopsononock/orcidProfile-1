@@ -1,9 +1,17 @@
 <?php
 
 
-class Validator {
+class OrcidValidator {
 
 	/**
+	 * OrcidValidator constructor.
+	 * @param $plugin
+	 */
+	function __construct(&$plugin) {
+		$this->plugin =& $plugin;
+	}
+
+		/**
 	 * @param $str
 	 * @return bool
 	 */

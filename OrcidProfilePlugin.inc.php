@@ -4,8 +4,8 @@
  * @file OrcidProfilePlugin.inc.php
  *
  * Copyright (c) 2015-2019 University of Pittsburgh
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
+ * Copyright (c) 2014-2021 Simon Fraser University
+ * Copyright (c) 2003-2021 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class OrcidProfilePlugin
@@ -15,6 +15,7 @@
  */
 
 import('lib.pkp.classes.plugins.GenericPlugin');
+import('plugins.generic.orcidProfile.classes.OrcidValidator');
 
 define('ORCID_URL', 'https://orcid.org/');
 define('ORCID_URL_SANDBOX', 'https://sandbox.orcid.org/');
@@ -44,9 +45,12 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function register($category, $path, $mainContextId = null) {
 		$success = parent::register($category, $path, $mainContextId);
+
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
+
+		$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
+
 		if ($success && $this->getEnabled($mainContextId)) {
-			$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
 
 			HookRegistry::register('ArticleHandler::view', array(&$this, 'submissionView'));
 			HookRegistry::register('PreprintHandler::view', array(&$this, 'submissionView'));
@@ -567,25 +571,52 @@ class OrcidProfilePlugin extends GenericPlugin {
 					__('manager.plugins.settings'),
 					null
 				),
+				new LinkAction(
+					'status',
+					new AjaxModal($router->url($request, null, null, 'manage', null, array('verb' => 'status', 'plugin' => $this->getName(), 'category' => 'generic')), $this->getDisplayName()),
+					__('common.status'),
+					null
+				),
 			),
 			parent::getActions($request, $actionArgs)
 		);
 	}
 
 	/**
+	 * @param null $contextId
+	 * @return bool
 	 * @see Plugin::manage()
 	 */
 	function getEnabled($contextId = null) {
+		$request = Application::get()->getRequest();
+		$contextId = $request->getContext()->getId();
 
-		return parent::getEnabled($contextId);
+
+		if ($request->getUserVar('save') ==1) {
+			$clientId = $request->getUserVar('orcidClientId');
+			$clientSecret = $request->getUserVar('orcidClientSecret');
+		}
+		else {
+			$clientId = $this->getSetting($contextId, 'orcidClientId');
+			$clientSecret = $this->getSetting($contextId, 'orcidClientSecret') ;
+
+		}
+		$validator = new OrcidValidator($this);
+
+		if($validator->validateClientSecret($clientSecret) and $validator->validateClientId($clientId) ) {
+			return parent::getEnabled($contextId);
+		}
+		return false;
+
+
 	}
 
 	function manage($args, $request) {
+		$context = $request->getContext();
+		$contextId = ($context == null) ? 0 : $context->getId();
+
 		switch ($request->getUserVar('verb')) {
 			case 'settings':
-				$context = $request->getContext();
-				$contextId = ($context == null) ? 0 : $context->getId();
-
 				$templateMgr = TemplateManager::getManager();
 				$templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
 				$apiOptions = [
@@ -599,7 +630,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					'ERROR' => 'plugins.generic.orcidProfile.manager.settings.logLevel.error',
 					'ALL' => 'plugins.generic.orcidProfile.manager.settings.logLevel.all'
 				]);
-				$this->import('OrcidProfileSettingsForm');
+				$this->import('classes.form.OrcidProfileSettingsForm');
 				$form = new OrcidProfileSettingsForm($this, $contextId);
 				if ($request->getUserVar('save')) {
 					$form->readInputData();
@@ -611,14 +642,13 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$form->initData();
 				}
 				return new JSONMessage(true, $form->fetch($request));
-			case 'enable':
-				if(!@include_once('Archive/Tar.php')) {
-					$message = NOTIFICATION_TYPE_ERROR;
-					$messageParams = array('contents' => __('plugins.generic.orcidProfile.manager.settings.pluginDisabled'));
-					break;
-				}
+			case 'status':
+				$this->import('classes.form.OrcidProfileStatusForm');
+				$form = new OrcidProfileStatusForm($this, $contextId);
+				$form->initData();
+				return new JSONMessage(true, $form->fetch($request));
 		}
-		return parent::manage($args, $message, $messageParams);
+		return parent::manage($args, $request);
 	}
 
 	/**
