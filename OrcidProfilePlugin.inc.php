@@ -80,8 +80,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 			// Send emails to authors without ORCID id upon submission
 			HookRegistry::register('submissionsubmitstep3form::execute', array($this, 'handleSubmissionSubmitStep3FormExecute'));
 
-			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'handleAdditionalFieldNames'));
-
 			// Add more ORCiD fields to user Schema
 			HookRegistry::register('Schema::get::user', function($hookName, $args) {
 				$schema = $args[0];
@@ -511,9 +509,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$authors[0]->setData('orcidAccessExpiresOn', $user->getData('orcidAccessExpiresOn'));
 			$authors[0]->setData('orcidSandbox', $user->getData('orcidSandbox'));
 
-			$authorDao = DAORegistry::getDAO('AuthorDAO');
-			/* @var $authorDao AuthorDAO */
-			$authorDao->updateObject($authors[0]);
+			Repo::author()->dao->update($authors[0]);
 
 			//error_log("OrcidProfilePlugin: author = " . var_export($authors[0], true));
 		}
@@ -736,8 +732,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			));
 
 			if ($updateAuthor) {
-				$authorDao = DAORegistry::getDAO('AuthorDAO');
-				$authorDao->updateObject($author);
+				Repo::author()->dao->update($author);
 			}
 		}
 	}
@@ -789,10 +784,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$publication = $submission->getCurrentPublication();
 
 			if (isset($publication)) {
-				$authorDao = DAORegistry::getDAO('AuthorDAO');
-				/** @var AuthorDAO $authorDao */
-
-				$authors = $authorDao->getByPublicationId($submission->getCurrentPublication()->getId());
+				$authors = Repo::author()->getMany(
+					Repo::author()
+						->getCollector()
+						->filterByPublicationIds([$submission->getCurrentPublication()->getId()])
+				);
 
 				foreach ($authors as $author) {
 					$orcidAccessExpiresOn = Carbon\Carbon::parse($author->getData('orcidAccessExpiresOn'));
@@ -833,9 +829,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$issue = Repo::issue()->get($issueId);
 		}
 
-		$authorDao = DAORegistry::getDAO('AuthorDAO');
-		/** @var $authorDao AuthorDAO */
-		$authors = $authorDao->getByPublicationId($publicationId);
+		$authors = Repo::author()->getMany(
+			Repo::author()
+				->getCollector()
+				->filterByPublicationIds([$publicationId])
+		);
 
 		// Collect valid ORCID ids and access tokens from submission contributors
 		$authorsWithOrcid = [];
@@ -917,7 +915,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$putCode = intval(basename(parse_url($location, PHP_URL_PATH)));
 					$this->logInfo("Work added to profile, putCode: $putCode");
 					$author->setData('orcidWorkPutCode', $putCode);
-					$authorDao->updateObject($author);
+					Repo::author()->dao->update($author);
 					$requestsSuccess[$orcid] = true;
 					break;
 				case 401:
@@ -938,7 +936,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					if ($method === 'PUT') {
 						$this->logError("Work deleted from ORCID record, deleting putCode form author");
 						$author->setData('orcidWorkPutCode', null);
-						$authorDao->updateObject($author);
+						Repo::author()->dao->update($author);
 						$requestsSuccess[$orcid] = false;
 					} else {
 						$this->logError("Unexpected status $httpstatus response, body: " . $response->getBody());
@@ -1212,8 +1210,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$author->setData('orcidSandbox', null);
 
 		if ($saveAuthor) {
-			$authorDao = DAORegistry::getDAO('AuthorDAO');
-			$authorDao->updateObject($author);
+			Repo::author()->dao->update($author);
 		}
 	}
 
