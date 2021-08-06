@@ -1,7 +1,7 @@
 # Jordi LC <jordi.lacruz@uab.cat>, 2021.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2021-08-03 12:04+0000\n"
+"PO-Revision-Date: 2021-08-07 02:51+0000\n"
 "Last-Translator: Jordi LC <jordi.lacruz@uab.cat>\n"
 "Language-Team: Catalan <http://translate.pkp.sfu.ca/projects/"
 "orcid-profile-plugin/orcid-profile-plugin/ca_ES/>\n"
@@ -120,13 +120,13 @@ msgid "plugins.generic.orcidProfile.manager.settings.orcidClientId"
 msgstr "Id. del client"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.memberSandbox"
-msgstr "Espai de proves de l'usuari/ària"
+msgstr "Entorn segur de l'usuari/ària"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.member"
 msgstr "Membre"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.publicSandbox"
-msgstr "Sandbox públic"
+msgstr "Entorn segur públic"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath.public"
 msgstr "Públic"
