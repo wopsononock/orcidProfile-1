@@ -86,7 +86,7 @@ class OrcidProfileStatusForm extends Form {
 			'globallyConfigured' => $this->plugin->isGloballyConfigured(),
 			'orcidAboutUrl' => $aboutUrl,
 			'pluginEnabled' => $this->plugin->getEnabled($contextId),
-			'clientIdValid' =>$this->validator->validateClientSecret($clientId),
+			'clientIdValid' =>$this->validator->validateClientId($clientId),
 			'clientSecretValid' =>$this->validator->validateClientSecret($clientSecret)
 
 		));

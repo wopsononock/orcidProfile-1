@@ -88,7 +88,7 @@ class OrcidHandler extends Handler {
 			$response = json_decode($result, true);
 			$orcid = $response['orcid'];
 			$accessToken = $response['access_token'];
-			$orcidUri = ($plugin->getSetting($contextId, "isSandBox") == true ? ORCID_URL_SANDBOX : ORCID_URL) . $orcid;
+			$orcidUri = ($plugin->isSandBox() ? ORCID_URL_SANDBOX : ORCID_URL) . $orcid;
 		}
 
 		switch ($request->getUserVar('targetOp')) {
@@ -288,7 +288,7 @@ class OrcidHandler extends Handler {
 			$templateMgr->display($templatePath);
 		}
 		// Set the orcid id using the full https uri
-		$orcidUri = ($plugin->getSetting($contextId, "isSandBox") == true ? ORCID_URL_SANDBOX : ORCID_URL) . $response['orcid'];
+		$orcidUri = ($plugin->isSandBox() ? ORCID_URL_SANDBOX : ORCID_URL) . $response['orcid'];
 		if (!empty($authorToVerify->getOrcid()) && $orcidUri != $authorToVerify->getOrcid()) {
 			// another ORCID id is stored for the author
 			$templateMgr->assign('duplicateOrcid', true);
