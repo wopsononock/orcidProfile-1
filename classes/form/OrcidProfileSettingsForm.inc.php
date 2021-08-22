@@ -4,8 +4,8 @@
  * @file OrcidProfileSettingsForm.inc.php
  *
  * Copyright (c) 2015-2019 University of Pittsburgh
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
+ * Copyright (c) 2014-2021 Simon Fraser University
+ * Copyright (c) 2003-2021 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class OrcidProfileSettingsForm
@@ -16,6 +16,7 @@
 
 
 import('lib.pkp.classes.form.Form');
+import('plugins.generic.orcidProfile.classes.OrcidValidator');
 
 class OrcidProfileSettingsForm extends Form {
 
@@ -33,15 +34,18 @@ class OrcidProfileSettingsForm extends Form {
 	/** @var $plugin object */
 	var $plugin;
 
+	var $validator;
+
 	/**
 	 * Constructor
 	 * @param $plugin object
 	 * @param $contextId int
 	 */
-	function __construct(&$plugin, $contextId) {
+	function __construct($plugin, $contextId) {
 		$this->contextId = $contextId;
-		$this->plugin =& $plugin;
-
+		$this->plugin = $plugin;
+		$orcidValidator = new OrcidValidator($plugin);
+		$this->validator = $orcidValidator;
 		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
 		if (!$this->plugin->isGloballyConfigured()) {
@@ -51,14 +55,13 @@ class OrcidProfileSettingsForm extends Form {
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
 		$this->addCheck(new FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientId.error', function ($clientId) {
-			return $this->_validateClientId($clientId);
+			return $this->validator->validateClientId($clientId);
 
 		}));
 		$this->addCheck(new FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error', function ($clientSecret) {
-			return $this->validateClientSecret($clientSecret);
+			return $this->validator->validateClientSecret($clientSecret);
 
 		}));
-
 
 	}
 
@@ -89,7 +92,6 @@ class OrcidProfileSettingsForm extends Form {
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign('globallyConfigured', $this->plugin->isGloballyConfigured());
 		$templateMgr->assign('pluginName', $this->plugin->getName());
-		$templateMgr->assign('prerequisitesMissing', $this->_checkPrerequisites());
 		return parent::fetch($request, $template, $display);
 	}
 
@@ -115,39 +117,20 @@ class OrcidProfileSettingsForm extends Form {
 	public function _checkPrerequisites() {
 		$messages = array();
 
-		$clientId = $this->plugin->getSetting($this->_contextId, 'orcidClientId');
-		if (!$this->_validateClientId($clientId)) {
+		$clientId = $this->getData('orcidClientId');
+		if (!$this->validator->validateClientId($clientId)) {
 			$messages[] = __('plugins.generic.orcidProfile.manager.settings.orcidClientId.error');
+		}
+		$clientSecret = $this->getData('orcidClientSecret');
+		if (!$this->validator->validateClientSecret($clientSecret)) {
+			$messages[] = __('plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error');
+		}
+		if(strlen($clientId) ==0 or strlen($clientSecret)==0) {
+			$this->plugin->setEnabled(false);
 		}
 		return $messages;
 	}
 
-	/**
-	 * @param $str
-	 * @return bool
-	 */
-	private function _validateClientId($str): bool {
-		if (preg_match('/^APP-[\da-zA-Z]{16}|(\d{4}-){3,}\d{3}[\dX]/', $str) == 1) {
-			$this->plugin->setEnabled(true);
-			return true;
-		} else {
-			$this->plugin->setEnabled(false);
-			return false;
-		}
-	}
 
-	/**
-	 * @param $str
-	 * @return bool
-	 */
-	private function validateClientSecret($str): bool {
-		if (preg_match('/^(\d|-|[a-f]){36,64}/', $str) == 1) {
-			$this->plugin->setEnabled(true);
-			return true;
-		} else {
-			$this->plugin->setEnabled(false);
-			return false;
-		}
-	}
 }
 

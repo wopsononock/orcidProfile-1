@@ -4,8 +4,8 @@
  * @file pages/OrcidHandler.inc.php
  *
  * Copyright (c) 2015-2019 University of Pittsburgh
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
+ * Copyright (c) 2014-2021 Simon Fraser University
+ * Copyright (c) 2003-2021 John Willinsky
  * Distributed under the GNU GPL v2 or later. For full terms see the file docs/COPYING.
  *
  * @class OrcidHandler
@@ -88,7 +88,7 @@ class OrcidHandler extends Handler {
 			$response = json_decode($result, true);
 			$orcid = $response['orcid'];
 			$accessToken = $response['access_token'];
-			$orcidUri = ($plugin->getSetting($contextId, "isSandBox") == true ? ORCID_URL_SANDBOX : ORCID_URL) . $orcid;
+			$orcidUri = ($plugin->isSandBox() ? ORCID_URL_SANDBOX : ORCID_URL) . $orcid;
 		}
 
 		switch ($request->getUserVar('targetOp')) {
@@ -288,7 +288,7 @@ class OrcidHandler extends Handler {
 			$templateMgr->display($templatePath);
 		}
 		// Set the orcid id using the full https uri
-		$orcidUri = ($plugin->getSetting($contextId, "isSandBox") == true ? ORCID_URL_SANDBOX : ORCID_URL) . $response['orcid'];
+		$orcidUri = ($plugin->isSandBox() ? ORCID_URL_SANDBOX : ORCID_URL) . $response['orcid'];
 		if (!empty($authorToVerify->getOrcid()) && $orcidUri != $authorToVerify->getOrcid()) {
 			// another ORCID id is stored for the author
 			$templateMgr->assign('duplicateOrcid', true);

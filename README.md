@@ -96,5 +96,11 @@ Use the Plugin Gallery from within your PKP application to install the plugin. F
 * check `logs` and `screenshots` for errors
 
 
+### Functional enhancements list
+* Do not allow to save, if globally configured.
+*
+
+
+
 
 
