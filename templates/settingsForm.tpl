@@ -18,6 +18,13 @@
 	{rdelim});
 </script>
 
+{if $prerequisitesMissing|@count > 0}
+	<ul>
+		{foreach from=$prerequisitesMissing item=message}
+			<li><span class='pkp_form_error'>{$message}</span></li>
+		{/foreach}
+	</ul>
+{/if}
 <form class="pkp_form" id="orcidProfileSettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
 	<div id="orcidProfileSettings">
 

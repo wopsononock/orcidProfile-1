@@ -563,21 +563,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$this->getEnabled() ? array(
 				new LinkAction(
 					'settings',
-					new AjaxModal(
-						$router->url(
-							$request,
-							null,
-							null,
-							'manage',
-							null,
-							array(
-								'verb' => 'settings',
-								'plugin' => $this->getName(),
-								'category' => 'generic'
-							)
-						),
-						$this->getDisplayName()
-					),
+					new AjaxModal($router->url($request, null, null, 'manage', null, array('verb' => 'settings', 'plugin' => $this->getName(), 'category' => 'generic')), $this->getDisplayName()),
 					__('manager.plugins.settings'),
 					null
 				),
@@ -620,8 +606,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$form->initData();
 				}
 				return new JSONMessage(true, $form->fetch($request));
+			case 'enable':
+				if(!@include_once('Archive/Tar.php')) {
+					$message = NOTIFICATION_TYPE_ERROR;
+					$messageParams = array('contents' => __('plugins.generic.orcidProfile.manager.settings.pluginDisabled'));
+					break;
+				}
 		}
-		return parent::manage($args, $request);
+		return parent::manage($args, $message, $messageParams);
 	}
 
 	/**

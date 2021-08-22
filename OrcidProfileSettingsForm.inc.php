@@ -51,21 +51,11 @@ class OrcidProfileSettingsForm extends Form {
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
 		$this->addCheck(new FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientId.error', function ($clientId) {
-			if (preg_match('/^APP-[\da-zA-Z]{16}|(\d{4}-){3,}\d{3}[\dX]/', $clientId) == 1) {
-				$this->plugin->setEnabled(true);
-				return true;
-			} else {
-				$this->plugin->setEnabled(false);
-			}
+			return $this->_validateClientId($clientId);
 
 		}));
 		$this->addCheck(new FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error', function ($clientSecret) {
-			if (preg_match('/^(\d|-|[a-f]){36,64}/', $clientSecret) == 1) {
-				$this->plugin->setEnabled(true);
-				return true;
-			} else {
-				$this->plugin->setEnabled(false);
-			}
+			return $this->validateClientSecret($clientSecret);
 
 		}));
 
@@ -99,6 +89,7 @@ class OrcidProfileSettingsForm extends Form {
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign('globallyConfigured', $this->plugin->isGloballyConfigured());
 		$templateMgr->assign('pluginName', $this->plugin->getName());
+		$templateMgr->assign('prerequisitesMissing', $this->_checkPrerequisites());
 		return parent::fetch($request, $template, $display);
 	}
 
@@ -120,6 +111,43 @@ class OrcidProfileSettingsForm extends Form {
 		}
 
 		parent::execute(...$functionArgs);
+	}
+	public function _checkPrerequisites() {
+		$messages = array();
+
+		$clientId = $this->plugin->getSetting($this->_contextId, 'orcidClientId');
+		if (!$this->_validateClientId($clientId)) {
+			$messages[] = __('plugins.generic.orcidProfile.manager.settings.orcidClientId.error');
+		}
+		return $messages;
+	}
+
+	/**
+	 * @param $str
+	 * @return bool
+	 */
+	private function _validateClientId($str): bool {
+		if (preg_match('/^APP-[\da-zA-Z]{16}|(\d{4}-){3,}\d{3}[\dX]/', $str) == 1) {
+			$this->plugin->setEnabled(true);
+			return true;
+		} else {
+			$this->plugin->setEnabled(false);
+			return false;
+		}
+	}
+
+	/**
+	 * @param $str
+	 * @return bool
+	 */
+	private function validateClientSecret($str): bool {
+		if (preg_match('/^(\d|-|[a-f]){36,64}/', $str) == 1) {
+			$this->plugin->setEnabled(true);
+			return true;
+		} else {
+			$this->plugin->setEnabled(false);
+			return false;
+		}
 	}
 }
 
