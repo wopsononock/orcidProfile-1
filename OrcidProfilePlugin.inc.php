@@ -226,7 +226,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					);
 				}
 
-				$templateMgr->registerFilter("output", array($this, 'authorFormFilter'));
+			$templateMgr->registerFilter("output", array($this, 'authorFormFilter'));
 				break;
 		}
 		return false;
@@ -409,10 +409,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Output filter adds ORCiD interaction to contributors metadata add/edit form.
 	 *
 	 * @param $output string
-	 * @param $templateMgr TemplateManager
+	 * @param Smarty_Internal_Template  TemplateManager
 	 * @return string
 	 */
-	function authorFormFilter(string $output, TemplateManager $templateMgr): string {
+	function authorFormFilter(string $output, Smarty_Internal_Template $templateMgr): string {
 		if (preg_match('/<input[^>]+name="submissionId"[^>]*>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
@@ -660,6 +660,15 @@ class OrcidProfilePlugin extends GenericPlugin {
 				return new JSONMessage(true, $form->fetch($request));
 		}
 		return parent::manage($args, $request);
+	}
+	/**
+	 * Return a string of the ORCiD SVG icon
+	 *
+	 * @return string
+	 */
+	function getIcon() {
+		$path = Core::getBaseDir() . '/' . $this->getPluginPath() . '/templates/images/orcid.svg';
+		return file_exists($path) ? file_get_contents($path) : '';
 	}
 
 	/**
