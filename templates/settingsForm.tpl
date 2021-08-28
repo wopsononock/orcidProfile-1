@@ -18,6 +18,7 @@
 	{rdelim});
 </script>
 
+
 <form class="pkp_form" id="orcidProfileSettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
 	<div id="orcidProfileSettings">
 
@@ -35,13 +36,13 @@
 				</p>
 				{/if}
 				{fbvElement id="orcidProfileAPIPath" type="select" translate="true" from=$orcidApiUrls selected=$orcidProfileAPIPath required="true" label="plugins.generic.orcidProfile.manager.settings.orcidProfileAPIPath" disabled=$globallyConfigured}
-				{fbvElement type="text" id="orcidClientId" value=$orcidClientId required="true" label="plugins.generic.orcidProfile.manager.settings.orcidClientId" maxlength="40" size=$fbvStyles.size.MEDIUM disabled=$globallyConfigured}
+				{fbvElement type="text" id="orcidClientId" value=$orcidClientId required="false" label="plugins.generic.orcidProfile.manager.settings.orcidClientId" maxlength="40" size=$fbvStyles.size.MEDIUM disabled=$globallyConfigured}
 				{if $globallyConfigured}
 					<p>
 						{translate key="plugins.generic.orcidProfile.manager.settings.orcidClientSecret"}: <i>{translate key="plugins.generic.orcidProfile.manager.settings.hidden"}</i>
 					</p>
 				{else}
-					{fbvElement type="text" id="orcidClientSecret" value=$orcidClientSecret required="true" label="plugins.generic.orcidProfile.manager.settings.orcidClientSecret" maxlength="40" size=$fbvStyles.size.MEDIUM disabled=$globallyConfigured}
+					{fbvElement type="text" id="orcidClientSecret" value=$orcidClientSecret required="false" label="plugins.generic.orcidProfile.manager.settings.orcidClientSecret" maxlength="40" size=$fbvStyles.size.MEDIUM disabled=$globallyConfigured}
 				{/if}
 			{/fbvFormSection}
 		{/fbvFormArea}
@@ -52,7 +53,9 @@
 			<p class="pkp_help">{translate key="plugins.generic.orcidProfile.manager.settings.logLevel.help"}</p>
 			{fbvElement id="logLevel" name="logLevel" type="select" from=$logLevelOptions selected=$logLevel}
 		{/fbvFormSection}
-		{fbvFormButtons}
+		{if !$globallyConfigured}
+			{fbvFormButtons}
+		{/if}
 		<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 	</div>
 </form>
