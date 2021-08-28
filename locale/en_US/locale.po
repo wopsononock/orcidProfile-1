@@ -174,3 +174,31 @@ msgstr "Invalid client ID"
 
 msgid "plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error"
 msgstr "Invalid client secret"
+
+msgid "plugins.generic.orcidProfile.manager.status.description"
+msgstr "OrcidProfile Plugin Status"
+
+msgid "plugins.generic.orcidProfile.manager.status.configuration.enabled"
+msgstr "OrcidProfile Plugin enabled"
+
+msgid "plugins.generic.orcidProfile.manager.status.configuration.disabled"
+msgstr "OrcidProfile Plugin disabled"
+
+msgid "plugins.generic.orcidProfile.manager.status.configuration.global"
+msgstr "Globally configured in config.inc.php"
+
+msgid "plugins.generic.orcidProfile.manager.status.configuration.journal"
+msgstr "Journal-wise configured"
+
+msgid "plugins.generic.orcidProfile.manager.status.configuration.clientIdValid"
+msgstr "Client Id is valid"
+
+msgid "plugins.generic.orcidProfile.manager.status.configuration.clientIdInvalid"
+msgstr "Client Id is invalid valid, please check your input"
+
+msgid "plugins.generic.orcidProfile.manager.status.configuration.clientSecretValid"
+msgstr "Client Secret is valid"
+
+msgid "plugins.generic.orcidProfile.manager.status.configuration.clientSecretInvalid"
+msgstr "Client Secret is invalid valid, please check your credentials"
+
