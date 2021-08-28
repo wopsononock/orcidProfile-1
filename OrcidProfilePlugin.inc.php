@@ -1013,7 +1013,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			/** @var CitationStyleLanguagePlugin $citationPlugin */
 			$bibtexCitation = trim(strip_tags($citationPlugin->getCitation($request, $submission, 'bibtex', $issue, $publication)));
 			$orcidWork['citation'] = [
-				'citation-type' => 'BIBTEX',
+				'citation-type' => 'bibtex',
 				'citation-value' => $bibtexCitation
 			];
 
