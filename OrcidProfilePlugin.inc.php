@@ -885,7 +885,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					$requestsSuccess[$orcid] = true;
 					break;
 				case 201:
-					$location = $responseHeaders['location'][0];
+					$location = $responseHeaders['Location'][0];
 					// Extract the ORCID work put code for updates/deletion.
 					$putCode = intval(basename(parse_url($location, PHP_URL_PATH)));
 					$this->logInfo("Work added to profile, putCode: $putCode");
