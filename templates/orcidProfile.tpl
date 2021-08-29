@@ -50,7 +50,7 @@
 		return false;
 	{rdelim}
 {if $targetOp eq 'profile'}
-	$(document).ready(function() {ldelim}        
+	$(document).ready(function() {ldelim}
 		var orcidInput = $('input[name=orcid]');
         orcidInput.attr('type', 'hidden');
         var orcidLinkOrButton = $(
@@ -58,13 +58,13 @@
         		{$orcidLink|json_encode}
         	{else}
         		{$orcidButton|json_encode}
-        	{/if});       
-        orcidLinkOrButton.insertAfter(orcidInput);		
+        	{/if});
+        orcidLinkOrButton.insertAfter(orcidInput);
 	{rdelim});
 {/if}
 </script>
 
 {if $targetOp eq 'register'}
-	{fbvElement type="hidden" name="orcid" id="orcid" value=$orcid maxlength="37"}
+	{fbvElement type="hidden" name="orcid" id="orcid" value=$orcid maxlength="46"}
 	{$orcidButton}
 {/if}
