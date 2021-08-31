@@ -35,7 +35,7 @@ class OrcidProfileStatusForm extends Form {
 	/** @var $plugin object */
 	var $plugin;
 
-	/**	  @var OrcidValidator*/
+	/**      @var OrcidValidator */
 	var $validator;
 
 	/**
@@ -69,15 +69,14 @@ class OrcidProfileStatusForm extends Form {
 	}
 
 
-
 	/**
 	 * Fetch the form.
 	 * @copydoc Form::fetch()
 	 */
-	function fetch($request, $template = null, $display = false): ?string {
+	function fetch($request, $template = null, $display = false) {
 		$contextId = $request->getContext()->getId();
 		$clientId = $this->plugin->getSetting($contextId, 'orcidClientId');
-		$clientSecret = $this->plugin->getSetting($contextId, 'orcidClientSecret') ;
+		$clientSecret = $this->plugin->getSetting($contextId, 'orcidClientSecret');
 
 
 		$templateMgr = TemplateManager::getManager($request);
@@ -86,14 +85,12 @@ class OrcidProfileStatusForm extends Form {
 			'globallyConfigured' => $this->plugin->isGloballyConfigured(),
 			'orcidAboutUrl' => $aboutUrl,
 			'pluginEnabled' => $this->plugin->getEnabled($contextId),
-			'clientIdValid' =>$this->validator->validateClientId($clientId),
-			'clientSecretValid' =>$this->validator->validateClientSecret($clientSecret)
+			'clientIdValid' => $this->validator->validateClientId($clientId),
+			'clientSecretValid' => $this->validator->validateClientSecret($clientSecret)
 
 		));
 		return parent::fetch($request, $template, $display);
 	}
-
-
 
 
 }
