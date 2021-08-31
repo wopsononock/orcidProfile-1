@@ -15,8 +15,8 @@
 <version>
 	<application>orcidProfile</application>
 	<type>plugins.generic</type>
-	<release>1.1.2.21</release>
-	<date>2021-08-29</date>
+	<release>1.1.2.22</release>
+	<date>2021-08-31</date>
 	<lazy-load>1</lazy-load>
 	<class>OrcidProfilePlugin</class>
 </version>
