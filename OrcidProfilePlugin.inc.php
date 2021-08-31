@@ -14,30 +14,34 @@
  * @brief ORCID Profile plugin class
  */
 
+use GuzzleHttp\Exception\ClientException;
+
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.orcidProfile.classes.OrcidValidator');
 
-const ORCID_URL = 'https://orcid.org/';
-const ORCID_URL_SANDBOX = 'https://sandbox.orcid.org/';
-const ORCID_API_URL_PUBLIC = 'https://pub.orcid.org/';
-const ORCID_API_URL_PUBLIC_SANDBOX = 'https://pub.sandbox.orcid.org/';
-const ORCID_API_URL_MEMBER = 'https://api.orcid.org/';
-const ORCID_API_URL_MEMBER_SANDBOX = 'https://api.sandbox.orcid.org/';
-const ORCID_API_VERSION_URL = 'v3.0/';
-const ORCID_API_SCOPE_PUBLIC = '/authenticate';
-const ORCID_API_SCOPE_MEMBER = '/activities/update';
+define('ORCID_URL', 'https://orcid.org/');
+define('ORCID_URL_SANDBOX', 'https://sandbox.orcid.org/');
+define('ORCID_API_URL_PUBLIC', 'https://pub.orcid.org/');
+define('ORCID_API_URL_PUBLIC_SANDBOX', 'https://pub.sandbox.orcid.org/');
+define('ORCID_API_URL_MEMBER', 'https://api.orcid.org/');
+define('ORCID_API_URL_MEMBER_SANDBOX', 'https://api.sandbox.orcid.org/');
+define('ORCID_API_VERSION_URL', 'v3.0/');
+define('ORCID_API_SCOPE_PUBLIC', '/authenticate');
+define('ORCID_API_SCOPE_MEMBER', '/activities/update');
 
-const OAUTH_TOKEN_URL = 'oauth/token';
-const ORCID_EMPLOYMENTS_URL = 'employments';
-const ORCID_PROFILE_URL = 'person';
-const ORCID_WORK_URL = 'work';
+define('OAUTH_TOKEN_URL', 'oauth/token');
+define('ORCID_EMPLOYMENTS_URL', 'employments');
+define('ORCID_PROFILE_URL', 'person');
+define('ORCID_EMAIL_URL', 'email');
+define('ORCID_WORK_URL', 'work');
 
 class OrcidProfilePlugin extends GenericPlugin {
 
 	const PUBID_TO_ORCID_EXT_ID = ["doi" => "doi", "other::urn" => "urn"];
 	const USER_GROUP_TO_ORCID_ROLE = ["Author" => "AUTHOR", "Translator" => "CHAIR_OR_TRANSLATOR", "Journal manager" => "AUTHOR"];
 
-	private int $currentContextId;
+	private $submissionIdToBePublished;
+	private $currentContextId;
 
 	/**
 	 * @copydoc Plugin::register()
@@ -46,7 +50,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param null $mainContextId
 	 * @return bool
 	 */
-	function register($category, $path, $mainContextId = null) : bool{
+	function register($category, $path, $mainContextId = null) {
 		$success = parent::register($category, $path, $mainContextId);
 
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
@@ -138,7 +142,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 
-
 	/**
 	 * Load a setting for a specific journal or load it from the config.inc.php if it is specified there.
 	 *
@@ -166,7 +169,6 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 
-
 	/**
 	 * Hook callback: register pages for each sushi-lite method
 	 * This URL is of the form: orcidapi/{$orcidrequest}
@@ -186,7 +188,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Check if there exist a valid orcid configuration section in the global config.inc.php of OJS.
 	 * @return boolean True, if the config file has api_url, client_id and client_secret set in an [orcid] section
 	 */
-	function isGloballyConfigured() : bool{
+	function isGloballyConfigured() {
 		$apiUrl = Config::getVar('orcid', 'api_url');
 		$clientId = Config::getVar('orcid', 'client_id');
 		$clientSecret = Config::getVar('orcid', 'client_secret');
@@ -202,11 +204,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param $args Form[]
 	 *
 	 * @return bool
-	 * @throws SmartyException
 	 * @see Form::display()
 	 *
 	 */
-	function handleFormDisplay(string $hookName, array $args) : bool{
+	function handleFormDisplay($hookName, $args) {
 		$request = PKPApplication::get()->getRequest();
 		$templateMgr = TemplateManager::getManager($request);
 		switch ($hookName) {
@@ -226,7 +227,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					);
 				}
 
-			$templateMgr->registerFilter("output", array($this, 'authorFormFilter'));
+				$templateMgr->registerFilter("output", array($this, 'authorFormFilter'));
 				break;
 		}
 		return false;
@@ -241,7 +242,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @see TemplateManager::display()
 	 *
 	 */
-	function handleTemplateDisplay(string $hookName, array $args) :bool {
+	function handleTemplateDisplay($hookName, $args) {
 		$templateMgr =& $args[0];
 		$template =& $args[1];
 		$request = PKPApplication::get()->getRequest();
@@ -270,7 +271,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param $templateMgr TemplateManager
 	 * @return string
 	 */
-	function registrationFilter(string $output, TemplateManager $templateMgr): string {
+	function registrationFilter($output, $templateMgr) {
 		if (preg_match('/<form[^>]+id="register"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
@@ -299,7 +300,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @return string
 	 */
-	function getOrcidUrl(): string {
+	function getOrcidUrl() {
 		$request = Application::get()->getRequest();
 		$context = $request->getContext();
 		$contextId = ($context == null) ? 0 : $context->getId();
@@ -318,7 +319,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param  $handlerMethod string containing a valid method of the OrcidHandler
 	 * @param  $redirectParams Array associative array with additional request parameters for the redirect URL
 	 */
-	function buildOAuthUrl(string $handlerMethod, array $redirectParams) {
+	function buildOAuthUrl($handlerMethod, $redirectParams) {
 		$request = PKPApplication::get()->getRequest();
 		$context = $request->getContext();
 		// This should only ever happen within a context, never site-wide.
@@ -345,11 +346,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	}
 
 
-
 	/**
 	 * @return bool True if the ORCID Member API has been selected in this context.
 	 */
-	public function isMemberApiEnabled($contextId): bool {
+	public function isMemberApiEnabled($contextId) {
 		$apiUrl = $this->getSetting($contextId, 'orcidProfileAPIPath');
 		if ($apiUrl === ORCID_API_URL_MEMBER || $apiUrl === ORCID_API_URL_MEMBER_SANDBOX) {
 			return true;
@@ -358,10 +358,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 	}
 
-	public function isSandbox(): bool {
+	public function isSandbox() {
 
 		$apiUrl = $this->getSetting($this->getCurrentContextId(), 'orcidProfileAPIPath');
-		return  ($apiUrl == ORCID_API_URL_MEMBER_SANDBOX) ;
+		return ($apiUrl == ORCID_API_URL_MEMBER_SANDBOX);
 
 	}
 
@@ -370,7 +370,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @return string
 	 */
-	function getOauthPath(): string {
+	function getOauthPath() {
 		return $this->getOrcidUrl() . 'oauth/';
 	}
 
@@ -382,7 +382,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param $params
 	 * @return bool @see lib/pkp/templates/user/publicProfileForm.tpl
 	 */
-	function handleUserPublicProfileDisplay($hookName, $params): bool {
+	function handleUserPublicProfileDisplay($hookName, $params) {
 		$templateMgr =& $params[1];
 		$output =& $params[2];
 		$request = Application::get()->getRequest();
@@ -409,10 +409,10 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * Output filter adds ORCiD interaction to contributors metadata add/edit form.
 	 *
 	 * @param $output string
-	 * @param Smarty_Internal_Template  TemplateManager
+	 * @param $templateMgr TemplateManager
 	 * @return string
 	 */
-	function authorFormFilter(string $output, Smarty_Internal_Template $templateMgr): string {
+	function authorFormFilter($output, $templateMgr) {
 		if (preg_match('/<input[^>]+name="submissionId"[^>]*>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
 			$match = $matches[0][0];
 			$offset = $matches[0][1];
@@ -434,7 +434,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @see AuthorForm::execute() The function calling the hook.
 	 *
 	 */
-	public function handleAuthorFormExecute(string $hookname, array $args) {
+	function handleAuthorFormExecute($hookname, $args) {
 		$form =& $args[0];
 		$form->readUserVars(array('requestOrcidAuthorization', 'deleteOrcid'));
 
@@ -459,7 +459,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param $params array
 	 * @return bool
 	 */
-	protected function collectUserOrcidId(string $hookName, array $params): bool {
+	function collectUserOrcidId($hookName, $params) {
 		$form = $params[0];
 		$user = $form->user;
 
@@ -475,7 +475,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param $params
 	 * @return bool
 	 */
-	function handleSubmissionSubmitStep3FormExecute($hookName, $params): bool {
+	function handleSubmissionSubmitStep3FormExecute($hookName, $params) {
 		$form = $params[0];
 		// Have to use global Request access because request is not passed to hook
 		$publicationDao = DAORegistry::getDAO('PublicationDAO');
@@ -514,7 +514,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 * @return bool
 	 */
-	function handleAdditionalFieldNames(string $hookName, array $params): bool {
+	function handleAdditionalFieldNames($hookName, $params) {
 		$fields =& $params[1];
 		$fields[] = 'orcidSandbox';
 		$fields[] = 'orcidAccessToken';
@@ -536,14 +536,14 @@ class OrcidProfilePlugin extends GenericPlugin {
 	/**
 	 * @see PKPPlugin::getInstallEmailTemplatesFile()
 	 */
-	function getInstallEmailTemplatesFile(): string {
+	function getInstallEmailTemplatesFile() {
 		return ($this->getPluginPath() . '/emailTemplates.xml');
 	}
 
 	/**
 	 * Extend the {url ...} smarty to support this plugin.
 	 */
-	function smartyPluginUrl($params, $smarty): string {
+	function smartyPluginUrl($params, $smarty) {
 		$path = array($this->getCategory(), $this->getName());
 		if (is_array($params['path'])) {
 			$params['path'] = array_merge($path, $params['path']);
@@ -670,6 +670,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		return parent::manage($args, $request);
 	}
+
 	/**
 	 * Return a string of the ORCiD SVG icon
 	 *
@@ -791,7 +792,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 **/
 	public function sendSubmissionToOrcid($publication, $request) {
 		$context = $request->getContext();
-		$contextId =  $context->getId();
+		$contextId = $context->getId();
 		$publicationId = $publication->getId();
 		$submissionId = $publication->getData('submissionId');
 
@@ -869,7 +870,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 						'json' => $orcidWork,
 					]
 				);
-			} catch (\GuzzleHttp\Exception\ClientException $exception) {
+			} catch (ClientException $exception) {
 				$reason = $exception->getResponse()->getBody(false);
 				$this->logInfo("Publication fail: $reason");
 				return new JSONMessage(false);
@@ -895,7 +896,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 					break;
 				case 401:
 					// invalid access token, token was revoked
-					$error = json_decode($response->getBody(),true);
+					$error = json_decode($response->getBody(), true);
 					if ($error['error'] === 'invalid_token') {
 						$this->logError($error['error_description'] . ', deleting orcidAccessToken from author');
 						$this->removeOrcidAccessToken($author);
@@ -971,11 +972,11 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param Request $request the current request
 	 * @return array             an associative array with article meta data corresponding to ORCID work JSON structure
 	 */
-	public function buildOrcidWork($publication, $context, $authors, $request, Issue $issue = null): array {
+	public function buildOrcidWork($publication, $context, $authors, $request, Issue $issue = null) {
 		$submission = Services::get('submission')->get($publication->getData('submissionId'));
 
 		$applicationName = Application::get()->getName();
-		$bibtexCitation= '';
+		$bibtexCitation = '';
 
 		$publicationLocale = ($publication->getData('locale')) ? $publication->getData('locale') : 'en_US';
 		$supportedSubmissionLocales = $context->getSupportedSubmissionLocales();

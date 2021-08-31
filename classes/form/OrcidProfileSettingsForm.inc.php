@@ -114,6 +114,7 @@ class OrcidProfileSettingsForm extends Form {
 
 		parent::execute(...$functionArgs);
 	}
+
 	public function _checkPrerequisites() {
 		$messages = array();
 
@@ -125,7 +126,7 @@ class OrcidProfileSettingsForm extends Form {
 		if (!$this->validator->validateClientSecret($clientSecret)) {
 			$messages[] = __('plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error');
 		}
-		if(strlen($clientId) ==0 or strlen($clientSecret)==0) {
+		if (strlen($clientId) == 0 or strlen($clientSecret) == 0) {
 			$this->plugin->setEnabled(false);
 		}
 		return $messages;
