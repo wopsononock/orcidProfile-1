@@ -82,8 +82,36 @@ class OrcidProfilePlugin extends GenericPlugin {
 
 			HookRegistry::register('authordao::getAdditionalFieldNames', array($this, 'handleAdditionalFieldNames'));
 
-			// Add more ORCiD fields to UserDAO
-			HookRegistry::register('userdao::getAdditionalFieldNames', array($this, 'handleAdditionalFieldNames'));
+			// Add more ORCiD fields to user Schema
+			HookRegistry::register('Schema::get::user', function($hookName, $args) {
+				$schema = $args[0];
+
+				$schema->properties->orcidAccessToken = (object)[
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidAccessScope = (object)[
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidRefreshToken = (object)[
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidAccessExpiresOn = (object)[
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+				$schema->properties->orcidAccessDenied = (object)[
+					'type' => 'string',
+					'apiSummary' => true,
+					'validation' => ['nullable']
+				];
+			});
 
 			// Send emails to authors without authorised ORCID access on promoting a submission to copy editing. Not included in OPS.
 			if ($this->getSetting($contextId, 'sendMailToAuthorsOnPublication')) {

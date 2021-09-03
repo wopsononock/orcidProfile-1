@@ -14,10 +14,10 @@
  * @brief Pass off internal ORCID API requests to ORCID
  */
 
-use \PKP\submission\PKPSubmission;
+use PKP\submission\PKPSubmission;
 use PKP\security\authorization\PKPSiteAccessPolicy;
 
-use \APP\handler\Handler;
+use APP\handler\Handler;
 use APP\facades\Repo;
 
 class OrcidHandler extends Handler {
@@ -137,8 +137,7 @@ class OrcidHandler extends Handler {
 				$user = $request->getUser();
 				// Store the access token and other data for the user
 				$this->_setOrcidData($user, $orcidUri, $response);
-				$userDao = DAORegistry::getDAO('UserDAO');
-				$userDao->updateLocaleFields($user);
+				Repo::user()->edit($user, ['orcidAccessDenied', 'orcidAccessToken', 'orcidAccessScope', 'orcidRefreshToken', 'orcidAccessExpiresOn']);
 
 				// Reload the public profile tab (incl. form)
 				echo '
