@@ -30,6 +30,7 @@ define('ORCID_PROFILE_URL', 'person');
 define('ORCID_EMAIL_URL', 'email');
 define('ORCID_WORK_URL', 'work');
 
+use APP\core\Application;
 use PKP\plugins\GenericPlugin;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
@@ -39,6 +40,10 @@ use PKP\submission\PKPSubmission;
 
 use APP\workflow\EditorDecisionActionsManager;
 use APP\facades\Repo;
+use APP\template\TemplateManager;
+use PKP\config\Config;
+use PKP\plugins\HookRegistry;
+use PKP\plugins\PluginRegistry;
 
 class OrcidProfilePlugin extends GenericPlugin {
 	const PUBID_TO_ORCID_EXT_ID = ["doi" => "doi", "other::urn" => "urn"];
@@ -52,7 +57,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 */
 	function register($category, $path, $mainContextId = null) {
 		$success = parent::register($category, $path, $mainContextId);
-		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
+		if (!Application::isReady()) return true;
 		if ($success && $this->getEnabled($mainContextId)) {
 			$contextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
 
@@ -241,7 +246,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *
 	 */
 	function handleFormDisplay($hookName, $args) {
-		$request = PKPApplication::get()->getRequest();
+		$request = Application::get()->getRequest();
 		$templateMgr = TemplateManager::getManager($request);
 		switch ($hookName) {
 			case 'authorform::display':
@@ -278,7 +283,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function handleTemplateDisplay($hookName, $args) {
 		$templateMgr =& $args[0];
 		$template =& $args[1];
-		$request = PKPApplication::get()->getRequest();
+		$request = Application::get()->getRequest();
 
 		// Assign our private stylesheet, for front and back ends.
 		$templateMgr->addStyleSheet(
@@ -331,7 +336,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 * @param  $redirectParams Array associative array with additional request parameters for the redirect URL
 	 */
 	function buildOAuthUrl($handlerMethod, $redirectParams) {
-		$request = PKPApplication::get()->getRequest();
+		$request = Application::get()->getRequest();
 		$context = $request->getContext();
 		// This should only ever happen within a context, never site-wide.
 		assert($context != null);
@@ -344,7 +349,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		}
 		// We need to construct a page url, but the request is using the component router.
 		// Use the Dispatcher to construct the url and set the page router.
-		$redirectUrl = $request->getDispatcher()->url($request, PKPApplication::ROUTE_PAGE, null, 'orcidapi',
+		$redirectUrl = $request->getDispatcher()->url($request, Application::ROUTE_PAGE, null, 'orcidapi',
 			$handlerMethod, null, $redirectParams);
 
 		return $this->getOauthPath() . 'authorize?' . http_build_query(
@@ -692,7 +697,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	 *    Use this only if not called from a function, which does this anyway.
 	 */
 	public function sendAuthorMail($author, $updateAuthor = false) {
-		$request = PKPApplication::get()->getRequest();
+		$request = Application::get()->getRequest();
 		$context = $request->getContext();
 
 		// This should only ever happen within a context, never site-wide.
@@ -714,7 +719,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$publication = Repo::publication()->get($author->getData('publicationId'));
 
 			$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'publicationId' => $publication->getId()));
-			$aboutUrl = $request->getDispatcher()->url($request, PKPApplication::ROUTE_PAGE, null, 'orcidapi', 'about', null);
+			$aboutUrl = $request->getDispatcher()->url($request, Application::ROUTE_PAGE, null, 'orcidapi', 'about', null);
 
 			// Set From to primary journal contact
 			$mail->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
@@ -755,7 +760,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$submission =& $args[2];
 		/** @var $submission Submission */
 
-		$request = PKPApplication::get()->getRequest();
+		$request = Application::get()->getRequest();
 
 		switch ($newPublication->getData('status')) {
 			case PKPSubmission::STATUS_PUBLISHED:
@@ -981,7 +986,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$publicationLocale = ($publication->getData('locale')) ? $publication->getData('locale') : 'en_US';
 		$supportedSubmissionLocales = $context->getSupportedSubmissionLocales();
 
-		$publicationUrl = $request->getDispatcher()->url($request, PKPApplication::ROUTE_PAGE, null, 'article', 'view', $submission->getId());
+		$publicationUrl = $request->getDispatcher()->url($request, Application::ROUTE_PAGE, null, 'article', 'view', $submission->getId());
 
 		$orcidWork = [
 			'title' => [

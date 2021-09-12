@@ -19,6 +19,7 @@ use PKP\security\authorization\PKPSiteAccessPolicy;
 
 use APP\handler\Handler;
 use APP\facades\Repo;
+use PKP\session\SessionManager;
 
 class OrcidHandler extends Handler {
 	const TEMPLATE = 'orcidVerify.tpl';
@@ -42,7 +43,9 @@ class OrcidHandler extends Handler {
 			$this->addPolicy(new UserRequiredPolicy($request));
 		}
 
-		if (!Config::getVar('general', 'installed')) define('SESSION_DISABLE_INIT', true);
+		if (!Application::isInstalled()) {
+			SessionManager::isDisabled(true);
+		}
 
 		$this->setEnforceRestrictedSite(false);
 		return parent::authorize($request, $args, $roleAssignments);
