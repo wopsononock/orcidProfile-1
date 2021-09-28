@@ -1071,43 +1071,80 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true, $contextId);
 		// Add doi, urn, etc. for article
 		$articleHasStoredPubId = false;
-		if (is_array($pubIdPlugins)) {
-			foreach ($pubIdPlugins as $plugin) {
-				if (!$plugin->getEnabled()) {
-					continue;
-				}
+		if (is_array($pubIdPlugins) || $context->areDoisEnabled()) {
+            // Handle non-DOI pubIds
+            if (is_array($pubIdPlugins)) {
+                foreach ($pubIdPlugins as $plugin) {
+                    if (!$plugin->getEnabled()) {
+                        continue;
+                    }
 
-				$pubIdType = $plugin->getPubIdType();
+                    $pubIdType = $plugin->getPubIdType();
 
-				# Add article ids
-				$pubId = $publication->getData($pubIdType);
+                    # Add article ids
+                    $pubId = $publication->getData($pubIdType);
 
-				if ($pubId) {
-					$externalIds[] = [
-						'external-id-type' => self::PUBID_TO_ORCID_EXT_ID[$pubIdType],
-						'external-id-value' => $pubId,
-						'external-id-url' => [
-							'value' => $plugin->getResolvingURL($contextId, $pubId)
-						],
-						'external-id-relationship' => 'self'
-					];
+                    if ($pubId) {
+                        $externalIds[] = [
+                            'external-id-type' => self::PUBID_TO_ORCID_EXT_ID[$pubIdType],
+                            'external-id-value' => $pubId,
+                            'external-id-url' => [
+                                'value' => $plugin->getResolvingURL($contextId, $pubId)
+                            ],
+                            'external-id-relationship' => 'self'
+                        ];
 
-					$articleHasStoredPubId = true;
-				}
+                        $articleHasStoredPubId = true;
+                    }
 
-				# Add issue ids if they exist
-				$pubId = $issue->getStoredPubId($pubIdType);
-				if ($pubId) {
-					$externalIds[] = [
-						'external-id-type' => self::PUBID_TO_ORCID_EXT_ID[$pubIdType],
-						'external-id-value' => $pubId,
-						'external-id-url' => [
-							'value' => $plugin->getResolvingURL($contextId, $pubId)
-						],
-						'external-id-relationship' => 'part-of'
-					];
-				}
-			}
+                    # Add issue ids if they exist
+                    $pubId = $issue->getStoredPubId($pubIdType);
+                    if ($pubId) {
+                        $externalIds[] = [
+                            'external-id-type' => self::PUBID_TO_ORCID_EXT_ID[$pubIdType],
+                            'external-id-value' => $pubId,
+                            'external-id-url' => [
+                                'value' => $plugin->getResolvingURL($contextId, $pubId)
+                            ],
+                            'external-id-relationship' => 'part-of'
+                        ];
+                    }
+                }
+
+                // Handle DOIs
+                if ($context->areDoisEnabled()) {
+                    # Add article ids
+                    $doiObject = $publication->getData('doiObject');
+
+                    if ($doiObject) {
+                        $externalIds[] = [
+                            'external-id-type' => self::PUBID_TO_ORCID_EXT_ID['doi'],
+                            'external-id-value' => $doiObject->getData('doi'),
+                            'external-id-url' => [
+                                'value' => $doiObject->getResolvingUrl()
+                            ],
+                            'external-id-relationship' => 'self'
+                        ];
+
+                        $articleHasStoredPubId = true;
+                    }
+
+                }
+
+                # Add issue ids if they exist
+                $pubId = $issue->getStoredPubId('doi');
+                $doiObject = $issue->getData('doiObject');
+                if ($doiObject) {
+                    $externalIds[] = [
+                        'external-id-type' => self::PUBID_TO_ORCID_EXT_ID['doi'],
+                        'external-id-value' => $doiObject->getData('doi'),
+                        'external-id-url' => [
+                            'value' => $doiObject->getResolvingUrl()
+                        ],
+                        'external-id-relationship' => 'part-of'
+                    ];
+                }
+            }
 		} else {
 			error_log("OrcidProfilePlugin::buildOrcidExternalIds: No pubId plugins could be loaded");
 		}
