@@ -1,10 +1,11 @@
+# Pia Piontkowitz <pia.piontkowitz@rub.de>, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T11:05:16+00:00\n"
-"PO-Revision-Date: 2021-06-10 08:46+0000\n"
-"Last-Translator: Sebastian Wolf <bibliothekswelt@htmlwolf.de>\n"
+"PO-Revision-Date: 2021-10-21 10:06+0000\n"
+"Last-Translator: Pia Piontkowitz <pia.piontkowitz@rub.de>\n"
 "Language-Team: German <http://translate.pkp.sfu.ca/projects/"
 "orcid-profile-plugin/orcid-profile-plugin/de_DE/>\n"
 "Language: de_DE\n"
@@ -86,9 +87,8 @@ msgstr "ORCID Zugriff abgelehnt"
 msgid "plugins.generic.orcidProfile.author.accessTokenStored"
 msgstr "ORCID Zugriff genehmigt mit Berechtigung {$orcidAccessScope}, gültig bis"
 
-#, fuzzy
 msgid "plugins.generic.orcidProfile.author.requestAuthorization"
-msgstr "Sende E-Mail an Beiträger/in um ORCID-Autorisierung anzufragen"
+msgstr "E-Mail an Beiträger/in senden um ORCID-Autorisierung anzufragen"
 
 msgid "plugins.generic.orcidProfile.author.deleteORCID"
 msgstr "Lösche ORCID iD und Zugriffsberechtigung!"
@@ -96,11 +96,9 @@ msgstr "Lösche ORCID iD und Zugriffsberechtigung!"
 msgid "plugins.generic.orcidProfile.author.orcidEmptyNotice"
 msgstr "Siehe unten zur Authentifizierung der ORCID iD"
 
-#, fuzzy
 msgid "plugins.generic.orcidProfile.author.unauthenticated"
 msgstr "ORCID iD nicht authentifiziert! Bitte Autorisierung anfragen."
 
-#, fuzzy
 msgid "plugins.generic.orcidProfile.verify.title"
 msgstr "ORCID-Autorisierung"
 
@@ -140,23 +138,21 @@ msgstr "ORCID iD authorisieren und verknüpfen"
 msgid "plugins.generic.orcidProfile.about.title"
 msgstr "Was ist ORCID?"
 
-#, fuzzy
 msgid "plugins.generic.orcidProfile.about.orcidExplanation"
 msgstr ""
 "ORCID ist eine unabhängige non-profit Organisation, die einen persistenten "
 "Identifier - die ORCID iD - zur Verfügung stellt, welche Sie von anderen "
-"Wissenschaftlern unterscheidbar macht (z.B. bei Namensgleichheit) und es "
-"ermöglicht, Ihren wissenschaftlichen Output und Ihre Aktivitäten eindeutig "
-"und dauerhaft (auch bei Namensänderungen oder unterschiedlichen "
-"Schreibweisen Ihres Namens) mit  Ihrer ORCID iD zu verknüpfen. ORCID ist "
+"Wissenschaftler/innen unterscheidbar macht (z.B. bei Namensgleichheit) und "
+"es ermöglicht, Ihren wissenschaftlichen Output und Ihre Aktivitäten "
+"eindeutig und dauerhaft (auch bei Namensänderungen oder unterschiedlichen "
+"Schreibweisen Ihres Namens) mit Ihrer ORCID iD zu verknüpfen. ORCID ist "
 "eingebunden in viele Systeme von Verlagen, Förderern, Einrichtungen und "
-"anderen Services für Wissenschaftler. Erfahren Sie mehr unter <a href=\""
-"https://orcid.org\">orcid.org</a>."
+"anderen Services für Wissenschaftler/innen. Erfahren Sie mehr unter <a href="
+"\"https://orcid.org\">orcid.org</a>."
 
 msgid "plugins.generic.orcidProfile.about.howAndWhy.title"
 msgstr "Wie und warum werden ORCID iDs gesammelt?"
 
-#, fuzzy
 msgid "plugins.generic.orcidProfile.about.howAndWhyPublicAPI"
 msgstr ""
 "Diese Zeitschrift sammelt Ihre ORCID iD, damit Sie korrekt identifiziert und "
@@ -179,7 +175,6 @@ msgstr ""
 msgid "plugins.generic.orcidProfile.about.display.title"
 msgstr "Wo werden ORCID iDs angezeigt?"
 
-#, fuzzy
 msgid "plugins.generic.orcidProfile.about.display"
 msgstr ""
 "Um zu bestätigen, dass Sie Ihre ORCID iD verwendet haben und dass sie "
@@ -201,7 +196,6 @@ msgstr ""
 "der Artikel angenommen wird, das heißt, wenn er zum Copy-Editing gesendet "
 "wird"
 
-#, fuzzy
 msgid "plugins.generic.orcidProfile.about.howAndWhyMemberAPI"
 msgstr ""
 "Diese Zeitschrift sammelt Ihre ORCID iD, damit Sie korrekt identifiziert und "
@@ -225,10 +219,8 @@ msgstr ""
 "https://info.orcid.org/six-ways-to-make-your-orcid-id-work-for-you/\">Six "
 "ways to make your ORCID iD work for you!</a>\n"
 
-#, fuzzy
 msgid "plugins.generic.orcidProfile.manager.settings.orcidClientId.error"
 msgstr "Ungültige Client-ID"
 
-#, fuzzy
 msgid "plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error"
 msgstr "Ungültiges Client Secret"
