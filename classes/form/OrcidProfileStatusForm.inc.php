@@ -78,7 +78,6 @@ class OrcidProfileStatusForm extends Form {
 		$clientId = $this->plugin->getSetting($contextId, 'orcidClientId');
 		$clientSecret = $this->plugin->getSetting($contextId, 'orcidClientSecret');
 
-
 		$templateMgr = TemplateManager::getManager($request);
 		$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
 		$templateMgr->assign(array(
@@ -86,7 +85,8 @@ class OrcidProfileStatusForm extends Form {
 			'orcidAboutUrl' => $aboutUrl,
 			'pluginEnabled' => $this->plugin->getEnabled($contextId),
 			'clientIdValid' => $this->validator->validateClientId($clientId),
-			'clientSecretValid' => $this->validator->validateClientSecret($clientSecret)
+			'clientSecretValid' => $this->validator->validateClientSecret($clientSecret),
+
 
 		));
 		return parent::fetch($request, $template, $display);
