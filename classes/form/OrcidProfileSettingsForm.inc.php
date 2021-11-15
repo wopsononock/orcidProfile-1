@@ -26,7 +26,10 @@ class OrcidProfileSettingsForm extends Form {
 		'orcidClientSecret' => 'string',
 		'sendMailToAuthorsOnPublication' => 'bool',
 		'logLevel' => 'string',
-		'isSandBox' => 'bool'
+		'isSandBox' => 'bool',
+		'country' => 'string',
+		'city' => 'string'
+
 	);
 	/** @var $contextId int */
 	var $contextId;
@@ -47,21 +50,18 @@ class OrcidProfileSettingsForm extends Form {
 		$orcidValidator = new OrcidValidator($plugin);
 		$this->validator = $orcidValidator;
 		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
-
-		if (!$this->plugin->isGloballyConfigured()) {
-			$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required',
-				'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
-		}
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
-		$this->addCheck(new FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientId.error', function ($clientId) {
-			return $this->validator->validateClientId($clientId);
 
-		}));
-		$this->addCheck(new FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error', function ($clientSecret) {
-			return $this->validator->validateClientSecret($clientSecret);
-
-		}));
+		if (!$this->plugin->isGloballyConfigured()) {
+			$this->addCheck(new FormValidator($this, 'orcidProfileAPIPath', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
+			$this->addCheck(new FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientId.error', function ($clientId) {
+				return $this->validator->validateClientId($clientId);
+			}));
+			$this->addCheck(new FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error', function ($clientSecret) {
+				return $this->validator->validateClientSecret($clientSecret);
+			}));
+		}
 
 	}
 

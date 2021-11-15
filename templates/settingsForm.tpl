@@ -46,16 +46,22 @@
 				{/if}
 			{/fbvFormSection}
 		{/fbvFormArea}
+        {if $applicationName == 'ojs2'}
+        {fbvFormSection for="coutries" title="plugins.generic.orcidProfile.manager.settings.review"}
+			<p class="pkp_help">{translate key="plugins.generic.orcidProfile.manager.settings.review.help"}</p>
+        {fbvElement id="country"  label="plugins.generic.orcidProfile.manager.settings.country" name="country" type="select" from=$countries translate=false selected=$country}
+        {/fbvFormSection}
+        {fbvElement type="text" id="city" value=$city  label="plugins.generic.orcidProfile.manager.settings.city" maxlength="40" size=$fbvStyles.size.MEDIUM }
+        {/if}
+
 		{fbvFormSection for="sendMailToAuthorsOnPublication" title="plugins.generic.orcidProfile.manager.settings.mailSectionTitle" list="true"}
 			{fbvElement type="checkbox" name="sendMailToAuthorsOnPublication" label="plugins.generic.orcidProfile.manager.settings.sendMailToAuthorsOnPublication" id="sendMailToAuthorsOnPublication" checked=$sendMailToAuthorsOnPublication}
 		{/fbvFormSection}
 		{fbvFormSection for="logLevel" title="plugins.generic.orcidProfile.manager.settings.logSectionTitle"}
 			<p class="pkp_help">{translate key="plugins.generic.orcidProfile.manager.settings.logLevel.help"}</p>
 			{fbvElement id="logLevel" name="logLevel" type="select" from=$logLevelOptions selected=$logLevel}
-		{/fbvFormSection}
-		{if !$globallyConfigured}
-			{fbvFormButtons}
-		{/if}
+        {/fbvFormSection}
+        {fbvFormButtons}
 		<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 	</div>
 </form>

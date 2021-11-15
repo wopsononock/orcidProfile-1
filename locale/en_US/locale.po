@@ -80,6 +80,18 @@ msgstr "Errors"
 msgid "plugins.generic.orcidProfile.manager.settings.logLevel.all"
 msgstr "All"
 
+msgid "plugins.generic.orcidProfile.manager.settings.city"
+msgstr "City"
+
+msgid "plugins.generic.orcidProfile.manager.settings.country"
+msgstr "Country"
+
+msgid "plugins.generic.orcidProfile.manager.settings.review"
+msgstr "Review Location settings"
+
+msgid "plugins.generic.orcidProfile.manager.settings.review.help"
+msgstr "Select City, Country for enabling sending reviewer information to ORCID"
+
 msgid "plugins.generic.orcidProfile.author.accessDenied"
 msgstr "ORCID access was denied at"
 
