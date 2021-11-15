@@ -27,8 +27,8 @@ install:
 - npm i g -npm && npm install && npm run build
 - rm -rf ~/${APPLICATION}/plugins/generic/orcidProfile
 - ln -s ${TRAVIS_BUILD_DIR} ~/${APPLICATION}/plugins/generic/orcidProfile
-- $(npm bin)/cypress run --spec "cypress/tests/data/10-Installation.spec.js,cypress/tests/data/20-CreateContext.spec.js"
 script:
+- $(npm bin)/cypress run --spec "cypress/tests/data/10-Installation.spec.js,cypress/tests/data/20-CreateContext.spec.js"
 - "$(npm bin)/cypress run  --env orcid_url=$ORCID_URL orcid_apiPath=$ORCID_APIPATH,orcid_apiType=$ORCID_APITYPE,orcid_clientId=$ORCID_CLIENTID,orcid_clientSecret=$ORCID_SECRET,orcid_email=$ORCID_EMAIL,orcid_emailPassword=$ORCID_EMAILPASSWORD
   --config integrationFolder=plugins/generic/orcidProfile/cypress/tests/"
 after_failure:
