@@ -2,6 +2,7 @@ language: php
 dist: bionic
 os: linux
 addons:
+  postgresql: "9.5"
   apt:
     update: true
 sudo: required
