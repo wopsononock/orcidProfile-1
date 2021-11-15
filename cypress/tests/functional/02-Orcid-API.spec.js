@@ -20,6 +20,5 @@ describe("Authorization Redirect: " + Cypress.env('orcid_url'), function () {
 			})
 	});
 
-
 });
 
