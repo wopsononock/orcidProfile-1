@@ -92,6 +92,7 @@ class OrcidProfileSettingsForm extends Form {
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign('globallyConfigured', $this->plugin->isGloballyConfigured());
 		$templateMgr->assign('pluginName', $this->plugin->getName());
+		$templateMgr->assign('applicationName', Application::get()->getName());
 		return parent::fetch($request, $template, $display);
 	}
 
