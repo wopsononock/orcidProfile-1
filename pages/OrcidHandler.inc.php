@@ -23,7 +23,7 @@ class OrcidHandler extends Handler {
 	 * @copydoc PKPHandler::authorize()
 	 */
 	function authorize($request, &$args, $roleAssignments) {
-		// Authorize all requets
+		// Authorize all requests
 		import('lib.pkp.classes.security.authorization.PKPSiteAccessPolicy');
 		$this->addPolicy(new PKPSiteAccessPolicy(
 			$request,
@@ -180,12 +180,11 @@ class OrcidHandler extends Handler {
 		$templatePath = $plugin->getTemplateResource(self::TEMPLATE);
 
 
-		$publicationId = $request->getUserVar('publicationId');
+		$publicationId = $request->getUserVar('state');
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$authors = $authorDao->getByPublicationId($publicationId);
 
 		$publication = Services::get('publication')->get($publicationId);
-
 		$authorToVerify = null;
 		// Find the author entry, for which the ORCID verification was requested
 		if ($request->getUserVar('token')) {
@@ -210,6 +209,7 @@ class OrcidHandler extends Handler {
 		if ($authorToVerify == null) {
 			// no Author exists in the database with the supplied orcidEmailToken
 			$plugin->logError('OrcidHandler::orcidverify - No author found with supplied token');
+			$plugin->logError( $request->getUserVar('token'));
 			$templateMgr->assign('verifySuccess', false);
 			$templateMgr->display($templatePath);
 			return;

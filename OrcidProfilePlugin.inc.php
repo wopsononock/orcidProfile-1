@@ -504,7 +504,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$publicationService = Services::get('publication');
 			$publication = $publicationService->get($author->getData('publicationId'));
 
-			$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'publicationId' => $publication->getId()));
+			$oauthUrl = $this->buildOAuthUrl('orcidVerify', array('token' => $emailToken, 'state' => $publication->getData('id')));
 			$aboutUrl = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'orcidapi', 'about', null);
 
 			// Set From to primary journal contact
