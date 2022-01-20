@@ -343,11 +343,7 @@ class OrcidProfilePlugin extends GenericPlugin
         $contextId = ($context == null) ? 0 : $context->getId();
 
         $apiPath = $this->getSetting($contextId, 'orcidProfileAPIPath');
-        if ($apiPath == ORCID_API_URL_PUBLIC || $apiPath == ORCID_API_URL_MEMBER) {
-            return ORCID_URL;
-        } else {
-            return ORCID_URL_SANDBOX;
-        }
+        return in_array($apiPath, [ORCID_API_URL_PUBLIC, ORCID_API_URL_MEMBER]) ? ORCID_URL : ORCID_URL_SANDBOX;
     }
 
     /**
@@ -1010,11 +1006,7 @@ class OrcidProfilePlugin extends GenericPlugin
                     $requestsSuccess[$orcid] = false;
             }
         }
-        if (array_product($requestsSuccess)) {
-            return true;
-        } else {
-            return $requestsSuccess;
-        }
+        return array_product($requestsSuccess) ? true : $requestsSuccess;
     }
 
     /**
@@ -1343,9 +1335,8 @@ class OrcidProfilePlugin extends GenericPlugin
     {
         if ($this->getSetting($this->currentContextId, 'logLevel') === 'ERROR') {
             return;
-        } else {
-            self::writeLog($message, 'INFO');
         }
+        self::writeLog($message, 'INFO');
     }
 
     /**
@@ -1376,10 +1367,6 @@ class OrcidProfilePlugin extends GenericPlugin
     public function isMemberApiEnabled($contextId)
     {
         $apiUrl = $this->getSetting($contextId, 'orcidProfileAPIPath');
-        if ($apiUrl === ORCID_API_URL_MEMBER || $apiUrl === ORCID_API_URL_MEMBER_SANDBOX) {
-            return true;
-        } else {
-            return false;
-        }
+        return in_array($apiUrl, [ORCID_API_URL_MEMBER, ORCID_API_URL_MEMBER_SANDBOX]);
     }
 }

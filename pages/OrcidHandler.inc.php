@@ -14,10 +14,14 @@
  * @brief Pass off internal ORCID API requests to ORCID
  */
 
+use APP\core\Application;
 use APP\facades\Repo;
 use APP\handler\Handler;
-
+use APP\template\TemplateManager;
+use PKP\core\Core;
+use PKP\plugins\PluginRegistry;
 use PKP\security\authorization\PKPSiteAccessPolicy;
+use PKP\security\authorization\UserRequiredPolicy;
 use PKP\session\SessionManager;
 use PKP\submission\PKPSubmission;
 
@@ -172,7 +176,7 @@ class OrcidHandler extends Handler
     {
         $templateMgr = TemplateManager::getManager($request);
         $context = $request->getContext();
-        $contextId = ($context == null) ? \PKP\core\PKPApplication::CONTEXT_ID_NONE : $context->getId();
+        $contextId = $context == null ? \PKP\core\PKPApplication::CONTEXT_ID_NONE : $context->getId();
 
         $plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
         $templatePath = $plugin->getTemplateResource(self::TEMPLATE);
@@ -266,13 +270,14 @@ class OrcidHandler extends Handler
         $response = json_decode($response->getBody(), true);
 
         $plugin->logInfo('Response body: ' . print_r($response, true));
-        if (isset($response['error']) && $response['error'] === 'invalid_grant') {
+        if (($response['error'] ?? null) === 'invalid_grant') {
             $plugin->logError('Authorization code invalid, maybe already used');
             $templateMgr->assign('authFailure', true);
             $templateMgr->display($templatePath);
             return;
-        } elseif (isset($response['error'])) {
-            $plugin->logError("Invalid ORCID response: ${result}");
+        }
+        if (isset($response['error'])) {
+            $plugin->logError("Invalid ORCID response: " . $response['error']);
             $templateMgr->assign('authFailure', true);
             $templateMgr->display($templatePath);
         }
@@ -285,8 +290,7 @@ class OrcidHandler extends Handler
             return;
         }
         $authorToVerify->setOrcid($orcidUri);
-        if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
-            $plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_PUBLIC_SANDBOX) {
+        if (in_array($plugin->getSetting($contextId, 'orcidProfileAPIPath'), [ORCID_API_URL_MEMBER_SANDBOX, ORCID_API_URL_PUBLIC_SANDBOX])) {
             // Set a flag to mark that the stored orcid id and access token came form the sandbox api
             $authorToVerify->setData('orcidSandbox', true);
             $templateMgr->assign('orcid', ORCID_URL_SANDBOX . $response['orcid']);
@@ -343,7 +347,7 @@ class OrcidHandler extends Handler
     public function about($args, $request)
     {
         $context = $request->getContext();
-        $contextId = ($context == null) ? \PKP\core\PKPApplication::CONTEXT_ID_NONE : $context->getId();
+        $contextId = $context == null ? \PKP\core\PKPApplication::CONTEXT_ID_NONE : $context->getId();
         $templateMgr = TemplateManager::getManager($request);
         $plugin = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
         $templateMgr->assign('orcidIcon', $plugin->getIcon());
