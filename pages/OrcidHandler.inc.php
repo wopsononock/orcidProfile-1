@@ -76,7 +76,7 @@ class OrcidHandler extends Handler {
 			error_log('ORCID token URL error: ' . $response->getStatusCode() . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 			$orcidUri = $orcid = $accessToken = null;
 		} else {
-			$response = json_decode($response->getBody(),true);
+			$response = json_decode($response->getBody(), true);
 			$orcid = $response['orcid'];
 			$accessToken = $response['access_token'];
 			$orcidUri = ($plugin->getSetting($contextId, "isSandBox") == true ? ORCID_URL_SANDBOX : ORCID_URL) . $orcid;
@@ -98,7 +98,7 @@ class OrcidHandler extends Handler {
 				if ($response->getStatusCode() != 200) {
 					error_log('ORCID profile URL error: ' . $response->getStatusCode() . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 					$profileJson = null;
-				} else $profileJson = json_decode($response->getBody(),true);
+				} else $profileJson = json_decode($response->getBody(), true);
 
 				// API request: get employments (for affiliation field)
 				$httpClient->request(
@@ -114,7 +114,7 @@ class OrcidHandler extends Handler {
 				if ($response->getStatusCode() != 200) {
 					error_log('ORCID employments URL error: ' . $response->getStatusCode() . ' (' . __FILE__ . ' line ' . __LINE__ . ', URL ' . $url . ')');
 					$employmentJson = null;
-				} else $employmentJson = json_decode($response->getBody(),true);
+				} else $employmentJson = json_decode($response->getBody(), true);
 
 				// Suppress errors for nonexistent array indexes
 				echo '
@@ -124,7 +124,7 @@ class OrcidHandler extends Handler {
 					opener.document.getElementById("email").value = ' . json_encode(@$profileJson['emails']['email'][0]['email']) . ';
 					opener.document.getElementById("country").value = ' . json_encode(@$profileJson['addresses']['address'][0]['country']['value']) . ';
 					opener.document.getElementById("affiliation").value = ' . json_encode(@$employmentJson['employment-summary'][0]['organization']['name']) . ';
-					opener.document.getElementById("orcid").value = ' . json_encode($orcidUri). ';
+					opener.document.getElementById("orcid").value = ' . json_encode($orcidUri) . ';
 					opener.document.getElementById("connect-orcid-button").style.display = "none";
 					window.close();
 					</script></body></html>
@@ -145,8 +145,24 @@ class OrcidHandler extends Handler {
 					</script></body></html>
 				';
 				break;
-			default: assert(false);
+			default:
+				assert(false);
 		}
+	}
+
+	function _setOrcidData($userOrAuthor, $orcidUri, $orcidResponse) {
+		// Save the access token
+		$orcidAccessExpiresOn = Carbon\Carbon::now();
+		// expires_in field from the response contains the lifetime in seconds of the token
+		// See https://members.orcid.org/api/get-oauthtoken
+		$orcidAccessExpiresOn->addSeconds($orcidResponse['expires_in']);
+		$userOrAuthor->setOrcid($orcidUri);
+		// remove the access denied marker, because now the access was granted
+		$userOrAuthor->setData('orcidAccessDenied', null);
+		$userOrAuthor->setData('orcidAccessToken', $orcidResponse['access_token']);
+		$userOrAuthor->setData('orcidAccessScope', $orcidResponse['scope']);
+		$userOrAuthor->setData('orcidRefreshToken', $orcidResponse['refresh_token']);
+		$userOrAuthor->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 	}
 
 	/**
@@ -163,9 +179,12 @@ class OrcidHandler extends Handler {
 		$templatePath = $plugin->getTemplateResource(self::TEMPLATE);
 
 
-		$publicationId = $request->getUserVar('publicationId');
+		$publicationId = $request->getUserVar('state');
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$authors = $authorDao->getByPublicationId($publicationId);
+		$isSandBox = $plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
+			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_PUBLIC_SANDBOX;
+
 
 		$publication = Services::get('publication')->get($publicationId);
 
@@ -216,7 +235,7 @@ class OrcidHandler extends Handler {
 		}
 
 		// fetch the access token
-		$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath').OAUTH_TOKEN_URL;
+		$url = $plugin->getSetting($contextId, 'orcidProfileAPIPath') . OAUTH_TOKEN_URL;
 
 		$httpClient = Application::get()->getHttpClient();
 		$header = ['Accept' => 'application/json'];
@@ -245,21 +264,21 @@ class OrcidHandler extends Handler {
 			$templateMgr->display($templatePath);
 			return;
 		}
-		$response = json_decode($response->getBody(),true);
+		$response = json_decode($response->getBody(), true);
 
-		$plugin->logInfo('Response body: ' . print_r($response,true));
+		$plugin->logInfo('Response body: ' . print_r($response, true));
 		if (isset($response['error']) && $response['error'] === 'invalid_grant') {
 			$plugin->logError("Authorization code invalid, maybe already used");
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($templatePath);
 			return;
 		} elseif (isset($response['error'])) {
-			$plugin->logError("Invalid ORCID response: $result");
+			$plugin->logError("Invalid ORCID response: " . $response['error']);
 			$templateMgr->assign('authFailure', true);
 			$templateMgr->display($templatePath);
 		}
 		// Set the orcid id using the full https uri
-		$orcidUri = ($plugin->getSetting($contextId, "isSandBox") == true ? ORCID_URL_SANDBOX : ORCID_URL) . $response['orcid'];
+		$orcidUri = ($isSandBox ? ORCID_URL_SANDBOX : ORCID_URL) . $response['orcid'];
 		if (!empty($authorToVerify->getOrcid()) && $orcidUri != $authorToVerify->getOrcid()) {
 			// another ORCID id is stored for the author
 			$templateMgr->assign('duplicateOrcid', true);
@@ -267,8 +286,7 @@ class OrcidHandler extends Handler {
 			return;
 		}
 		$authorToVerify->setOrcid($orcidUri);
-		if ($plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_MEMBER_SANDBOX ||
-			$plugin->getSetting($contextId, 'orcidProfileAPIPath') == ORCID_API_URL_PUBLIC_SANDBOX) {
+		if ($isSandBox) {
 			// Set a flag to mark that the stored orcid id and access token came form the sandbox api
 			$authorToVerify->setData('orcidSandbox', true);
 			$templateMgr->assign('orcid', ORCID_URL_SANDBOX . $response['orcid']);
@@ -280,7 +298,7 @@ class OrcidHandler extends Handler {
 		$authorToVerify->setData('orcidEmailToken', null);
 		$this->_setOrcidData($authorToVerify, $orcidUri, $response);
 		$authorDao->updateObject($authorToVerify);
-		if($plugin->isMemberApiEnabled($contextId) ) {
+		if ($plugin->isMemberApiEnabled($contextId)) {
 			if ($publication->getData('status') == STATUS_PUBLISHED) {
 				$templateMgr->assign('sendSubmission', true);
 				$sendResult = $plugin->sendSubmissionToOrcid($publication, $request);
@@ -298,21 +316,6 @@ class OrcidHandler extends Handler {
 		));
 
 		$templateMgr->display($templatePath);
-	}
-
-	function _setOrcidData($userOrAuthor, $orcidUri, $orcidResponse) {
-		// Save the access token
-		$orcidAccessExpiresOn = Carbon\Carbon::now();
-		// expires_in field from the response contains the lifetime in seconds of the token
-		// See https://members.orcid.org/api/get-oauthtoken
-		$orcidAccessExpiresOn->addSeconds($orcidResponse['expires_in']);
-		$userOrAuthor->setOrcid($orcidUri);
-		// remove the access denied marker, because now the access was granted
-		$userOrAuthor->setData('orcidAccessDenied', null);
-		$userOrAuthor->setData('orcidAccessToken', $orcidResponse['access_token']);
-		$userOrAuthor->setData('orcidAccessScope', $orcidResponse['scope']);
-		$userOrAuthor->setData('orcidRefreshToken', $orcidResponse['refresh_token']);
-		$userOrAuthor->setData('orcidAccessExpiresOn', $orcidAccessExpiresOn->toDateTimeString());
 	}
 
 	/**
