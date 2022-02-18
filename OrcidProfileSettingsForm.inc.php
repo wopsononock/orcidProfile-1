@@ -16,109 +16,115 @@
 
 use PKP\form\Form;
 
-class OrcidProfileSettingsForm extends Form {
+class OrcidProfileSettingsForm extends Form
+{
+    public const CONFIG_VARS = [
+        'orcidProfileAPIPath' => 'string',
+        'orcidClientId' => 'string',
+        'orcidClientSecret' => 'string',
+        'sendMailToAuthorsOnPublication' => 'bool',
+        'logLevel' => 'string',
+        'isSandBox' => 'bool'
+    ];
+    /** @var int $contextId */
+    public $contextId;
 
-	const CONFIG_VARS = array(
-		'orcidProfileAPIPath' => 'string',
-		'orcidClientId' => 'string',
-		'orcidClientSecret' => 'string',
-		'sendMailToAuthorsOnPublication' => 'bool',
-		'logLevel' => 'string',
-		'isSandBox' => 'bool'
-	);
-	/** @var $contextId int */
-	var $contextId;
+    /** @var object $plugin */
+    public $plugin;
 
-	/** @var $plugin object */
-	var $plugin;
+    /**
+     * Constructor
+     *
+     * @param object $plugin
+     * @param int $contextId
+     */
+    public function __construct(&$plugin, $contextId)
+    {
+        $this->contextId = $contextId;
+        $this->plugin = & $plugin;
 
-	/**
-	 * Constructor
-	 * @param $plugin object
-	 * @param $contextId int
-	 */
-	function __construct(&$plugin, $contextId) {
-		$this->contextId = $contextId;
-		$this->plugin =& $plugin;
+        parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
-		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
+        if (!$this->plugin->isGloballyConfigured()) {
+            $this->addCheck(new \PKP\form\validation\FormValidator(
+                $this,
+                'orcidProfileAPIPath',
+                'required',
+                'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'
+            ));
+        }
+        $this->addCheck(new \PKP\form\validation\FormValidatorPost($this));
+        $this->addCheck(new \PKP\form\validation\FormValidatorCSRF($this));
+        $this->addCheck(new \PKP\form\validation\FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientId.error', function ($clientId) {
+            if (preg_match('/^APP-[\da-zA-Z]{16}|(\d{4}-){3,}\d{3}[\dX]/', $clientId) == 1) {
+                $this->plugin->setEnabled(true);
+                return true;
+            }
+            $this->plugin->setEnabled(false);
+        }));
+        $this->addCheck(new \PKP\form\validation\FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error', function ($clientSecret) {
+            if (preg_match('/^(\d|-|[a-f]){36,64}/', $clientSecret) == 1) {
+                $this->plugin->setEnabled(true);
+                return true;
+            }
+            $this->plugin->setEnabled(false);
+        }));
+    }
 
-		if (!$this->plugin->isGloballyConfigured()) {
-			$this->addCheck(new \PKP\form\validation\FormValidator($this, 'orcidProfileAPIPath', 'required',
-				'plugins.generic.orcidProfile.manager.settings.orcidAPIPathRequired'));
-		}
-		$this->addCheck(new \PKP\form\validation\FormValidatorPost($this));
-		$this->addCheck(new \PKP\form\validation\FormValidatorCSRF($this));
-		$this->addCheck(new \PKP\form\validation\FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientId.error', function ($clientId) {
-			if (preg_match('/^APP-[\da-zA-Z]{16}|(\d{4}-){3,}\d{3}[\dX]/', $clientId) == 1) {
-				$this->plugin->setEnabled(true);
-				return true;
-			} else {
-				$this->plugin->setEnabled(false);
-			}
+    /**
+     * Initialize form data.
+     */
+    public function initData()
+    {
+        $contextId = $this->contextId;
+        $plugin = & $this->plugin;
+        $this->_data = [];
+        foreach (self::CONFIG_VARS as $configVar => $type) {
+            $this->_data[$configVar] = $plugin->getSetting($contextId, $configVar);
+        }
+    }
 
-		}));
-		$this->addCheck(new \PKP\form\validation\FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.orcidProfile.manager.settings.orcidClientSecret.error', function ($clientSecret) {
-			if (preg_match('/^(\d|-|[a-f]){36,64}/', $clientSecret) == 1) {
-				$this->plugin->setEnabled(true);
-				return true;
-			} else {
-				$this->plugin->setEnabled(false);
-			}
+    /**
+     * Assign form data to user-submitted data.
+     */
+    public function readInputData()
+    {
+        $this->readUserVars(array_keys(self::CONFIG_VARS));
+    }
 
-		}));
+    /**
+     * Fetch the form.
+     *
+     * @copydoc Form::fetch()
+     *
+     * @param null|mixed $template
+     */
+    public function fetch($request, $template = null, $display = false)
+    {
+        $templateMgr = TemplateManager::getManager($request);
+        $templateMgr->assign('globallyConfigured', $this->plugin->isGloballyConfigured());
+        $templateMgr->assign('pluginName', $this->plugin->getName());
+        return parent::fetch($request, $template, $display);
+    }
 
+    /**
+     * @copydoc Form::execute()
+     */
+    public function execute(...$functionArgs)
+    {
+        $plugin = & $this->plugin;
+        $contextId = $this->contextId;
+        foreach (self::CONFIG_VARS as $configVar => $type) {
+            if ($configVar === 'orcidProfileAPIPath') {
+                $plugin->updateSetting($contextId, $configVar, trim($this->getData($configVar), "\"\';"), $type);
+            } else {
+                $plugin->updateSetting($contextId, $configVar, $this->getData($configVar), $type);
+            }
+        }
+        if (strpos($this->getData('orcidProfileAPIPath'), 'sandbox.orcid.org') == true) {
+            $plugin->updateSetting($contextId, 'isSandBox', true, 'bool');
+        }
 
-	}
-
-	/**
-	 * Initialize form data.
-	 */
-	function initData() {
-		$contextId = $this->contextId;
-		$plugin =& $this->plugin;
-		$this->_data = array();
-		foreach (self::CONFIG_VARS as $configVar => $type) {
-			$this->_data[$configVar] = $plugin->getSetting($contextId, $configVar);
-		}
-	}
-
-	/**
-	 * Assign form data to user-submitted data.
-	 */
-	function readInputData() {
-		$this->readUserVars(array_keys(self::CONFIG_VARS));
-	}
-
-	/**
-	 * Fetch the form.
-	 * @copydoc Form::fetch()
-	 */
-	function fetch($request, $template = null, $display = false) {
-		$templateMgr = TemplateManager::getManager($request);
-		$templateMgr->assign('globallyConfigured', $this->plugin->isGloballyConfigured());
-		$templateMgr->assign('pluginName', $this->plugin->getName());
-		return parent::fetch($request, $template, $display);
-	}
-
-	/**
-	 * @copydoc Form::execute()
-	 */
-	function execute(...$functionArgs) {
-		$plugin =& $this->plugin;
-		$contextId = $this->contextId;
-		foreach (self::CONFIG_VARS as $configVar => $type) {
-			if ($configVar === 'orcidProfileAPIPath') {
-				$plugin->updateSetting($contextId, $configVar, trim($this->getData($configVar), "\"\';"), $type);
-			} else {
-				$plugin->updateSetting($contextId, $configVar, $this->getData($configVar), $type);
-			}
-		}
-		if (strpos($this->getData("orcidProfileAPIPath"), "sandbox.orcid.org") == true) {
-			$plugin->updateSetting($contextId, "isSandBox", true, "bool");
-		}
-
-		parent::execute(...$functionArgs);
-	}
+        parent::execute(...$functionArgs);
+    }
 }
-

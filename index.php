@@ -3,7 +3,7 @@
 /**
  * @defgroup plugins_generic_orcidProfile
  */
- 
+
 /**
  * @file index.php
  *
@@ -20,4 +20,3 @@
 require_once('OrcidProfilePlugin.inc.php');
 
 return new OrcidProfilePlugin();
-
