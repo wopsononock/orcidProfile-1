@@ -31,9 +31,9 @@ define('ORCID_EMAIL_URL', 'email');
 define('ORCID_WORK_URL', 'work');
 
 use APP\core\Application;
+use APP\decision\Decision;
 use APP\facades\Repo;
 use APP\template\TemplateManager;
-use APP\workflow\EditorDecisionActionsManager;
 use PKP\config\Config;
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;
@@ -834,7 +834,7 @@ class OrcidProfilePlugin extends GenericPlugin
         /** @var Submission $submission */
         $decision = $args[1];
 
-        if ($decision['decision'] == EditorDecisionActionsManager::SUBMISSION_EDITOR_DECISION_ACCEPT) {
+        if ($decision['decision'] == Decision::ACCEPT) {
             $publication = $submission->getCurrentPublication();
 
             if (isset($publication)) {
