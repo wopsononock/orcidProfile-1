@@ -44,6 +44,8 @@ class OrcidProfilePlugin extends GenericPlugin {
 	private $submissionIdToBePublished;
 	private $currentContextId;
 
+        var $settingsRequired = ["orcidClientSecret","orcidClientId"];
+
 	/**
 	 * @copydoc Plugin::register()
 	 * @param $category
@@ -54,7 +56,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 	function register($category, $path, $mainContextId = null) {
 		$success = parent::register($category, $path, $mainContextId);
 
-		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
+		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE') || $this->isPluginConfigured()) return true;
 
 		$this->currentContextId = ($mainContextId === null) ? $this->getCurrentContextId() : $mainContextId;
 
@@ -732,8 +734,7 @@ class OrcidProfilePlugin extends GenericPlugin {
 		$validator = new OrcidValidator($this);
 
 		if ($this->isSitePlugin()) {
-			$contextId = 0;
-		}
+			$contextId = 0;		}
 		if ($request->getUserVar('save') == 1) {
 			$clientId = $request->getUserVar('orcidClientId');
 			$clientSecret = $request->getUserVar('orcidClientSecret');
@@ -742,13 +743,23 @@ class OrcidProfilePlugin extends GenericPlugin {
 			$clientSecret = $this->getSetting($contextId, 'orcidClientSecret');
 
 		}
-
-		if (!$validator->validateClientSecret($clientSecret) or !$validator->validateClientId($clientId)) {
-			$enabled = false;
-
-		}
 		$this->updateSetting($contextId, 'enabled', $enabled, 'bool');
 	}
+        
+        /**
+        * @copydoc Plugin::isPluginConfigured()
+        * Determine whether or not this plugin is currently configured.
+        * @return boolean
+        */
+        
+        function isPluginConfigured() {
+                foreach($this->settingsRequired as $setting){
+                    if ($this->getSetting($this->_contextId, $setting)==null){
+                        return false;
+                    }
+                }
+                    return true;
+            }
 
 	function manage($args, $request) {
 		$context = $request->getContext();
